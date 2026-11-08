@@ -16,8 +16,8 @@ Deterministic support for a prescription the doctor dictates: a versioned list o
 | --------------- | ----------------------------------------------------------------------------------- |
 | `lexicon.ts`    | `MEDICATION_LEXICON`, its version, and `lexiconFor(profileId)`                      |
 | `vocabulary.ts` | Dose, frequency and duration words, bilingual. Also read by `suggestions/safety.ts` |
-| `similarity.ts` | Phonetic and orthographic distance, and the bars that admit a candidate             |
-| `match.ts`      | `matchMedication`, span-preserving                                                  |
+| `similarity.ts` | Phonetic and orthographic distance (over `lib/text/levenshtein`), and the bars      |
+| `match.ts`      | `matchMedication`, span-preserving through `lib/text/source-map`                    |
 | `sig.ts`        | `parseSig`                                                                          |
 
 ---

@@ -1,4 +1,5 @@
 export { evaluateRedFlags, mergeRedFlags } from './evaluate.js'
+export { firedRuleIds } from './ids.js'
 export { proposeMishearCorrections } from './mishears.js'
 export {
   ALL_REDFLAG_TRIGGERS,

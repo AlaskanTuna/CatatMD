@@ -9,6 +9,7 @@ Provides backend infrastructure for authentication, ownership checks, persistenc
 - Root helpers: auth, authorization, HTTP errors, the Prisma client and privacy-safe logging.
 - llm/: the LLM port, provider adapter and embedding client.
 - asr/: hosted speech adapters and controlled recognition vocabulary.
+- text/: pure text helpers shared by several modules: token-level Levenshtein distance and source-mapped text building.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -22,12 +23,14 @@ Provides backend infrastructure for authentication, ownership checks, persistenc
 - [asr/ilmu.ts](asr/ilmu.ts): transcribeWithIlmu, getAsrDescriptor and IlmuRelayError.
 - [asr/soniox.ts](asr/soniox.ts): mintSonioxSession, getLiveAsrDescriptor, liveSessionConfig, sonioxHosts and SonioxMintError.
 - [asr/elevenlabs.ts](asr/elevenlabs.ts): mintBatchToken, getBatchAsrDescriptor, batchRefinementConfig and ElevenLabsMintError.
+- [text/levenshtein.ts](text/levenshtein.ts): levenshtein. [text/source-map.ts](text/source-map.ts): buildSourceMappedText and appendSourceRange.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
 ## Used By
 
 - Routes and middleware use auth, ownership checks, errors, logging and Prisma.
+- Medications, redflags and evals/wer.ts use the text/ helpers.
 - Analysis, copilot, draft-turns, retrieval, suggestions, transcript-cleanup, audio, audit and scripts use shared infrastructure.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

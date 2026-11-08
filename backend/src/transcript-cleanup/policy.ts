@@ -1,5 +1,5 @@
 import { applyMishearProposal, type MishearProposal, type Transcript } from '@shared/types'
-import { ALL_REDFLAG_TRIGGERS, evaluateRedFlags } from '../redflags/index.js'
+import { firedRuleIds } from '../redflags/index.js'
 
 /**
  * What a model edit has to survive before a doctor is ever shown it (#309).
@@ -69,13 +69,6 @@ function occurrences(haystack: string, needle: string): number[] {
 const overlaps = (aStart: number, aEnd: number, bStart: number, bEnd: number): boolean =>
   aStart < bEnd && bStart < aEnd
 
-/** The rule ids a transcript raises, evaluated over every trigger there is. */
-function firedIds(transcript: Transcript): Set<string> {
-  return new Set(
-    evaluateRedFlags(transcript, ALL_REDFLAG_TRIGGERS).map((flag) => flag.ruleId ?? flag.id),
-  )
-}
-
 /**
  * Whether accepting this proposal would take a red flag away.
  *
@@ -111,7 +104,7 @@ function wouldSuppress(
   before: Set<string>,
 ): boolean {
   if (before.size === 0) return false
-  const after = firedIds(applyMishearProposal(transcript, proposal))
+  const after = firedRuleIds(applyMishearProposal(transcript, proposal))
   for (const id of before) if (!after.has(id)) return true
   return false
 }
@@ -153,7 +146,7 @@ export function applyEditPolicy(
   edits: readonly CleanupEdit[],
   transcript: Transcript,
 ): PolicyResult {
-  const before = firedIds(transcript)
+  const before = firedRuleIds(transcript)
 
   const proposals: MishearProposal[] = []
   let dropped = 0
