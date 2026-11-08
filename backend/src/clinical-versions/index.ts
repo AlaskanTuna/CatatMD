@@ -3,8 +3,8 @@ import {
   CLINICAL_PROFILES,
   type ClinicalProfile,
   DEFAULT_PROFILE_ID,
-  type ProfileId,
 } from '../clinical-profiles/index.js'
+import type { ClinicalArtefactVersion, ProfileId } from '../clinical-types.js'
 import { GAP_CHECKLIST_VERSION } from '../gaps/index.js'
 import { GUIDELINE_CORPUS_VERSION } from '../guidelines/index.js'
 // The file, not the barrel. `medications/index.js` reaches the matcher and
@@ -13,9 +13,8 @@ import { GUIDELINE_CORPUS_VERSION } from '../guidelines/index.js'
 import { MEDICATION_LEXICON_VERSION } from '../medications/lexicon.js'
 import { MEDICAL_RECORD_TEMPLATE_VERSION } from '../note-templates/index.js'
 import { RED_FLAG_LIST_VERSION } from '../redflags/index.js'
-import type { ClinicalArtefactVersion } from './types.js'
 
-export type { ClinicalArtefactVersion } from './types.js'
+export type { ClinicalArtefactVersion } from '../clinical-types.js'
 
 /**
  * The clinical content active for this build (docs/TRD.md §15). Every

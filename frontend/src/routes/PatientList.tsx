@@ -1,10 +1,10 @@
-import type { PatientListItem } from '@shared/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil, Plus, Search, X } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { ApiError, api } from '../lib/api.js'
+import { formatGender, formatLastSeen } from '../lib/patient-format.js'
 import { count } from '../lib/plural.js'
 import { Button } from '../ui/Button.js'
 import { Card, Skeleton } from '../ui/Card.js'
@@ -23,20 +23,6 @@ const VISIT_FILTERS = [
   { value: 'with-visits', label: 'Has Visits' },
   { value: 'without-visits', label: 'No Visits' },
 ]
-
-const formatLastSeen = (patient: PatientListItem) => {
-  if (patient.lastSeenAt === null) return 'Not seen yet'
-  return new Intl.DateTimeFormat('en-MY', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(patient.lastSeenAt))
-}
-
-const formatGender = (gender: PatientListItem['gender']) => {
-  if (gender === null) return 'Not recorded'
-  return gender.charAt(0).toUpperCase() + gender.slice(1)
-}
 
 export function PatientList() {
   const queryClient = useQueryClient()
@@ -258,7 +244,9 @@ export function PatientList() {
                           {formatGender(patient.gender)}
                         </td>
                         <td className="px-4 py-3.5 text-ink-muted">{patient.consultationCount}</td>
-                        <td className="px-4 py-3.5 text-ink-muted">{formatLastSeen(patient)}</td>
+                        <td className="px-4 py-3.5 text-ink-muted">
+                          {formatLastSeen(patient, 'list')}
+                        </td>
                       </tr>
                     )
                   })}

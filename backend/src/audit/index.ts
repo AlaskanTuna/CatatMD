@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import {
+  type AuditEvent,
   type DispositionState,
   type LiveAsrMode,
   type NoteTemplate,
@@ -607,7 +608,9 @@ export async function verifyAuditChainFromDatabase(
  * caller's responsibility — every route reaching this has already been through
  * `assertOwnedConsultation`.
  */
-export async function getAuditHistory(consultationId: string) {
+export async function getAuditHistory(
+  consultationId: string,
+): Promise<(AuditEvent & { actorId: string | null })[]> {
   return prisma.auditEvent.findMany({
     where: { consultationId },
     orderBy: { createdAt: 'asc' },

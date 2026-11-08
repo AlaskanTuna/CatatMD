@@ -1,5 +1,14 @@
 import { z } from 'zod'
 
+/** The audit fields the consultation history client reads. */
+export const AuditEventSchema = z.object({
+  id: z.string(),
+  action: z.string(),
+  createdAt: z.coerce.date(),
+  metadata: z.unknown().nullable().optional(),
+})
+export type AuditEvent = z.infer<typeof AuditEventSchema>
+
 /**
  * What a doctor decided about a red flag or a gap.
  *

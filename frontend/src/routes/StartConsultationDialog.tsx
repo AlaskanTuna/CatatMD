@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ApiError, api } from '../lib/api.js'
 import { cn } from '../lib/cn.js'
+import { formatGender, formatLastSeen } from '../lib/patient-format.js'
 import { Skeleton } from '../ui/Card.js'
 import { Select } from '../ui/Select.js'
 
@@ -32,20 +33,10 @@ const LIST_HEIGHT = 'max-h-[15rem]'
  */
 const formatMeta = (patient: PatientListItem) => {
   const age = patient.age === null ? null : `Age ${patient.age}`
-  const gender =
-    patient.gender === null
-      ? null
-      : patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1)
+  const gender = patient.gender === null ? null : formatGender(patient.gender)
   const parts = [age, gender].filter((part): part is string => part !== null)
   return parts.length === 0 ? 'No details recorded' : parts.join(' · ')
 }
-
-const formatLastSeen = (patient: PatientListItem) =>
-  patient.lastSeenAt === null
-    ? 'Not seen yet'
-    : `Last seen ${new Intl.DateTimeFormat('en-MY', { day: 'numeric', month: 'short' }).format(
-        new Date(patient.lastSeenAt),
-      )}`
 
 /**
  * The question a consultation actually starts with: is this someone we know?
@@ -259,7 +250,7 @@ export function StartConsultationDialog({
                       </span>
                     </span>
                     <span className="shrink-0 text-xs text-ink-muted">
-                      {formatLastSeen(patient)}
+                      {formatLastSeen(patient, 'dialog')}
                     </span>
                   </button>
                 ))}

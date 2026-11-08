@@ -11,6 +11,7 @@ Shared API and browser helpers used across the frontend.
 - [api.ts](api.ts) defines the typed API client, error type, and request boundary.
 - [transcript.ts](transcript.ts) parses, serializes, and reshapes transcript turns.
 - [note-templates.ts](note-templates.ts) provides note sections and clipboard formatting.
+- [patient-format.ts](patient-format.ts) formats patient gender and last-seen labels for the patient list, detail and start dialog.
 - [theme.tsx](theme.tsx) owns the theme provider and preference hook.
 - [clock.ts](clock.ts), [plural.ts](plural.ts), [cn.ts](cn.ts), and [use-viewport-fit.ts](use-viewport-fit.ts) provide small shared helpers.
 

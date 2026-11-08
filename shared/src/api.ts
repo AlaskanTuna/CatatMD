@@ -9,6 +9,13 @@ import { MAX_PRESCRIPTIONS } from './transcript.js'
 
 // ─── API contracts (docs/TRD.md §13) ─────────────────────────────────────────
 
+export const HealthResponseSchema = z.object({
+  status: z.string(),
+  provider: z.string().optional(),
+  database: z.enum(['local', 'remote', 'unreachable']).optional(),
+})
+export type HealthResponse = z.infer<typeof HealthResponseSchema>
+
 /*
  * `title` is the one clinical field this projection carries, and the widening
  * is deliberate rather than incidental.

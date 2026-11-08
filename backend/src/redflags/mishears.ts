@@ -1,4 +1,9 @@
 import type { MishearProposal, Transcript } from '@shared/types'
+import {
+  appendSourceRange,
+  buildSourceMappedText,
+  type SourceMappedText,
+} from '../lib/text/source-map.js'
 
 /**
  * Measured Malay ASR confusables (docs/TRD.md §20.3, issue #193).
@@ -76,56 +81,47 @@ const TOKEN = /[\p{L}]+/gu
  * original text that expanded character `i` came from, so a matched span can be
  * cut from the original and quoted verbatim.
  */
-export type Expansion = { text: string; origin: number[] }
+export type Expansion = SourceMappedText
 
 export const expandMishears = (text: string): Expansion | null => {
-  let out = ''
-  const origin: number[] = []
-  let cursor = 0
   let changed = false
 
-  for (const match of text.matchAll(TOKEN)) {
-    const start = match.index
-    const word = match[0]
-    const replacement = CONFUSABLES.get(word.toLowerCase())
+  const expansion = buildSourceMappedText((append) => {
+    let cursor = 0
 
-    for (let i = cursor; i < start; i++) {
-      out += text[i]
-      origin.push(i)
+    for (const match of text.matchAll(TOKEN)) {
+      const start = match.index
+      const word = match[0]
+      const replacement = CONFUSABLES.get(word.toLowerCase())
+
+      appendSourceRange(append, text, cursor, start)
+
+      if (replacement === undefined) {
+        appendSourceRange(append, text, start, start + word.length)
+      } else {
+        changed = true
+        const cased =
+          word.charAt(0) === word.charAt(0).toUpperCase()
+            ? replacement.charAt(0).toUpperCase() + replacement.slice(1)
+            : replacement
+        /*
+         * Character `i` of the replacement points at character `i` of the word it
+         * replaced, clamped to that word's last character when the replacement is
+         * the longer of the two ("penkak" becomes "bengkak"). Clamping keeps the
+         * map monotonic, so a span cut from the first and last mapped indexes is
+         * the whole original token rather than a fragment of it.
+         */
+        for (const [i, character] of [...cased].entries()) {
+          append(character, start + Math.min(i, word.length - 1))
+        }
+      }
+      cursor = start + word.length
     }
 
-    if (replacement === undefined) {
-      for (let i = 0; i < word.length; i++) {
-        out += word[i]
-        origin.push(start + i)
-      }
-    } else {
-      changed = true
-      const cased =
-        word.charAt(0) === word.charAt(0).toUpperCase()
-          ? replacement.charAt(0).toUpperCase() + replacement.slice(1)
-          : replacement
-      /*
-       * Character `i` of the replacement points at character `i` of the word it
-       * replaced, clamped to that word's last character when the replacement is
-       * the longer of the two ("penkak" becomes "bengkak"). Clamping keeps the
-       * map monotonic, so a span cut from the first and last mapped indexes is
-       * the whole original token rather than a fragment of it.
-       */
-      for (const [i, character] of [...cased].entries()) {
-        out += character
-        origin.push(start + Math.min(i, word.length - 1))
-      }
-    }
-    cursor = start + word.length
-  }
+    appendSourceRange(append, text, cursor, text.length)
+  })
 
-  for (let i = cursor; i < text.length; i++) {
-    out += text[i]
-    origin.push(i)
-  }
-
-  return changed ? { text: out, origin } : null
+  return changed ? expansion : null
 }
 
 /**

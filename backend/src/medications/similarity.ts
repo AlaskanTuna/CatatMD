@@ -1,4 +1,5 @@
 import { doubleMetaphone } from 'double-metaphone'
+import { levenshtein } from '../lib/text/levenshtein.js'
 
 /**
  * How close two drug names are, measured two ways because neither way alone
@@ -17,32 +18,10 @@ import { doubleMetaphone } from 'double-metaphone'
  * Pure functions: no I/O, no clock, no randomness.
  */
 
-/** Levenshtein distance. Two rows rather than a full matrix. */
-const editDistance = (a: string, b: string): number => {
-  if (a === b) return 0
-  if (a.length === 0) return b.length
-  if (b.length === 0) return a.length
-
-  let previous = Array.from({ length: b.length + 1 }, (_, i) => i)
-
-  for (let i = 1; i <= a.length; i++) {
-    const current = [i]
-    for (let j = 1; j <= b.length; j++) {
-      current[j] =
-        a[i - 1] === b[j - 1]
-          ? (previous[j - 1] as number)
-          : 1 + Math.min(previous[j] as number, current[j - 1] as number, previous[j - 1] as number)
-    }
-    previous = current
-  }
-
-  return previous[b.length] as number
-}
-
 /** Edit distance normalised to 0..1, where 1 is identical. */
 export const orthographicSimilarity = (a: string, b: string): number => {
   const longest = Math.max(a.length, b.length)
-  return longest === 0 ? 1 : 1 - editDistance(a, b) / longest
+  return longest === 0 ? 1 : 1 - levenshtein(a.split(''), b.split('')) / longest
 }
 
 /**
