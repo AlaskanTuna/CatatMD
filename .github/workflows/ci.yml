@@ -72,9 +72,10 @@ jobs:
         run: |
           # The release tarball is checksum-verified. When release downloads
           # fail, the binary comes from the official image, pinned by digest.
+          # Bounded, because a stalled fetch otherwise hangs until the job times out.
           archive="$RUNNER_TEMP/gitleaks_8.30.1_linux_x64.tar.gz"
           mkdir -p "$RUNNER_TEMP/gitleaks"
-          if curl --fail --location --silent --show-error --retry 3 --retry-all-errors --output "$archive" \
+          if curl --fail --location --silent --show-error --connect-timeout 10 --max-time 60 --retry 3 --retry-all-errors --retry-max-time 180 --output "$archive" \
             https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz; then
             printf '%s  %s\n' '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb' "$archive" | sha256sum --check --status
             tar -xzf "$archive" -C "$RUNNER_TEMP/gitleaks" gitleaks
