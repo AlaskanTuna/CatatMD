@@ -603,7 +603,7 @@ The disclosure cites the **PDPA as amended in 2024**, under which voice is biome
 | **Failure Copy**   | One message for every upstream reason, so the provider's operational state never reaches a consulting-room screen                                                                                                                                                                                    |
 | **Provenance**     | `asr_hosted` is sticky for the consultation once any hosted recording contributed, and never downgrades on a later local pass                                                                                                                                                                        |
 
-**Follow-Up, Closed 16/08/26:** `docs/assets/tech-stack.drawio.png` and the doctor-journey diagram now draw the hosted adapter as `ilmu-asr-v4.2`, built, with the audio relayed through the API. The dashed outline remains because the provider sits outside the trust boundary.
+**Follow-Up, Closed 16/08/26:** the technical stack diagram (`docs/assets/diagrams/tech-stack-*.svg`) and the doctor-journey diagram draw the hosted adapter outside the trust boundary, with the audio relayed through the API.
 
 ### What Pins This, Added 06/09/26 (#254)
 
@@ -743,27 +743,12 @@ Two of the three survive intact. They are not arguments against ambient capture,
 
 Ambient capture is **segmented batch transcription at conversational cadence**, not a socket. The microphone stays open for the whole consultation, the audio is cut into short segments on natural pauses, and each segment makes one ordinary HTTP round trip.
 
-```
-mic (open for the session)
-  |
-  v
-RMS silence detector          cut at a pause; floor 8 s, ceiling 20 s; silent segments dropped
-  |
-  v
-segment blob (webm/opus)      POST /api/asr/live-segments   (one request, one response)
-  |
-  v
-relay to qwen3-asr-flash      text and detected language return in that same response
-  |
-  v
-running transcript            browser memory only, until the doctor finishes
-  |
-  |--- every segment -------> red-flag rules       deterministic, in-process, no model
-  |--- every 12 s or more --> de-identify, extract facts, derive gaps
-  |
-  v
-Finish                        speaker labelling, then the existing full analysis, unchanged
-```
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/ambient-segments-dark.svg" />
+    <img src="../assets/diagrams/ambient-segments-light.svg" alt="Ambient capture as segmented batch transcription. The browser keeps the microphone open for the session, and a silence detector cuts the audio on a pause into 8 to 20 second segments. Each webm/opus segment is one POST to /live-segments, which relays the audio to qwen3-asr-flash and returns text and the detected language in the same response. The running transcript stays in browser memory and each segment triggers the live checks: rules every segment, facts and gaps every 12 seconds or more. When the doctor stops, Finish labels speakers and runs the full analysis." width="100%" />
+  </picture>
+</p>
 
 **Floor Revised 05/09/26.** This diagram first specified a 4 second floor. Measured on real speech, a 4 second floor costs 23.5 points of Malay word error against the whole file, where an 8 second floor costs 1.5. A batch model called once per chunk starts cold each time and loses the surrounding speech it uses to disambiguate, so the penalty is measured in multiples rather than percentages. See 20.8.
 

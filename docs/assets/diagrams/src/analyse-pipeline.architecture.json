@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "The Analyse Pipeline",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "Clinical logic"
+        },
+        "database": {
+          "label": "Data and record"
+        },
+        "cloud": {
+          "label": "Third party"
+        },
+        "security": {
+          "label": "Trust gate"
+        },
+        "external": {
+          "label": "Request"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "corpus",
+      "type": "database",
+      "label": "Guideline Corpus",
+      "sublabel": "cited by ID only",
+      "pos": [580, 50],
+      "size": [200, 64]
+    },
+    {
+      "id": "request",
+      "type": "external",
+      "label": "POST /analyze",
+      "sublabel": "session, then ownership",
+      "pos": [40, 200],
+      "size": [200, 64]
+    },
+    {
+      "id": "deid",
+      "type": "security",
+      "label": "deid/",
+      "sublabel": "request-scoped token vault",
+      "pos": [310, 200],
+      "size": [200, 64]
+    },
+    {
+      "id": "ops",
+      "type": "backend",
+      "label": "LLM Operations",
+      "sublabel": "four concurrent calls",
+      "pos": [580, 200],
+      "size": [200, 64]
+    },
+    {
+      "id": "llm",
+      "type": "security",
+      "label": "lib/llm/",
+      "sublabel": "re-scans, fails closed",
+      "pos": [850, 200],
+      "size": [200, 64]
+    },
+    {
+      "id": "qwen",
+      "type": "cloud",
+      "label": "Qwen",
+      "sublabel": "in-region endpoint",
+      "pos": [1120, 200],
+      "size": [200, 64]
+    },
+    {
+      "id": "rules",
+      "type": "backend",
+      "label": "Red-Flag Rules",
+      "sublabel": "raw transcript, no egress",
+      "pos": [40, 380],
+      "size": [200, 64]
+    },
+    {
+      "id": "union",
+      "type": "backend",
+      "label": "Union Assembly",
+      "sublabel": "adds, never filters",
+      "pos": [310, 380],
+      "size": [200, 64]
+    },
+    {
+      "id": "gaps",
+      "type": "backend",
+      "label": "Gap Derivation",
+      "sublabel": "deterministic checklist",
+      "pos": [580, 380],
+      "size": [200, 64]
+    },
+    {
+      "id": "evidence",
+      "type": "security",
+      "label": "Evidence Check",
+      "sublabel": "no span, NOT_ASSESSED",
+      "pos": [850, 380],
+      "size": [200, 64]
+    },
+    {
+      "id": "persist",
+      "type": "database",
+      "label": "Re-hydrate And Persist",
+      "sublabel": "awaiting_review",
+      "pos": [310, 550],
+      "size": [200, 64]
+    },
+    {
+      "id": "audit",
+      "type": "database",
+      "label": "Audit Event",
+      "sublabel": "labels and ids, never content",
+      "pos": [580, 550],
+      "size": [200, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Express API, Inside The Trust Boundary",
+      "wraps": [
+        "corpus",
+        "request",
+        "deid",
+        "ops",
+        "llm",
+        "rules",
+        "union",
+        "gaps",
+        "evidence",
+        "persist",
+        "audit"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "req-deid",
+      "from": "request",
+      "to": "deid",
+      "label": "raw"
+    },
+    {
+      "id": "req-rules",
+      "from": "request",
+      "to": "rules",
+      "label": "raw",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "deid-ops",
+      "from": "deid",
+      "to": "ops",
+      "label": "tokens"
+    },
+    {
+      "id": "corpus-ops",
+      "from": "corpus",
+      "to": "ops",
+      "label": "IDs",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "ops-llm",
+      "from": "ops",
+      "to": "llm"
+    },
+    {
+      "id": "llm-qwen",
+      "from": "llm",
+      "to": "qwen",
+      "label": "tokens only",
+      "variant": "security"
+    },
+    {
+      "id": "qwen-evidence",
+      "from": "qwen",
+      "to": "evidence",
+      "label": "JSON",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "evidence-gaps",
+      "from": "evidence",
+      "to": "gaps"
+    },
+    {
+      "id": "gaps-union",
+      "from": "gaps",
+      "to": "union"
+    },
+    {
+      "id": "rules-union",
+      "from": "rules",
+      "to": "union",
+      "label": "hits",
+      "variant": "emphasis"
+    },
+    {
+      "id": "union-persist",
+      "from": "union",
+      "to": "persist",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "persist-audit",
+      "from": "persist",
+      "to": "audit"
+    }
+  ]
+}

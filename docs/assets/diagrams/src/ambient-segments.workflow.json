@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Ambient Capture As Segmented Batch Transcription",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "frontend": {
+          "label": "Browser"
+        },
+        "backend": {
+          "label": "API"
+        },
+        "database": {
+          "label": "Held in memory"
+        },
+        "cloud": {
+          "label": "Speech provider"
+        },
+        "security": {
+          "label": "Trust gate"
+        },
+        "external": {
+          "label": "Input"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "browser",
+      "label": "Browser"
+    },
+    {
+      "id": "api",
+      "label": "API"
+    },
+    {
+      "id": "provider",
+      "label": "Speech Provider",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": ["mic", "detector", "relay", "transcript", "finish"],
+  "nodes": [
+    {
+      "id": "mic",
+      "lane": "browser",
+      "col": 0,
+      "type": "external",
+      "label": "Microphone",
+      "sublabel": "open for the session",
+      "width": 150
+    },
+    {
+      "id": "detector",
+      "lane": "browser",
+      "col": 1,
+      "type": "frontend",
+      "label": "Silence Detector",
+      "sublabel": "cut on a pause, 8 to 20 s",
+      "width": 150
+    },
+    {
+      "id": "relay",
+      "lane": "api",
+      "col": 2,
+      "type": "security",
+      "label": "POST /live-segments",
+      "sublabel": "one request per segment",
+      "width": 150
+    },
+    {
+      "id": "asr",
+      "lane": "provider",
+      "col": 2,
+      "type": "cloud",
+      "label": "qwen3-asr-flash",
+      "sublabel": "text back in the same response",
+      "width": 170
+    },
+    {
+      "id": "transcript",
+      "lane": "browser",
+      "col": 3,
+      "type": "database",
+      "label": "Running Transcript",
+      "sublabel": "browser memory only",
+      "width": 150
+    },
+    {
+      "id": "checks",
+      "lane": "api",
+      "col": 4,
+      "type": "backend",
+      "label": "Live Checks",
+      "sublabel": "rules each segment, facts each 12 s",
+      "width": 170
+    },
+    {
+      "id": "finish",
+      "lane": "browser",
+      "col": 5,
+      "type": "frontend",
+      "label": "Finish",
+      "sublabel": "label speakers, full analysis",
+      "width": 160
+    }
+  ],
+  "edges": [
+    {
+      "id": "mic-detector",
+      "from": "mic",
+      "to": "detector"
+    },
+    {
+      "id": "detector-relay",
+      "from": "detector",
+      "to": "relay",
+      "label": "webm/opus"
+    },
+    {
+      "id": "relay-asr",
+      "from": "relay",
+      "to": "asr",
+      "label": "audio",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "transcript-checks",
+      "from": "transcript",
+      "to": "checks",
+      "label": "each segment"
+    },
+    {
+      "id": "transcript-finish",
+      "from": "transcript",
+      "to": "finish",
+      "label": "doctor stops",
+      "variant": "emphasis"
+    },
+    {
+      "id": "relay-transcript",
+      "from": "relay",
+      "to": "transcript",
+      "label": "text",
+      "variant": "default",
+      "fromSide": "right",
+      "toSide": "bottom"
+    }
+  ]
+}
