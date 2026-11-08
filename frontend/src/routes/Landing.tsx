@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
  * The only brand-register surface in the product, and the first thing an
  * evaluator sees.
  *
- * The research (`docs/superpowers/research/09-medical-web-design.md`) is
+ * The research (`docs/research/09-medical-web-design.md`) is
  * specific about what belongs here: Malaysian clinical audiences expect
  * explicit credentials, Western clinician products express them with
  * restraint, and CatatMD's audience is Malaysian doctors. So the hero states

@@ -223,7 +223,7 @@ export async function runAnalysis(
       }
     }),
     // The reviewed checklist, surfaced rather than discarded. Without these
-    // the UI cannot render a `NOT_ASSESSED` it was never sent, and docs/prd.md
+    // the UI cannot render a `NOT_ASSESSED` it was never sent, and docs/PRD.md
     // §10's "unestablished, never absent" requirement has nothing to display
     // (Demo Script step 5).
     clinicalFacts: rehydrateAssertions(noteResult.clinicalFacts, rehydrate),
@@ -234,7 +234,7 @@ export async function runAnalysis(
     })),
     // Carried rather than dropped. An empty `suggestions` array cannot tell the
     // reader whether the corpus had nothing to say or was never consulted, which
-    // is the conflation this flag exists to prevent (docs/trd.md §19 row 7).
+    // is the conflation this flag exists to prevent (docs/TRD.md §19 row 7).
     outOfScope: suggestionResult.outOfScope,
     ...(retrieved.length === 0 ? {} : { retrievedGuidelines: retrieved }),
     ...(scores.length === 0 ? {} : { scores }),

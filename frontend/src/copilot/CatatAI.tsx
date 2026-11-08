@@ -123,7 +123,7 @@ export function CatatAI({
   /*
    * Propose as Edit (#185). Four prompt and tool-description revisions could
    * not make the model reach for the tool reliably without breaking something
-   * else (docs/trd.md §25), so when an answer comes back as prose the doctor
+   * else (docs/TRD.md §25), so when an answer comes back as prose the doctor
    * can ask for it as a card. Offered only under the latest answer, only when
    * that answer ran no tool, and never on a signed note, where nothing may
    * change. The card it produces is still only a proposal.

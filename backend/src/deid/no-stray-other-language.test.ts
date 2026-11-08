@@ -9,7 +9,7 @@ import { deidentifyTranscript, serialiseTranscript } from './index.js'
 
 /**
  * The other-language half of a translated turn never reaches a model (#392,
- * docs/trd.md §20.12).
+ * docs/TRD.md §20.12).
  *
  * It is Bengali or Urdu script, and no detector in this directory reads
  * either: a name written in it would pass the gate untouched, and
@@ -97,7 +97,7 @@ describe('the other language never reaches model-bound text', () => {
 
 /*
  * Mandarin and Tamil (#385). Their script is outside the gate's `SCRIPT`
- * detector on purpose (docs/trd.md §20.12), so on a translated session this
+ * detector on purpose (docs/TRD.md §20.12), so on a translated session this
  * guarantee is the whole of the protection for the other half.
  */
 const HAN_OR_TAMIL = /[\p{Script=Han}\p{Script=Tamil}]/u

@@ -191,7 +191,7 @@ export async function updateConsultation(
      * transcript now usually arrives by this route rather than with the row.
      * Losing the fact on the path that became the common one would have made
      * the audit trail quietly stop answering which consultations used a hosted
-     * relay (docs/trd.md §15).
+     * relay (docs/TRD.md §15).
      */
     if (patch.transcript.source === 'asr_hosted') {
       await recordAuditEvent({

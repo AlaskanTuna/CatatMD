@@ -23,7 +23,7 @@ import { ALL_REDFLAG_TRIGGERS } from '../redflags/index.js'
  *    prose is not. That one distinction is what keeps `analysis/prompt.ts`,
  *    which discusses the "diagnosis" field at length, from tripping this.
  * 2. **Guideline scoring-system names.** These carry the thresholds the two
- *    Malaysian sources disagree on (docs/trd.md §11), so a hard-coded one is
+ *    Malaysian sources disagree on (docs/TRD.md §11), so a hard-coded one is
  *    a manufactured consensus with nothing citing it.
  *
  * The id set is read from the data at runtime rather than listed here. A

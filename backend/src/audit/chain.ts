@@ -14,7 +14,7 @@ export const AUDIT_CHAIN_GENESIS = 'genesis'
  * `metadata` is deliberately absent. It is the one column that could ever carry
  * something richer than a label, so keeping it out of the hash input means the
  * chain can never become a second copy of anything sensitive. The cost is that
- * a `metadata` rewrite is not detectable; docs/trd.md §15 states that plainly.
+ * a `metadata` rewrite is not detectable; docs/TRD.md §15 states that plainly.
  */
 export interface AuditChainInput {
   prevHash: string

@@ -11,7 +11,7 @@ import {
 import { asrContextTerms } from './vocabulary.js'
 
 /**
- * The batch refinement adapter (#436, docs/trd.md §20.14), mirroring
+ * The batch refinement adapter (#436, docs/TRD.md §20.14), mirroring
  * `soniox.test.ts`: the CSP pin, the config literals that cross the egress,
  * and a mint that never reads an error body.
  *

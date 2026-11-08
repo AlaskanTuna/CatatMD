@@ -22,13 +22,13 @@ Credentials and cookies stay in memory; authentication happens before the record
 
 ## Operator Dependencies
 
-| Component | Requirement |
-| --- | --- |
-| Runtime | Node 24 or Bun; Bash and Python 3 |
-| Browser | External Playwright installation with Chromium; set `DEMO_PLAYWRIGHT` to its module entry path |
-| Media | `ffmpeg` with libx264, libvpx and subtitle support; `ffprobe` |
-| Narration | Local Python environment containing `kokoro-onnx` and `soundfile`; licensed model and voice files |
-| Optional PDF Deck | `pdfinfo`, `pdftoppm`, and an operator-supplied PDF |
+| Component         | Requirement                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| Runtime           | Node 24 or Bun; Bash and Python 3                                                                 |
+| Browser           | External Playwright installation with Chromium; set `DEMO_PLAYWRIGHT` to its module entry path    |
+| Media             | `ffmpeg` with libx264, libvpx and subtitle support; `ffprobe`                                     |
+| Narration         | Local Python environment containing `kokoro-onnx` and `soundfile`; licensed model and voice files |
+| Optional PDF Deck | `pdfinfo`, `pdftoppm`, and an operator-supplied PDF                                               |
 
 Keep dependencies, models, credentials, and all generated outputs outside this repository. Do not add Playwright to the application dependencies. Installing browser/model dependencies is an operator setup step and can require network access.
 
@@ -81,13 +81,13 @@ bash scripts/demo/narrate.sh
 
 Default export: `$DEMO_DIR/CatatMD-Demo.mp4`. `DEMO_OUT` overrides it. Narration requires the successful-take marker before doing audio work.
 
-| Setting | Purpose |
-| --- | --- |
-| `DEMO_SCRIPT` | Fixed narration text, default `scripts/demo/narration.txt` |
-| `DEMO_SOURCE` | Source picture, default `$DEMO_DIR/capture.webm` |
-| `DEMO_VOICE` / `DEMO_LANGUAGE` | Kokoro voice/language, default `af_heart` / `en-us` |
-| `DEMO_SPEED` | Kokoro speaking rate |
-| `DEMO_FILM_SPEED` | Final picture and voice speed together, 0.5–2.0 |
+| Setting                            | Purpose                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------- |
+| `DEMO_SCRIPT`                      | Fixed narration text, default `scripts/demo/narration.txt`                |
+| `DEMO_SOURCE`                      | Source picture, default `$DEMO_DIR/capture.webm`                          |
+| `DEMO_VOICE` / `DEMO_LANGUAGE`     | Kokoro voice/language, default `af_heart` / `en-us`                       |
+| `DEMO_SPEED`                       | Kokoro speaking rate                                                      |
+| `DEMO_FILM_SPEED`                  | Final picture and voice speed together, 0.5–2.0                           |
 | `DEMO_MUSIC` / `DEMO_MUSIC_CREDIT` | Optional licensed bed and required attribution; creates a voice-only twin |
 
 Narration uses `beat | offset_ms | text` lines. `schedule.py` resolves measured beats, rejects unknown beats, and shifts overlapping audio. `subtitles.py` derives captions from the same `lines.json`. Tail padding can extend the final picture when speech runs long. Review alignment manually rather than trusting nominal timings.

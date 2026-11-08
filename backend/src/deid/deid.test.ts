@@ -22,7 +22,7 @@ import { RequestTokenVault } from './vault.js'
 
 const labelsIn = (text: string) => [...new Set(detect(text).map((m) => m.label))].sort()
 
-describe('detector inventory (docs/trd.md §9)', () => {
+describe('detector inventory (docs/TRD.md §9)', () => {
   it('detects a Malaysian NRIC', () => {
     expect(labelsIn('My IC number is 850523-14-5677.')).toContain('NRIC')
   })
@@ -337,7 +337,7 @@ describe('de-identification reaches a fixed point', () => {
   })
 })
 
-describe('the egress guard — fail closed (docs/trd.md §19 row 2)', () => {
+describe('the egress guard — fail closed (docs/TRD.md §19 row 2)', () => {
   it('blocks a payload that never passed through the gate', () => {
     // Simulates the §5 provenance gap: a value branded outside deid/.
     const smuggled = 'Patient Ahmad bin Ismail, IC 850523-14-5677' as never
@@ -1194,7 +1194,7 @@ describe('Pakistani and Bangladeshi names with no cue in front of them (#391)', 
 })
 
 /*
- * Script no other detector reads (#391, docs/trd.md §20.12). Bengali, Urdu in
+ * Script no other detector reads (#391, docs/TRD.md §20.12). Bengali, Urdu in
  * Arabic script, and Devanagari are tokenised as whole runs at the gate, so a
  * name written in one of them cannot reach the model whatever a client sends.
  * Synthetic text throughout.
@@ -1545,7 +1545,7 @@ describe('names in Chinese and Tamil script are found by their cues (#418)', () 
 })
 
 /*
- * Identifiers read aloud and written as number words (#435, docs/trd.md §9,
+ * Identifiers read aloud and written as number words (#435, docs/TRD.md §9,
  * "Spoken Digit Runs"). Batch `scribe_v2` never returned the synthetic IC as
  * digits in 32 results, so a gate reading only digit patterns would pass every
  * one of them to the model in cleartext. Synthetic numbers throughout.
@@ -1849,7 +1849,7 @@ describe('identifiers spoken as number words (#435)', () => {
     ['Pulse one twenty, one eighteen, one oh two.', 'Pulse [PHONE_1].'],
     // Found in the final clinical review: vital-sign logs mixing pairs and
     // single digits, which only the model pass reads, since the rules engine
-    // carries no numeric cutoff. An open owner decision (docs/trd.md §9).
+    // carries no numeric cutoff. An open owner decision (docs/TRD.md §9).
     ['Sats ninety-two, nine one, nine zero, eighty-nine, eighty-eight.', 'Sats [MRN_1].'],
     ['Temp three eight five, three eight nine, three nine one, thirty-eight.', 'Temp [MRN_1].'],
     ['BP one three five eh eight five, one three two eh eight two.', 'BP [PHONE_1].'],

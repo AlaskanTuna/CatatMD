@@ -98,7 +98,7 @@ function Toggle({
  *
  * **Mounted on the Record tab only.** The prescription-dictation choice it
  * used to hold, and the copy the review page mounted to reach it, were removed
- * on 06/10/26 (`docs/decisions.md` D-001): dictation streams and falls back to
+ * on 06/10/26 (`docs/DECISIONS.md` D-001): dictation streams and falls back to
  * this device on its own. This remains the single writer of the stored object.
  *
  * The engine choice is the half that belongs here: it names where the audio
@@ -180,7 +180,7 @@ export function AudioSettingsDialog({
             {/* It said "Ambient capture always uses Soniox" until refinement
                 after Stop gave the same recording a second processor (#436).
                 Naming that one here instead would be the quieter disclosure
-                `docs/decisions.md` D-004 forbids, so it names neither. */}
+                `docs/DECISIONS.md` D-004 forbids, so it names neither. */}
             <InfoTip label="About Transcription Engine" layered>
               Applies to Press To Record. Ambient capture follows this consultation&apos;s Capture
               Mode, not this choice. Choosing ILMU does not send anything on its own. Each patient
@@ -208,7 +208,7 @@ export function AudioSettingsDialog({
               claim made by a component that cannot see the socket, and this
               dialog has already shipped a claim that outlived what it
               described. **No surface names the region for ambient any more**
-              (`docs/decisions.md` D-004), so this card must not point at one:
+              (`docs/DECISIONS.md` D-004), so this card must not point at one:
               it says the audio leaves and stops there, which is true.
             */}
             {ambient && (

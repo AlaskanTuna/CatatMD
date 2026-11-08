@@ -62,7 +62,7 @@ describe('env fail-fast (issue #14)', () => {
       expect(output).toContain('local-dev-only')
     })
 
-    // docs/trd.md §19 row 9 — DeepSeek is PRC-hosted, raising the same
+    // docs/TRD.md §19 row 9 — DeepSeek is PRC-hosted, raising the same
     // cross-border question Gemini was guarded for.
     it('refuses deepseek in production', () => {
       const { ok, output } = boot({ NODE_ENV: 'production', LLM_PROVIDER: 'deepseek' })

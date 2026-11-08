@@ -4,7 +4,7 @@
 
 ## Register
 
-**Product.** Design serves the task. This is an authenticated clinical tool a doctor uses between patients, not a marketing surface. The one exception is the sign-in screen, which is the only page an evaluator meets before the product, and which carries a restrained credential row rather than a hero.
+**Product.** Design serves clinical work. Doctors use this authenticated tool between patients. The sign-in screen uses a restrained credential row rather than a hero.
 
 ## Platform
 
@@ -12,12 +12,12 @@
 
 ## Target Users
 
-|                    | Primary                                                                                                     | Secondary                                                |
-| ------------------ | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| **Who**            | Malaysian GPs in private practice and panel clinics                                                         | An external reviewer evaluating the prototype            |
-| **Context**        | Between patients, 10 to 20 consultations a session, screen shared with a real desk and a real queue outside | Reading the repo and clicking through a demo once        |
-| **Time budget**    | 30 to 60 seconds per note review                                                                            | 90 seconds to first real output                          |
-| **What they need** | To see what the AI got wrong, fast, and sign off on something they can defend                               | Evidence the safety claims are real rather than asserted |
+|                    | Primary                                                                                                     | Secondary                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Who**            | Malaysian GPs in private practice and panel clinics                                                         | A reviewer of the code                                |
+| **Context**        | Between patients, 10 to 20 consultations a session, screen shared with a real desk and a real queue outside | Reading the repo and using the guided demo tour once  |
+| **Time budget**    | 30 to 60 seconds per note review                                                                            | 90 seconds to first real output                       |
+| **What they need** | To see what the AI got wrong, fast, and sign off on something they can defend                               | Verify the safety controls against the implementation |
 
 The primary user is not impressed by software. They are interrupted, accountable, and medico-legally exposed. Every second of decoration is a second not spent on the patient outside.
 
@@ -29,33 +29,33 @@ Turn a GP consultation transcript into a reviewable structured clinical note, wi
 
 ## Positioning
 
-CatatMD's differentiators are all claims of discipline:
+CatatMD's design rests on four documented controls:
 
 - Identifiers never reach the model. A de-identification gate sits in front of every call.
 - Red flags are deterministic. The model may add candidates, never suppress a rule hit.
 - Citations are ID-constrained. A hallucinated reference fails schema validation.
 - Data stays in region. Frontend, API, and database are all Singapore.
 
-The interface has to look like it was built by people who think this way. **Restraint is the brand.** An interface that oversells undermines the only thing the product is selling.
+The interface should reflect these engineering choices. **Restraint is the brand.** Visual language should match the product's documented behavior.
 
 ## Brand Personality
 
 - **Composed, not clinical-cold.** Warm ground rather than hospital white. The doctor is at a desk, not in theatre.
 - **Quiet until it matters.** One accent, used scarcely. When something is wrong, that is the only loud thing on screen.
 - **Legible under pressure.** Generous type, high contrast, no density for its own sake.
-- **Shows its work.** Evidence spans, guideline IDs, and `NOT_ASSESSED` fields are surfaced rather than hidden. The product's credibility comes from being auditable.
+- **Shows its work.** Evidence spans, guideline IDs, and `NOT_ASSESSED` fields are visible rather than hidden. The interface makes clinical evidence and review status auditable.
 
 ## Anti-References
 
 What this must not resemble, and why:
 
-| Anti-reference                                                                  | Why it fails here                                                                                                                                                                        |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Consumer health apps (illustration, mascots, encouragement)                     | Reads as a wellness product. Stream 08 concluded a companion mascot is the single most expensive contradiction of a safety-first positioning, and is out of the evaluated build entirely |
-| Hospital marketing sites (badge walls, phone numbers, WhatsApp FABs, carousels) | Over-signals to patients making a purchase decision. Our user is the doctor, already inside                                                                                              |
-| Generic SaaS dashboards (hero metric, gradient accents, identical card grids)   | Says nothing true about the product and everything about the template                                                                                                                    |
-| Legacy clinical systems (grey chrome, dense grids, 11px labels)                 | Familiar to the user, and the reason they hate their current software                                                                                                                    |
-| AI-forward dark tooling (terminal aesthetics, neon, monospace everywhere)       | Signals a dev tool, not a medical record a doctor signs                                                                                                                                  |
+| Anti-reference                                                                  | Why it fails here                                                                                                                                    |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Consumer health apps (illustration, mascots, encouragement)                     | Reads as a wellness product. Stream 08 concluded that a companion mascot conflicts most with the safety-first design; it is out of the current build |
+| Hospital marketing sites (badge walls, phone numbers, WhatsApp FABs, carousels) | Over-signals to patients when the primary user is a doctor already using the clinical workflow                                                       |
+| Generic SaaS dashboards (hero metric, gradient accents, identical card grids)   | Says nothing true about the product and everything about the template                                                                                |
+| Legacy clinical systems (grey chrome, dense grids, 11px labels)                 | Familiar to the user, and the reason they hate their current software                                                                                |
+| AI-forward dark tooling (terminal aesthetics, neon, monospace everywhere)       | Signals a dev tool, not a medical record a doctor signs                                                                                              |
 
 ## Strategic Design Principles
 
@@ -80,4 +80,4 @@ WCAG 2.2 AA is a requirement, not an aspiration. The specific commitments that s
 
 ## Success Criteria
 
-The interface has succeeded when a GP can complete a note review in under 60 seconds without asking what anything means, and a reviewer can watch a red flag survive a suppression attempt without being told where to look.
+The interface succeeds when a GP can complete a note review in under 60 seconds without asking what anything means, and a reviewer of the code can confirm that a red flag survives a suppression attempt without extra direction.

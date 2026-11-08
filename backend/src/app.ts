@@ -65,7 +65,7 @@ export function createApp() {
   app.use(clientIp)
 
   // CSP is left at helmet's default: the SPA is served by Vercel, not by this
-  // API, so this process only ever emits JSON (docs/trd.md §16).
+  // API, so this process only ever emits JSON (docs/TRD.md §16).
   app.use(helmet())
   app.use(compression())
   app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))

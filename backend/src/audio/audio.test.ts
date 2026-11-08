@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  * The retention rules for the consultation recording (#293).
  *
  * Three properties are worth pinning here, because each of them is a promise
- * made in `docs/dpia.md` and in `.env.example` rather than an implementation
+ * made in `docs/DPIA.md` and in `.env.example` rather than an implementation
  * detail: nothing is stored without an adopted retention period, nothing is
  * served past its window, and the sweep actually deletes.
  */

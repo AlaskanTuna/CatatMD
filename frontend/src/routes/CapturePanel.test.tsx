@@ -317,7 +317,7 @@ function MockAudioCapture({
       >
         mock transcribe hosted raw
       </button>
-      {/* A hosted draft carrying a measured Malay mishear (docs/trd.md
+      {/* A hosted draft carrying a measured Malay mishear (docs/TRD.md
           §20.3), so the tap-to-correct chip can be driven end to end. */}
       <button
         type="button"

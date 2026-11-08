@@ -18,7 +18,7 @@ export interface EvidenceCheckResult {
   discardedFieldIds: string[]
 }
 
-/** Only these two states assert something happened or did not — docs/trd.md §21.4. */
+/** Only these two states assert something happened or did not — docs/TRD.md §21.4. */
 const EVIDENCE_REQUIRED_STATES = new Set(['PRESENT', 'DENIED'])
 
 const normalise = (text: string): string => text.toLowerCase().replace(/\s+/g, ' ').trim()
@@ -31,7 +31,7 @@ function hasVerbatimEvidence(assertion: ClinicalAssertion, transcriptText: strin
 }
 
 /**
- * The primary control (docs/trd.md §21.4). Scoped to `state`, not `value` —
+ * The primary control (docs/TRD.md §21.4). Scoped to `state`, not `value` —
  * a paraphrased `value` paired with a genuine `evidence` span survives; only
  * a `state` with no matching span is downgraded. Strict matching biases every
  * error toward the safe direction (§21.4's asymmetry table): a false

@@ -16,7 +16,7 @@ export { buildRedFlagsSystemPrompt, buildSuggestionsSystemPrompt } from './promp
 export { filterUnsafeModelSuggestions } from './safety.js'
 
 /**
- * Operation 2 (docs/trd.md §12). Runs after de-identification and never
+ * Operation 2 (docs/TRD.md §12). Runs after de-identification and never
  * merges with the deterministic rules engine here — that union is the route
  * handler's job (`redflags/` exports `mergeRedFlags`), so this function
  * returns model candidates only.

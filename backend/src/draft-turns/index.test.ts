@@ -108,7 +108,7 @@ describe('draftTurns', () => {
  */
 describe('draftTurns over a consultation-length transcript', () => {
   /** Long enough to cross several chunk boundaries, in the unpunctuated
-   * lowercase shape the hosted relay actually returns (docs/trd.md 20.3). */
+   * lowercase shape the hosted relay actually returns (docs/TRD.md 20.3). */
   const longStream = (() => {
     const unit =
       'doctor good morning what brings you in today patient i have had a cough for four days and my throat hurts when i swallow '

@@ -202,7 +202,7 @@ jobs:
   # Nothing applies migrations to production, deliberately: Render's
   # `preDeployCommand` is a paid-tier feature and Postgres is Supabase rather
   # than Render, so migrations are applied by hand against `DIRECT_URL`
-  # (docs/trd.md §17). That decision is sound and the gap was that **nothing
+  # (docs/TRD.md §17). That decision is sound and the gap was that **nothing
   # enforced the manual step**.
   #
   # PR #124 merged and deployed with `notificationsClearedAt` absent from
@@ -363,7 +363,7 @@ jobs:
             {
               echo "\`${name}\` merged in ${GITHUB_SHA} and is **not applied to production**."
               echo
-              echo "Production does not apply migrations on deploy, by design (\`docs/trd.md\` §17):"
+              echo "Production does not apply migrations on deploy, by design (\`docs/TRD.md\` §17):"
               echo "Render's \`preDeployCommand\` is a paid-tier feature and Postgres is Supabase, so"
               echo "there is no deploy hook to hang it on. This issue is the forcing function around"
               echo "that manual step, not the apply itself."
@@ -455,7 +455,7 @@ jobs:
       VERCEL_ORG_ID: team_CwktsdBSB9TLrdwdCV3dZRbg
       VERCEL_PROJECT_ID: prj_6QNJo1XWj70DACDO3F0ICVSJkQTF
       # The domain a reviewer actually visits, and the origin the API trusts for
-      # CORS and cookies (docs/trd.md §14). Asserting against the deployment's
+      # CORS and cookies (docs/TRD.md §14). Asserting against the deployment's
       # own URL would prove nothing: that URL always resolves to the deployment.
       PRODUCTION_DOMAIN: catatmd.vercel.app
 
@@ -760,7 +760,7 @@ jobs:
   #
   # Deterministic code (red flags, the prescription parser) runs for real in
   # the stub; anything that needs a model, a database or a recogniser key gets a
-  # placeholder or its normal "unavailable" fallback. docs/trd.md §17, Pull
+  # placeholder or its normal "unavailable" fallback. docs/TRD.md §17, Pull
   # Request Previews, has the detail and the manual Vercel setting this needs.
   #
   # Skipped for pull requests from forks, which get no secrets, and when
@@ -932,7 +932,7 @@ jobs:
           set -euo pipefail
 
           marker='<!-- vercel-preview -->'
-          body="$(printf '%s\n**Preview:** %s\n\nBuilt from %s against the in-browser stub backend: synthetic data, no production API, no model. Sign-in is automatic. See docs/trd.md §17, Pull Request Previews.' \
+          body="$(printf '%s\n**Preview:** %s\n\nBuilt from %s against the in-browser stub backend: synthetic data, no production API, no model. Sign-in is automatic. See docs/TRD.md §17, Pull Request Previews.' \
             "$marker" "$DEPLOYMENT_URL" "${HEAD_SHA:0:7}")"
           echo "Preview: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
 

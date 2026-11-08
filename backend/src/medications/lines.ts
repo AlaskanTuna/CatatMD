@@ -6,7 +6,7 @@ import { SIG_STOPWORDS, SPOKEN_NUMERALS } from './vocabulary.js'
 
 /**
  * Cuts one dictated prescription into lines, one per drug said
- * (`docs/decisions.md` D-001, amended 06/10/26).
+ * (`docs/DECISIONS.md` D-001, amended 06/10/26).
  *
  * **It reads clauses, then decides who each one belongs to.** A clause naming a
  * drug starts that drug's line. A clause with no drug name either continues the

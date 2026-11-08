@@ -8,7 +8,7 @@ import { aggregate, characterErrorRate, type ErrorRate, wordErrorRate } from './
 /**
  * A/B harness for hosted ASR (issue #151): posts a local audio file to ILMU's
  * `/audio/transcriptions` endpoint and reports what came back, so the token
- * table and segment-integrity verdict in `docs/trd.md` section 20.3 are
+ * table and segment-integrity verdict in `docs/TRD.md` section 20.3 are
  * measured rather than assumed.
  *
  * `--segment` extends it to the ambient question of section 20.9: what does
@@ -22,7 +22,7 @@ import { aggregate, characterErrorRate, type ErrorRate, wordErrorRate } from './
  *
  * Nothing this touches is committed: audio samples stay wherever they already
  * live on disk, and reports land in `evals/reports/` (gitignored). Never point
- * it at a recording of a real consultation; the provenance rules of trd.md
+ * it at a recording of a real consultation; the provenance rules of TRD.md
  * sections 20.1 and 20.2 (synthetic or scripted audio only) apply here.
  *
  * Usage, from the repo root (the key is read from `.env` or the environment):

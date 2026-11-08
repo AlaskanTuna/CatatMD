@@ -19,7 +19,7 @@ import { prisma } from './prisma.js'
  * `Lax` is therefore both correct and stricter. It is worth the change rather
  * than left alone, because `none` gave up the CSRF protection `SameSite`
  * exists to provide, which left origin trust resting entirely on the
- * single-origin CORS policy plus `trustedOrigins` (docs/trd.md §16).
+ * single-origin CORS policy plus `trustedOrigins` (docs/TRD.md §16).
  *
  * This is what makes the rewrite load-bearing rather than a deployment detail:
  * pointing the SPA back at the API's own origin would now break sign-in on
@@ -39,7 +39,7 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    // Open self-service sign-up is in scope (docs/trd.md §14). No email
+    // Open self-service sign-up is in scope (docs/TRD.md §14). No email
     // verification: there is no mail provider configured, and requiring it
     // would lock every new account out permanently.
     requireEmailVerification: false,
@@ -51,7 +51,7 @@ export const auth = betterAuth({
   },
 
   /**
-   * Closes docs/trd.md §19 row 4 — "confirm the default rate limiting actually
+   * Closes docs/TRD.md §19 row 4 — "confirm the default rate limiting actually
    * covers /api/auth/sign-up/email on the installed version".
    *
    * Verified against better-auth 1.6.27: `getDefaultSpecialRules()` matches

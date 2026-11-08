@@ -7,7 +7,7 @@
  * inspected; this only decides how much confidence the match carries.
  *
  * The place-of-birth table is copied from the MIT-licensed `mykad` package
- * rather than taken as a dependency (docs/trd.md §9).
+ * rather than taken as a dependency (docs/TRD.md §9).
  */
 
 /** Codes never issued. Everything else in 01–93 is a real state or country. */

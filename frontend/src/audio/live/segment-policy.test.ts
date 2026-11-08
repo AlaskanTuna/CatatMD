@@ -52,7 +52,7 @@ describe('shouldCut', () => {
 
   /*
    * The floor is the threshold worth tuning against measurement, and how much
-   * it costs to get wrong is provider-specific: docs/trd.md 20.7 measured a
+   * it costs to get wrong is provider-specific: docs/TRD.md 20.7 measured a
    * cliff below it on one recogniser, and 20.9 records that the result is not
    * known to transfer to another. Hence a supplied floor rather than a baked-in
    * one, which is the behaviour this pins.
@@ -96,7 +96,7 @@ describe('rmsFromTimeDomain', () => {
 })
 
 describe('DEFAULT_SEGMENT_BOUNDS', () => {
-  // The eight to twenty second window specified in docs/trd.md 20.7.
+  // The eight to twenty second window specified in docs/TRD.md 20.7.
   it('carries the measured window', () => {
     expect(DEFAULT_SEGMENT_BOUNDS.floorMs).toBe(8_000)
     expect(DEFAULT_SEGMENT_BOUNDS.ceilingMs).toBe(20_000)

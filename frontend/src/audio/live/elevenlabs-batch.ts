@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 /*
  * The SPA's only cross-origin fetch, and the third audio egress (#436,
- * docs/trd.md §20.14).
+ * docs/TRD.md §20.14).
  *
  * After Stop on an untranslated ambient consultation, the finished recording
  * is uploaded from the browser straight to the vendor's batch endpoint for a

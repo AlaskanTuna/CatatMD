@@ -179,7 +179,7 @@ export function ConsultationRows({
  *
  * The status breakdown exists so the weight of the selection is visible at the
  * moment of the decision. Approved notes are erasable, which is deliberate and
- * follows docs/dpia.md: erasure serves a data-subject right that does not lapse
+ * follows docs/DPIA.md: erasure serves a data-subject right that does not lapse
  * because a doctor signed the note. But a doctor about to erase one should not
  * discover that afterwards.
  *

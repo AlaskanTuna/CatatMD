@@ -9,7 +9,7 @@ import type { TranscriptSegment } from './protocol.js'
 /**
  * Draft speaker labels from Whisper segment boundaries and sentence content
  * (#118; revised after the segment-level rules measured 9 of 17 lines on the
- * reference recording, docs/trd.md §20.2).
+ * reference recording, docs/TRD.md §20.2).
  *
  * There is still no voice information here: Whisper cannot tell the voices
  * apart, so this reads its segmentation and what each sentence says. The
@@ -19,7 +19,7 @@ import type { TranscriptSegment } from './protocol.js'
  * suppress a red flag the engine would otherwise raise (issue #70), which is
  * why nothing here reaches the transcript until the doctor applies it.
  *
- * Two measured v1 failure modes drive this shape (docs/trd.md §20.2):
+ * Two measured v1 failure modes drive this shape (docs/TRD.md §20.2):
  * a speaker handoff inside one segment was invisible while labels were per
  * segment, so segments are now split at sentence boundaries and every
  * sentence is scored on its own; and blind alternation flipped labels on
@@ -114,7 +114,7 @@ function splitSentences(text: string): string[] {
  * (questions, instructions, examination); patient patterns are first-person
  * experience and addressing the doctor. The tables are English-only, so
  * heavy code-switching degrades v2 toward the context rules below; that
- * limit is recorded in docs/trd.md §20.2 rather than hidden.
+ * limit is recorded in docs/TRD.md §20.2 rather than hidden.
  */
 const DOCTOR_PATTERNS: readonly RegExp[] = [
   /\b(?:what brings you|how are you|how long (?:have|has)|how about|what about|any (?:fever|chills|pain|cough|phlegm|blood|rash|runny nose|sore throat|allerg|difficulty|shortness|vomiting|nausea|other)\w*|have you|do you|are you|did you|were you|when did|does it|is there any)\b/i,

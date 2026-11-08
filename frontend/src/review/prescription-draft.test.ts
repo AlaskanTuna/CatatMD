@@ -17,7 +17,7 @@ import {
 
 /**
  * The data half of dictated prescription capture (#313, #365,
- * `docs/decisions.md` D-001).
+ * `docs/DECISIONS.md` D-001).
  *
  * A drug name is only ever written by the doctor; the wire shape is exact,
  * because `lexiconId` and the sig fields disagree about what "absent" means; a
