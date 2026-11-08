@@ -1,0 +1,4 @@
+# Supply-chain cooldown: install no package version published less than three
+# days ago, so a compromised release has time to be caught and pulled.
+[install]
+minimumReleaseAge = 259200
