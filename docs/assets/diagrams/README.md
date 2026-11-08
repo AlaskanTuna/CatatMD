@@ -15,8 +15,8 @@ Every architecture and flow diagram in the docs is an SVG pair, one per GitHub t
 
 ## Sources And Styling
 
-- **Sources:** `src/*.json` are [Archify](https://github.com/tt-a1i/archify) candidates. Edit one, run `archify finalize <type> <file> <out.html> --quality showcase`, then export the light and dark SVGs from the viewer.
-- **Styling:** the exports are re-skinned with the tokens in [`docs/DESIGN.md`](../../DESIGN.md): ground and surface, ink, the accent for clinical logic, Advisory blue for the browser, Emergency red for trust gates and Urgent amber for third parties. Work Sans and Outfit are embedded, so the SVG renders the same everywhere.
+- **Sources:** `src/<name>.<type>.json` are [Archify](https://github.com/tt-a1i/archify) candidates. Edit one, then run `node scripts/diagrams/render.mjs <name>` to rebuild its light and dark SVGs. The script header lists what it needs outside the repository: Archify, `playwright-core` and a Chromium.
+- **Styling:** the script re-skins Archify's export with the tokens in [`docs/DESIGN.md`](../../DESIGN.md): ground and surface, ink, the accent for clinical logic, Advisory blue for the browser, Emergency red for trust gates and Urgent amber for third parties. Work Sans and Outfit are embedded, so the SVG renders the same everywhere.
 - **Embedding:** keep the `<picture>` pattern and a full alt text, centred.
 
 ```html
