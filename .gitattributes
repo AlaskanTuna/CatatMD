@@ -1,0 +1,10 @@
+# LF everywhere. Biome and Prettier check for LF, hook scripts run under Node
+# from a bash command line, and vendored skills stay byte-diffable against
+# upstream, so a CRLF checkout on Windows would break all three.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+graphify-out/** linguist-generated
+bun.lock linguist-generated
