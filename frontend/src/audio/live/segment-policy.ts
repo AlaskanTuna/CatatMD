@@ -1,7 +1,8 @@
 /*
  * When to cut an ambient stream into one recognisable window, and nothing else.
- * Pure and DOM-free on purpose: the thresholds below are the part worth testing,
- * and the browser wiring that feeds them lives in `use-segment-recorder.ts`.
+ * Pure and DOM-free on purpose: the thresholds below are the part worth testing.
+ * Streaming capture (`soniox-stream.ts`) replaced the segment recorder that fed
+ * them; the rationale stays because `live-tokens.ts` relies on it.
  */
 
 export type SegmentBounds = {

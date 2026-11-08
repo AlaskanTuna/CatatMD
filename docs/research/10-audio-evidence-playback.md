@@ -126,7 +126,6 @@ Constraints an agent must check before designing anything in this area. All curr
 - `frontend/src/audio/live/live-tokens.ts` carries real `startMs` and `endMs` per token on the ambient path, but the timing is discarded before persistence in `CapturePanel.tsx`.
 - `attribute()` in `runAnalysis` (`backend/src/consultations/analysis.ts`) already resolves a quoted span to a turn by unique substring match, and is the existing precedent for evidence linking.
 - `ChecklistPanel.tsx` already renders a linked row as a button and an unlinked row as an inert div. Reuse that idiom rather than inventing a second one.
-- `frontend/src/audio/live/use-segment-recorder.ts` implements per-utterance blob slicing with start and duration metadata. It is currently dead code, imported only by its own test.
 
 **Known Technical Limit.** Word-level timestamps in `transformers.js` are unreliable under chunking (open upstream issues). Segment-level timestamps are the dependable granularity, and they match a sentence-level interaction anyway.
 
