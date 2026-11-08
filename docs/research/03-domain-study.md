@@ -247,7 +247,7 @@ Design posture:
 - Since all consultation data in this repo is synthetic, the prototype does not process personal data at all. **Say that explicitly** — it converts an unresolved compliance question into a stated scope boundary, which is the correct posture for a prototype.
 - Note in the TRD that a production deployment would trigger DPO appointment and breach notification duties, and that health data handled by private clinics sits under PDPA (private sector) rather than the public-sector exemption.
 
-**Open question for the human:** does the brief expect data _in Malaysia_, or _in region_? Singapore answers the second, not the first. If the first, that is a known, stated limitation, not something to paper over.
+**Open product question:** does the required data-residency control mean _in Malaysia_ or _in region_? Singapore answers the second, not the first. If Malaysia-only hosting is required, that is a known limitation to state clearly.
 
 ---
 

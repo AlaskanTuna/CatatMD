@@ -1,8 +1,8 @@
 # 00 — Research Synthesis
 
-> Written by the orchestrating agent from streams 01–07. Each numbered file carries its own sources and its own "What this changes" section; this file consolidates, ranks, and flags conflicts. Nothing here edits `docs/PRD.md` or `docs/TRD.md` — every delta below is a **proposal awaiting Gate 1**.
+> This file consolidates findings from streams 01–07, ranks their product implications, and flags conflicts. Each stream carries its own sources and its own "What this changes" section. The current requirements and implementation reference live in `docs/PRD.md` and `docs/TRD.md`.
 
-**Streams:** 01 GP workday · 02 GP systems/language/billing · 03 domain study · 04 market fit · 05 similar products · 06 competition patterns · 07 OSS engineering. (08, companion mascot, is a separate exploratory stream outside this synthesis's Gate 1 scope.)
+**Streams:** 01 GP workday · 02 GP systems/language/billing · 03 domain study · 04 market fit · 05 similar products · 06 presentation and demo patterns · 07 OSS engineering. (08, companion mascot, is a separate exploratory stream.)
 
 ---
 
@@ -37,7 +37,7 @@ Three streams independently converge on the same repositioning:
 - **Genuinely unoccupied:** deterministic red flags no scribe vendor ships (05); an inference-path de-id gate with a request-scoped vault no vendor publishes — competitor "de-identified" claims are training-pipeline controls (05); the leading OSS scribe has no de-id stage at all (07). But the wording must be precise or it reads as parity: _de-identification on the inference path, before every outbound call, at a single egress point that rejects un-gated input_.
 - **Already occupied locally — do not claim as novel:** browser-side Malaysian NRIC tokenisation (DocReport, RM499/mo) and Malaysian CPG citation lookup (Qmed AskCPG, MOH-co-developed). Name them and position against them.
 - **Lead verifiable differentiator:** all-Singapore residency — but reframed per stream 03: Singapore hosting **is** a PDPA s.129 cross-border transfer of Malaysian data (the whitelist regime is gone), so the claim is "in-region ASEAN + documented s.129 basis + region-portable adapter," not "data residency solved."
-- **Why now (04):** P.U.(A) 150/2026 raised the consultation ceiling RM35 → RM80 (first revision in 30+ years, effective 2 Apr 2026) while TPAs hold effective prices down — documentation that justifies the charge acquired commercial value this year. Stronger than any generic AI opener.
+- **Recent fee context (04):** P.U.(A) 150/2026 raised the consultation ceiling RM35 → RM80 (first revision in 30+ years, effective 2 Apr 2026) while TPAs hold effective prices down. This changes the pricing context for private-GP documentation.
 - **Buyer/payer split (04):** under Act 586 the clinic owner must be a registered practitioner — buyer and user are the same doctor-owner; ~60% of visits arrive via TPA/corporate panels pricing consultation near RM34. Any pricing anchors on the RM45–179 CMS, not Western per-clinician scribe rates; the credible commercial path is a component/OEM layer, not clinic subscriptions.
 
 ---
@@ -52,7 +52,7 @@ Three streams independently converge on the same repositioning:
 
 **"The doctor reviews everything" is a weak safety argument on its own (06).** An active literature shows humans don't reliably catch AI errors. The strong version names the mechanisms review rests on: deterministic rules the model can't suppress, ID-constrained citations, visible provenance. This upgrade costs a paragraph.
 
-**Regulatory posture must be volunteered, not defended (05, 03).** Red flags + cited suggestions sit closest to CDS; under Malaysia's MDA/AMDD that is Class B territory, and Act 737 §2 names software explicitly, hinging on stated intended purpose — no documentation-software carve-out was found. Vendors that approach CDS carry Class IIa/ISO 13485 (Tortus, Corti); Microsoft's scribe _refuses_ "did I miss a diagnosis?" prompts. Write an explicit Intended Purpose statement in Act 737's vocabulary and a "Regulatory Posture" section that concedes the classification question and argues the architecture is the compliance strategy. Cheap adjacent fix (05): frame CAP-2 as **documentation completeness** ("no duration recorded for the cough"), not decision support ("you did not ask about haemoptysis") — the latter is the exact prompt class the most-regulated vendor refuses.
+**Regulatory posture should be stated clearly (05, 03).** Red flags + cited suggestions sit closest to CDS; under Malaysia's MDA/AMDD that is Class B territory, and Act 737 §2 names software explicitly, hinging on stated intended purpose. No documentation-software carve-out was found. Vendors that approach CDS carry Class IIa/ISO 13485 (Tortus, Corti); Microsoft's scribe _refuses_ "did I miss a diagnosis?" prompts. Write an explicit Intended Purpose statement in Act 737's vocabulary and a "Regulatory Posture" section that states the classification question and describes the architecture as a compliance control. Cheap adjacent fix (05): frame CAP-2 as **documentation completeness** ("no duration recorded for the cough"), not decision support ("you did not ask about haemoptysis"). The latter is the exact prompt class the most-regulated vendor refuses.
 
 ---
 
@@ -65,20 +65,20 @@ Three streams independently converge on the same repositioning:
 
 ---
 
-## 5. Demo & Proposal Playbook (06, 02)
+## 5. Presentation And Demo Patterns (06, 02)
 
-- Happy path hard-gated at **90 seconds to first real output** (pre-seeding and stubbing are judge-sanctioned); target **an approved note in under 30 seconds** as the demo's acceptance beat.
+- The happy path reaches first real output within **90 seconds**; pre-seeding and stubbing can remove avoidable waits. Target **an approved note in under 30 seconds** as the demo's acceptance beat.
 - Add a **~60 s guardrail reel**: (1) the actual outbound payload showing PHI never leaves, (2) a red flag surviving a model suppression attempt, (3) a free-text citation failing schema validation. Showing a guardrail catch beats claiming perfection.
-- Record the demo, narrate live, keep the recording as fallback. End on limits + a named next step.
-- README/proposal: mirror the evaluation criteria in their order; add a requirement → module → test traceability table; report **real eval numbers from the fixture set** (PDQI-9-derived dimensions + omission/commission counts; red-flag recall at zero false-negative tolerance; PHI-egress assertions); state plainly that **no clinician has reviewed the prototype** and substitute published evidence traced to design decisions + a validation protocol + a falsification list.
+- Record the demo, narrate live, and keep the recording as fallback. End on product limits and a named next step.
+- Product README: add a requirement → module → test traceability table; report **evaluation numbers from the fixture set** (PDQI-9-derived dimensions + omission/commission counts; red-flag recall at zero false-negative tolerance; PHI-egress assertions); state plainly that **no clinician has reviewed the product** and pair that limitation with published evidence, a validation protocol, and a falsification list.
 - Fixtures: rewrite to Malaysian register (Manglish, MC not "sick note", panel patients, dispensed-in-clinic, NRIC, RM) and design them as _gradeable_ encounters with per-case rubrics — one deliberately hard case, one red-flag case.
 
 ---
 
 ## 6. Conflicts With Recorded Decisions — Flagged, Not Reopened
 
-1. **PDF/print export (DECISIONS.md 2026-08-13: moved into MVP; PRD CAP-5).** Stream 02 argues it has no consumer in a TPA-portal/e-invoicing clinic and creates an unfiled PHI artefact; it recommends demoting it in favour of structured JSON + per-section copy. **This contradicts a recorded decision.** Not silently reversed — a human call at Gate 1. Cheapest reconciliation: keep browser print (already nearly free), add per-section copy, skip dedicated PDF generation work.
-2. **Open self-service sign-up.** The research brief states it was **cut**; `docs/DECISIONS.md` (2026-08-13), the PRD Demo Script, and TRD §14/§19 row 4 still record it as **in scope**. Whichever is current, the docs and the decision log disagree with the brief and must be reconciled at Gate 1. If it is cut, §19 row 4 closes for free.
+1. **PDF/print export (DECISIONS.md 2026-08-13: moved into MVP; PRD CAP-5).** Stream 02 argues it has no consumer in a TPA-portal/e-invoicing clinic and creates an unfiled PHI artefact; it recommends demoting it in favour of structured JSON + per-section copy. **This contradicts a recorded decision.** Resolve the conflict explicitly. Cheapest reconciliation: keep browser print (already nearly free), add per-section copy, skip dedicated PDF generation work.
+2. **Open self-service sign-up.** An earlier note says it was **cut**; `docs/DECISIONS.md` (2026-08-13), the PRD Demo Script, and TRD §14/§19 row 4 still record it as **in scope**. These sources disagree and need reconciliation. If it is cut, §19 row 4 closes for free.
 3. **"Slower than writing the note unaided" (PRD, Will Not Tolerate).** Streams 01+02 show that for the modal 3-minute URTI consult the tool plausibly _is_ slower than the handwritten line it replaces. Not a scope reversal — but the PRD's own tolerance line currently sets a bar the product may not clear, and the positioning fix (quality + safety net, not speed) needs to reach that sentence too.
 
 **Explicitly validated, no change:** clinical scope (now with numbers), the PHI boundary, deterministic-first red flags, ID-constrained citations, single-provider Qwen, browser-side ASR as the privacy architecture (as demo path it is a risk — see §3), and no-EMR-write-back (strengthened, with a better justification).
@@ -99,10 +99,10 @@ Three streams independently converge on the same repositioning:
 
 ## What This Changes
 
-The top deltas across all streams, ranked by (value ÷ effort) inside the current window — each is a Gate 1 proposal, not an applied edit:
+The top deltas across all streams, ranked by impact relative to effort:
 
 1. **PRD CAP-1 / schema:** keep SOAP as scaffold; add the Malaysian operational block (minimum `mcDays`) or the "At a glance" strip; state SOAP-as-scaffold explicitly. (01, 02)
-2. **Proposal/README positioning:** lead with the inference-path de-id boundary + deterministic red flags + ID-constrained citations, precisely worded; name Qmed/Cliniclah/MedicalMet/Heidi/DocReport/AskCPG; re-tier "doctor approves" and "no diagnosis" as hygiene; add the P.U.(A) 150/2026 "why now." (04, 05)
+2. **README positioning:** lead with the inference-path de-id boundary + deterministic red flags + ID-constrained citations, precisely worded; name Qmed/Cliniclah/MedicalMet/Heidi/DocReport/AskCPG; re-tier "doctor approves" and "no diagnosis" as hygiene; add the P.U.(A) 150/2026 context. (04, 05)
 3. **Add a Regulatory Posture section** (Act 737 intended-purpose statement, AMDD Class B concession, architecture-as-compliance) and reframe residency as "in-region + s.129 basis." Rename CAP-2's framing to documentation completeness. (05, 03)
 4. **Corpus:** drop NICE, anchor NAG 2024 + CC-licensed Malaysian sources, add licence metadata, keep disagreeing guidelines as separate attributed chunks. Settles §19 row 3. (03)
 5. **TRD threat model:** add ASR silent-translation and Whisper hallucination as a second fabrication surface; always pass `language`; paste is the primary demo path. (02, 03)
@@ -110,4 +110,4 @@ The top deltas across all streams, ranked by (value ÷ effort) inside the curren
 7. **De-id upgrades in-window:** NRIC structural validation, context-word scoring, name gazetteer; record "keep regex over Presidio" as an evidenced decision. (07)
 8. **Demo script:** 90-second gate, guardrail reel, record-and-narrate, end on limits; sub-30-second approval beat; Malaysian-register gradeable fixtures. (06, 01, 02)
 9. **PRD copy fixes:** quantified review target ("reviewed and approved in under 60 seconds"); split English-only into output (fine) vs input (real limitation); position on quality/safety-net, not time saved; state no-GP-has-reviewed-this plainly. (01, 02, 03, 06)
-10. **Gate 1 conflicts to rule on:** PDF export demotion vs the recorded decision; sign-up cut-vs-docs discrepancy; the "slower than unaided" tolerance line. (§6 above)
+10. **Product decisions to reconcile:** PDF export demotion vs the recorded decision; sign-up cut-vs-docs discrepancy; the "slower than unaided" tolerance line. (§6 above)

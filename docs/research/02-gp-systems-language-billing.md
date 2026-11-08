@@ -52,9 +52,9 @@ I could not find a credible market-share study for clinic management systems in 
 | MyCLINIC / MyHIS                         | Cloud clinic app + hospital system                                                                    | [myclinichealthcare.com](https://www.myclinichealthcare.com/)                                 |
 | CMAGSYS                                  | Named as a legacy Malaysian clinic stack running on local servers                                     | [desk.clinic blog](https://desk.clinic/blog/best-clinic-management-system-malaysia-2026)      |
 
-**Names from the brief — verification status:**
+**Vendor names checked and their verification status:**
 
-| Name in brief | Verdict                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name checked | Verdict                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Qmed Asia** | **[VERIFIED]** real, but it is a patient-experience/queue/teleconsult layer, **not** a full GP EMR                                                                                                                                                                                                                                                                                                                               |
 | **Mednefits** | **[VERIFIED]** real, but it is **not** a clinic system — it is a Singapore-origin employee medical benefits platform operating in Malaysia (1,500+ GP clinics in its SG+MY network; RM24m Series A in 2020). Sits on the _payer_ side. [mednefits.com](https://www.mednefits.com/about-us), [hrnews.my](https://hrnews.my/2020/11/19/mednefits-concludes-series-a-rm24-million-funding-enhancing-employee-benefits-in-malaysia/) |
@@ -68,7 +68,7 @@ I could not find a credible market-share study for clinic management systems in 
 | TM offerings  | **[UNVERIFIED]** — no evidence found of a TM clinic system for GPs                                                                                                                                                                                                                                                                                                                                                               |
 | Ottobock      | **[UNVERIFIED]** — no evidence found as Malaysian clinic software                                                                                                                                                                                                                                                                                                                                                                |
 
-> Do not put any of the UNVERIFIED names into the PRD, TRD, README, or a demo script. Naming a vendor that does not exist in this market is a credibility hit an external reviewer will catch instantly.
+> Do not list any of the UNVERIFIED names as a current market vendor in the PRD, TRD, README, or a demo script. The scan found no evidence that they are Malaysian GP clinic systems.
 
 ### 1.2 Are Many Clinics Still Paper-Based?
 
@@ -127,7 +127,7 @@ The MOF release is explicit that MediAsas/MDHCN participation is framed for **ho
 
 - **For the high-volume short URTI consult: marginal.** Consultation fees anchored at RM10–RM35 for decades, six-in-ten patients on TPA rates paying below RM35 (§4.1), and dispensing-dependent economics all point to a throughput-optimised clinic where a 3-minute note is already fast.
 - **For the longer consult: plausibly yes.** The 2026 fee reform raised the ceiling from RM35 to RM80 explicitly to reward depth — the Health Minister contrasted "a 10-minute consultation for a common cold" with "a 40-minute session for diabetes, cholesterol, hypertension, or mental health assessments." Floor stays RM10, unchanged since the MMA Fee Schedule 1992. **[VERIFIED]** — [Malay Mail, 11 Oct 2025](https://www.malaymail.com/news/malaysia/2025/10/11/health-minister-says-rm10-still-the-floor-price-for-doctor-visits-but-ceiling-raised-to-rm80/194240)
-- **[INFERRED]** The defensible positioning is therefore **documentation quality and a safety net**, not "saves you time on coughs." Red-flag detection and missing-information prompts are the value; the note is the vehicle. That framing survives the "but I can write it faster by hand" objection. The time-saving pitch does not.
+- **[INFERRED]** The defensible positioning is therefore **documentation quality and a safety net**, not "saves you time on coughs." Red-flag detection and missing-information prompts are the value; the note is the vehicle. That framing survives the "but I can write it faster by hand" objection. The time-saving claim does not.
 
 ---
 
@@ -145,7 +145,7 @@ The MOF release is explicit that MediAsas/MDHCN participation is framed for **ho
 
 I found Malaysian code-switching work in classrooms and nurse–patient interaction, and code-switching-in-consultation work from _other_ health systems (Galician–Spanish, using a 586-consultation audio corpus — [MDPI _Languages_](https://www.mdpi.com/2226-471X/9/6/209)), but nothing that gives a switch rate for a Malaysian GP room.
 
-> **Do not put a made-up percentage in the PRD.** Write the Known Limitation qualitatively and cite the ambient evidence. An external reviewer who knows this literature will respect "we could not find a quantified figure" far more than an invented one.
+> **Do not put a made-up percentage in the PRD.** Write the Known Limitation qualitatively and cite the ambient evidence. No quantified rate for Malaysian GP consultations was found.
 
 ### 3.3 The Asymmetry That Saves the Design
 
@@ -176,7 +176,7 @@ This is where the real damage is, and it is worse for CatatMD's specific archite
 
 **Mesolitica / malaysia-ai publish Whisper models fine-tuned on Malaysian audio** — `malaysian-whisper-small-v2/v3`, `malaysian-whisper-medium`, trained on IMDA STT, pseudolabelled Malaysian YouTube, the Malay Conversational Speech Corpus and Nusantara audiobooks; v3 is described as offering better handling for **Malay, Manglish, Mandarin, Tamil**. A Malay–Singlish code-switching finetune also exists. **[REPORTED]** — [Malaysian Whisper collection](https://huggingface.co/collections/mesolitica/malaysian-whisper-6590b6b733d72b44f0cfae79), [malaysian-whisper-small-v3](https://huggingface.co/mesolitica/malaysian-whisper-small-v3), [malaya-speech](https://github.com/malaysia-ai/malaya-speech/releases)
 
-Not a build item in the current window. But naming it turns the Known Limitation from a shrug into a costed roadmap item, which reads completely differently to a reviewer.
+Not part of current scope. Naming it turns the Known Limitation into a costed roadmap item.
 
 ---
 
@@ -188,7 +188,7 @@ Not a build item in the current window. But naming it turns the Known Limitation
 - FPMPAM: private clinic doctors "once managed 60% of outpatient visits but now their patient numbers are falling." **[REPORTED]** — [FMT, Nov 2024](https://www.freemalaysiatoday.com/category/nation/2024/11/18/private-clinic-doctors-threaten-rm20-surcharge-over-new-price-display-rule)
 - "About **30 TPAs** currently managing the health benefits of employees," each with its own registration procedure, claim submission process and documentation; registration fees RM100–RM2,500, plus monthly admin fees, per-claim submission fees, payment fees, and mandatory **terminal rental at the clinic**; payment delayed 3–6 months. **[VERIFIED]** — [Malaysiakini letter](https://www.malaysiakini.com/letters/328416). Note this is an opinion letter, not a study — but the operational picture it describes is consistent with everything else here.
 
-**Verified TPA/MCO names** (the brief asked for verification, not guesses): **PMCare** (self-described pioneer/leading TPA — [pmcare.com.my](https://www.pmcare.com.my/)), **MediExpress**, **MiCare** ([eclaims.micaresvc.com](https://eclaims.micaresvc.com/)), **Medilink-Global** ([medilink-global.com](https://www.medilink-global.com/)), **HealthMetrics**, **WeCare TPA** ([wecaretpa.com](https://www.wecaretpa.com/)), **Selcare** ([CodeBlue](https://codeblue.galencentre.org/2024/03/selcare-isnt-your-typical-tpa-with-fast-payments-no-consultation-fee-cap/)), **MediJaring**, **Compumed**, **Emas**, **HealthConnect** (last four **[REPORTED]** from [Mayflax panel-clinic guide](https://mayflax.com/becoming-a-panel-clinic/) only). **Mednefits** is payer-side but is a benefits platform, not a classical TPA. **ProtectHealth** is the government-scheme administrator.
+**Verified TPA/MCO names:** **PMCare** (self-described pioneer/leading TPA, [pmcare.com](https://www.pmcare.com.my/)), **MediExpress**, **MiCare** ([eclaims.micaresvc.com](https://eclaims.micaresvc.com/)), **Medilink-Global** ([medilink-global.com](https://www.medilink-global.com/)), **HealthMetrics**, **WeCare TPA** ([wecaretpa.com](https://www.wecaretpa.com/)), **Selcare** ([CodeBlue](https://codeblue.galencentre.org/2024/03/selcare-isnt-your-typical-tpa-with-fast-payments-no-consultation-fee-cap/)), **MediJaring**, **Compumed**, **Emas**, **HealthConnect** (last four **[REPORTED]** from [Mayflax panel-clinic guide](https://mayflax.com/becoming-a-panel-clinic/) only). **Mednefits** is payer-side but is a benefits platform, not a classical TPA. **ProtectHealth** is the government-scheme administrator.
 
 ### 4.2 What the Panel Claim Actually Demands
 
@@ -251,9 +251,9 @@ A Malaysian MC carries: patient name and NRIC/passport number, doctor's name and
 2. **MC** — days, NRIC, MMC number
 3. **Dispensing/inventory** — clinic economics depend on it
 4. **Tax e-invoice** — where above threshold
-5. **The clinical narrative** — required professionally, but the least externally audited of the five
+5. **The clinical narrative:** required professionally, but the least audited of the five
 
-**[INFERRED]** CatatMD's SOAP note serves #5 and touches none of #1–#4. That is not a fatal flaw for a prototype whose stated value is safety and documentation quality — but it does mean nobody outside the room is _demanding_ this artifact, which is exactly why the copy-paste boundary is survivable and why the time-saving pitch is not.
+**[INFERRED]** CatatMD's SOAP note serves #5 and touches none of #1–#4. This is consistent with the product's stated value of safety and documentation quality. TPA claims, medical certificates, dispensing, and tax invoices do not require this clinical narrative as an exported artifact, which is why the copy-paste boundary is workable and the time-saving claim is not.
 
 ---
 
@@ -264,7 +264,7 @@ Stated so nobody re-runs this work:
 | Gap                                                       | Why it isn't worth chasing                                                                                                  |
 | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Market share of any Malaysian GP CMS                      | No public study exists. Wouldn't change the write-back decision — no vendor is dominant enough to integrate with regardless |
-| Whether panel claims require ICD-10                       | Behind private panel agreements. Doesn't change a 72-hour build                                                             |
+| Whether panel claims require ICD-10                       | Behind private panel agreements. Does not change the current product scope                                                             |
 | Quantified code-switch rate in Malaysian GP consultations | Literature gap. Report it as a gap; do not invent a number                                                                  |
 | Exact PMCare/Mediline claim schema                        | Binary PDF + behind panel agreements                                                                                        |
 | Fine-tuning or self-hosting a Malaysian Whisper           | Not a short-window task. Name it as roadmap, don't attempt it                                                               |

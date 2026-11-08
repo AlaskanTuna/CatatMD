@@ -305,9 +305,9 @@ Caveats, all **VERIFIED** from those model cards:
 13. **Check cross-origin isolation before counting on multi-threaded WASM.** COOP/COEP headers are required, and enabling them on Vercel constrains cross-origin model fetches from the HF CDN.
 14. **Have the Malay-accuracy answer ready:** `mesolitica/malaysian-whisper-*` (IMDA STT + Malay Conversational Speech Corpus + pseudolabelled Malaysian YouTube), no ONNX published, no public WER. Cite it as the improvement path — do not attempt the conversion now.
 
-### Positioning (README)
+### README Product Boundary
 
-15. **Say that the leading OSS scribe has no de-identification stage.** OpenScribe (198★, MIT, active) ships encrypted local storage and a provider-agnostic LLM client but no PHI gate, and disclaims HIPAA compliance itself. Our de-identification boundary is the differentiator; make the reviewer see it.
+15. **Say that the leading OSS scribe has no de-identification stage.** OpenScribe (198★, MIT, active) ships encrypted local storage and a provider-agnostic LLM client but no PHI gate, and disclaims HIPAA compliance itself. Our de-identification boundary is a core product distinction; document it alongside its enforcement.
 
 ### What This Changes Nothing About
 

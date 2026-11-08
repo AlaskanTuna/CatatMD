@@ -2,7 +2,7 @@
 
 > Research stream: who pays, what they can pay, and who we are actually competing against in Malaysian private GP.
 > Compiled 13/08/26. Every claim carries a URL. **VERIFIED** = read from the cited source. **INFERRED** = my reasoning over verified inputs, labelled as such.
-> This is a prototype to be evaluated by an external party; the market framing exists to shape the proposal narrative, not to justify a business plan.
+> Desk research behind CatatMD's market and product decisions. It covers the buyer and payer environment, pricing context, and local competitors. Claims link to sources and carry a confidence grade.
 
 ---
 
@@ -60,9 +60,9 @@
 
 **INFERRED:** summing the named groups gives roughly **450–600 clinics** against a national registry of 11,000+ — i.e. **chains are a low-single-digit percentage of registered private clinic count**, even allowing for groups I did not find. Qualitas's "20% market share" is share _of the chain segment_, not of all GP clinics; do not restate it as a market share of Malaysian primary care.
 
-**INFERRED — who decides at a chain.** CareClinics is building its own EMR to HIMSS standards; a group at that stage buys a platform, not a feature. Expect a corporate/CIO procurement cycle, integration requirements, and a long sales motion. **Not a 72-hour narrative asset.**
+**INFERRED: who decides at a chain.** CareClinics is building its own EMR to HIMSS standards; a group at that stage buys a platform, not a feature. This segment likely requires CIO-level selection and integration, so it is a lower priority than solo and small-group clinics for the current product.
 
-**NOT VERIFIED:** I found **no published solo-vs-chain split** of Malaysia's registered clinics. A CodeBlue commentary states only that "a significant proportion of GP clinics function as small, single-practitioner operations, often with limited diagnostic facilities" and restricted hours ([CodeBlue, Mar 2026](https://codeblue.galencentre.org/2026/03/outpatient-overload-can-private-gps-relieve-malaysias-public-hospitals-dr-mohamed-rafick-khan/)). Do not put a percentage in the proposal.
+**NOT VERIFIED:** I found **no published solo-vs-chain split** of Malaysia's registered clinics. A CodeBlue commentary states only that "a significant proportion of GP clinics function as small, single-practitioner operations, often with limited diagnostic facilities" and restricted hours ([CodeBlue, Mar 2026](https://codeblue.galencentre.org/2026/03/outpatient-overload-can-private-gps-relieve-malaysias-public-hospitals-dr-mohamed-rafick-khan/)). Do not state a percentage; the evidence does not support one.
 
 ---
 
@@ -80,7 +80,7 @@
 | **"nearly 10,000 private general practitioners"**                                   | Apr 2026    | MMA via [CodeBlue](https://codeblue.galencentre.org/2026/04/gp-led-care-central-to-ageing-nation-strategy-mma)                                                                                                                                                             |
 | **Statista**: >9,800 registered private health clinics                              | 2022        | [Statista](https://www.statista.com/statistics/1464154/malaysia-number-of-private-medical-clinics/)                                                                                                                                                                        |
 
-**Safe phrasing for the proposal:** _"roughly 11,000 registered private medical clinics, staffed by close to 10,000 private GPs."_
+**Summary supported by the sources:** _"roughly 11,000 registered private medical clinics, staffed by close to 10,000 private GPs."_
 
 **VERIFIED context:** private practices outnumber public clinics roughly **6:1**, yet public clinics handle the majority of outpatient visits — public facilities took **83% of total visits (19.6 million) in 2023**. ([CodeBlue, Mar 2026](https://codeblue.galencentre.org/2026/03/outpatient-overload-can-private-gps-relieve-malaysias-public-hospitals-dr-mohamed-rafick-khan/))
 
@@ -99,11 +99,9 @@ MMA President Datuk Dr R. Thirunavukarasu: monthly earnings are "insufficient to
 
 **VERIFIED — setup capital.** Opening a GP clinic runs **RM300,000–RM350,000** (renovation ~RM100k, equipment ~RM150k, drugs ~RM20k, licensing/registration ~RM6.5k, premises deposits ~RM24k). ([Mayflax](https://mayflax.com/cost-to-open-a-clinic-in-malaysia/))
 
-**WEAK / SECONDARY — monthly opex.** A Malaysian practice-management blog gives approximate monthly figures of rent ~RM4,000, maintenance ~RM1,000, staff salaries ~RM6,000. The source ([Disruptive Doctors](https://disruptive-doctors.com/how-much-does-it-cost-to-build-run-a-gp-clinic-in-malaysia/)) **returned HTTP 403 to direct fetch**; figures come from search indexing only. **Do not put these in the proposal as fact.**
-
 **NOT VERIFIED:** typical headcount per clinic. No authoritative Malaysian source found for staff-per-clinic. Do not state one.
 
-### 2.3 Consultation Fee Regulation — Just Changed, and That Is the "Why Now"
+### 2.3 Consultation Fee Regulation And Recent Changes
 
 **VERIFIED timeline:**
 
@@ -133,7 +131,7 @@ Malaysian primary-care consultation duration studies give **~10.5 min**, **12–
 | **MedicalMet**                         | **RM45/month** (Solo), no setup fee, 30-day trial                            | **Yes — "AI treatment notes"** in the base plan                                                                                          | [MedicalMet](https://medicalmet.com/faq/what-is-the-best-clinic-management-software-for-small-clinics-in-malaysia/)                                                                               |
 | **Clinica ERP**                        | **RM49/clinic/month**                                                        | Not stated                                                                                                                               | [Desk Clinic comparison](https://desk.clinic/blog/best-clinic-management-system-malaysia-2026)                                                                                                    |
 | **Curo**                               | **from RM60/month**                                                          | Not stated                                                                                                                               | [Curo](https://curo.com.my/blog/best-clinic-management-system-malaysia)                                                                                                                           |
-| **Cliniclah**                          | **from RM179/month per clinic**; Pro+ adds _unlimited_ AI consultation notes | **Yes — "AI consultation notes" (auto-drafts SOAP from the clinical conversation, doctor signs off) + AI X-ray reporting**; 108+ clinics | [Cliniclah pricing](https://www.cliniclah.com/en/pricing/) _(page returned HTTP 403 to direct fetch — details from vendor's own indexed page copy; verify before quoting in a client-facing doc)_ |
+| **Cliniclah**                          | **from RM179/month per clinic**; Pro+ adds _unlimited_ AI consultation notes | **Yes: "AI consultation notes" (auto-drafts SOAP from the clinical conversation, doctor signs off) + AI X-ray reporting**; 108+ clinics | [Cliniclah pricing](https://www.cliniclah.com/en/pricing/) _(page returned HTTP 403 to direct fetch; details from vendor's own indexed page copy; verify before using as a published price)_ |
 | **Desk Clinic**                        | Starter **US$59/mo**, Growth **US$179/mo**                                   | Not stated                                                                                                                               | [Desk Clinic](https://desk.clinic/malaysia)                                                                                                                                                       |
 | Broad Malaysia listing (20 products)   | Mostly **US$14–29/month**; ZibRX **US$20/doctor**, self-described "AI-based" | Mostly no                                                                                                                                | [SoftwareSuggest Malaysia](https://www.softwaresuggest.com/clinic-management-software/malaysia)                                                                                                   |
 | **PRIMIS** (government, MADANI claims) | **Free**                                                                     | No                                                                                                                                       | [ProtectHealth](https://protecthealth.com.my/skimperubatanmadani/)                                                                                                                                |
@@ -148,13 +146,13 @@ Malaysian primary-care consultation duration studies give **~10.5 min**, **12–
 4. Against a **RM34** panel consultation, RM179/month is roughly **five panel consultations**; RM45/month is barely more than one. Those are the only honest units to reason in.
 5. **Heidi Health publishes a genuinely free tier with "unlimited transcription"** ([Heidi pricing](https://www.heidihealth.com/pricing)). A standalone scribe's floor price globally is zero.
 
-**Defensible band for the proposal (INFERRED, flag it as an estimate, not a finding):** a _differentiated_ documentation layer plausibly commands **RM50–RM200/clinic/month** as an add-on, or is bundled/OEM'd into a CMS. Anything above ~RM250/clinic/month needs a payer other than the doctor (a TPA, a chain, or the government scheme). **I found no Malaysian willingness-to-pay survey for AI scribes — this band is reasoning, not evidence.**
+**Pricing estimate (INFERRED, not a finding):** a _differentiated_ documentation layer plausibly commands **RM50–RM200/clinic/month** as an add-on, or is bundled/OEM'd into a CMS. Anything above ~RM250/clinic/month needs a payer other than the doctor (a TPA, a chain, or the government scheme). **I found no Malaysian willingness-to-pay survey for AI scribes; this band is reasoning, not evidence.**
 
 ### 3.3 The Actual Wedge Is Compliance, Not AI
 
 **VERIFIED:** LHDN **e-Invoice / MyInvois** is a phased mandate — RM100m (Aug 2024), RM25m (Jan 2025), RM500k (Jul 2025), with later phases repeatedly revised; December 2025 guidelines **raised the exemption threshold to RM1 million**, and a no-minimum-threshold phase is dated 1 July 2026. Penalties RM200–RM20,000 per non-compliant invoice under s.82C Income Tax Act 1967. ([ClearTax Malaysia](https://www.cleartax.com/my/en/e-invoicing-malaysia), [JomEinvoice](https://jomeinvoice.my/article/lhdn-e-invoice-malaysia-2026-complete-guide/), [MedicalMet healthcare guide](https://medicalmet.com/blog/lhdn-e-invoice-complete-guide-clinics/))
 
-> **Sources disagree on the exact small-business thresholds and dates.** Do not state a specific clinic-level deadline in the proposal.
+> **Sources disagree on the exact small-business thresholds and dates.** Do not state a specific clinic-level threshold or date from this evidence.
 
 **INFERRED:** every Malaysian CMS vendor now leads with **MyInvois compliance**, not AI. Compliance is what forces a paper clinic onto software; AI is an upsell on top of an already-installed system. A standalone AI product has no forcing function of its own.
 
@@ -190,7 +188,7 @@ Malaysian primary-care consultation duration studies give **~10.5 min**, **12–
 
 **VERIFIED:** the **MMA's 1st AI in Healthcare Conference** runs **15–16 August 2026** in Petaling Jaya, organised by MMA's AI & Digital Health Committee, themed _"AI with a Human touch"_, targeting **200+ senior decision-makers** including MOH. The page lists **no dedicated session on AI documentation or clinical scribes**. ([MMA Events](https://www.mmaevents.org/ai-healthcare-2026))
 
-**INFERRED:** the profession is convening its _first_ AI conference this month, and clinical documentation is not yet on its agenda even though three local vendors are already selling it. The category is being sold before it is being discussed. That is a real, citable framing for the proposal — and it is two days out, so it is a live fact, not a stale one.
+**INFERRED:** the profession is convening its _first_ AI conference this month, while clinical documentation remains absent from the agenda even though three local vendors already sell it. This is timely market context, not evidence that the product category is widely adopted.
 
 ### 4.4 Regulatory Entry Cost (Flag, Do Not Deep-Dive)
 
@@ -209,7 +207,7 @@ State these as unknowns rather than filling them in:
 | **Solo vs chain split** of the ~11,000 registered clinics              | Determines whether the buyer is one doctor or a procurement committee. No published figure found.    |
 | **Malaysian GP documentation-time burden**                             | Every scribe ROI number in existence is US/AU/UK. There is no local baseline to cite.                |
 | **Willingness to pay for AI scribes in Malaysia**                      | No survey found. The RM50–RM200 band in §3.2 is reasoning, not evidence.                             |
-| **Cliniclah and Curo pricing pages** returned HTTP 403 to direct fetch | Prices came from indexed copies of the vendors' own pages. Re-verify before any client-facing quote. |
+| **Cliniclah and Curo pricing pages** returned HTTP 403 to direct fetch | Prices came from indexed copies of the vendors' own pages. Re-verify before using the figures in public product documentation. |
 | **MOH Health Facts 2024 PDF** returned HTTP 403                        | The 10,495 figure is strong but not first-hand.                                                      |
 | **e-Invoice thresholds for the smallest clinics**                      | Sources contradict each other on dates and amounts.                                                  |
 | Qualitas's current Malaysian clinic count                              | Only a 2019 press figure exists publicly.                                                            |
@@ -223,16 +221,16 @@ Five concrete deltas. Everything else in this document is supporting evidence.
 **1. PRD "Who It Is For" — name the buyer and the payer separately.**
 Current framing ("Malaysian private GPs") is one step too coarse. Replace with: _the doctor-owner of a solo or small private GP clinic — who, under Act 586, must be a registered medical practitioner, and is therefore both the user and the purchaser_ — and add a second line naming the **payer environment**: ~60% of visits arrive through TPA/corporate panels that price the consultation near RM34. Two verified facts, one sentence each, and they make the "who it is for" section specific rather than generic.
 
-**2. Proposal narrative — stop leading with the scribe. Lead with the boundary.**
-The scribe function is **already commoditised in Malaysia**: bundled free inside a RM45/month CMS (MedicalMet), inside a RM179/month CMS (Cliniclah), and shipped by an MDA-registered local vendor (Qmed Scribe). A funded regional player with a free tier just opened a Singapore SEA hub. Positioning CatatMD as "an AI scribe" walks into a fight it loses on price and distribution. Positioning it as **the de-identification gate + deterministic red-flag engine + ID-constrained citations** — the three things no bundled CMS AI feature demonstrably does — is the only differentiated claim available, and it happens to be exactly what the architecture already is. This is a framing change to the proposal's opening, not a scope change.
+**2. Product positioning — emphasize the boundary.**
+The scribe function is **already commoditised in Malaysia**: bundled free inside a RM45/month CMS (MedicalMet), inside a RM179/month CMS (Cliniclah), and shipped by an MDA-registered local vendor (Qmed Scribe). A funded regional player with a free tier just opened a Singapore SEA hub. Positioning CatatMD as "an AI scribe" enters a market where local CMS products already compete on price and distribution. Its evidence-backed distinctions are **the de-identification gate + deterministic red-flag engine + ID-constrained citations**, which no bundled CMS AI feature in this scan demonstrably provides. This describes the existing architecture and does not change product scope.
 
-**3. Add a "why now" paragraph anchored on the April 2026 gazette.**
-**P.U. (A) 150/2026 raised the Schedule 7 consultation ceiling from RM35 to RM80 effective 2 April 2026 — the first revision in over 30 years — while leaving the floor at RM10.** Doctors can now charge more but must be able to justify it, and FPMPAM/MMA both publicly flagged that TPAs will hold the effective price down. That is a genuine, four-month-old, citable reason why consultation documentation acquired commercial value this year. It is stronger than any generic "AI is transforming healthcare" opener.
+**3. Consultation fee reform affects the product's market context.**
+**P.U. (A) 150/2026 raised the Schedule 7 consultation ceiling from RM35 to RM80 effective 2 April 2026, the first revision in over 30 years, while leaving the floor at RM10.** FPMPAM and MMA both publicly flagged that TPAs will hold effective prices down. This makes documentation and fee justification relevant context for the product's use.
 
 **4. Price the thing against the CMS, not against Abridge.**
-Any pricing or business-model slide should anchor on **RM45–RM179 per clinic per month for an entire CMS**, and on **RM34 as the panel consultation value**. State plainly that Western per-clinician scribe pricing is 3–10x the whole Malaysian CMS and does not transplant. If a commercial path is mentioned at all, the credible one is **a component/OEM layer sold into CMS vendors, chains, or a payer** — not a direct subscription to a clinic where 70% earn under RM60,000/month.
+Any pricing or business-model discussion should anchor on **RM45–RM179 per clinic per month for an entire CMS**, and on **RM34 as the panel consultation value**. Western per-clinician scribe pricing is 3–10x the whole Malaysian CMS and does not transplant. A CMS-integrated component remains a plausible commercial model; a direct clinic subscription is harder to support where 70% earn under RM60,000/month.
 
 **5. Competitive section — name the incumbents, and be right about them.**
-Replace any generic competitor list with: **Qmed Asia (Qmed Scribe + AskCPG, ISO 13485, MDA-approved)**, **Cliniclah**, **MedicalMet**, and **Heidi Health (Singapore SEA HQ, 31 July 2026, free tier)**. Naming a locally-MDA-approved competitor and then explaining what CatatMD does that it does not is far more credible to an external evaluator than claiming an empty market.
+Replace any generic competitor list with: **Qmed Asia (Qmed Scribe + AskCPG, ISO 13485, MDA-approved)**, **Cliniclah**, **MedicalMet**, and **Heidi Health (Singapore SEA HQ, 31 July 2026, free tier)**. Naming a locally-MDA-approved competitor and accurately describing product differences is more credible than claiming an empty market.
 
-**What this does _not_ change:** the clinical scope (adult GP, acute cough / sore throat / URTI) is settled and nothing here argues against it. The architecture is untouched. Do not attempt a market-sizing model, a WTP study, or an MDA classification analysis — none can be completed responsibly at the current pace, and §5 lists exactly which numbers would have to be invented to try.
+**What this does _not_ change:** the clinical scope (adult GP, acute cough / sore throat / URTI) is settled and nothing here argues against it. The architecture is untouched. The available evidence does not support a market-sizing model, a WTP study, or an MDA classification analysis. Section 5 lists the key evidence gaps.

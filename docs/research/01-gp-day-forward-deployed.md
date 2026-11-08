@@ -187,7 +187,7 @@ Ordered by value per unit of effort.
 
 2. **PRD Goals — restate the time target quantitatively.** Change any unquantified "saves documentation time" to **"note reviewed and approved in under 60 seconds, inside a consultation the regulator prices at ≤10 minutes"**, justified by Schedule 7 banding and the ~32 patients/day private-clinic median.
 
-3. **PRD — convert a hidden assumption into a stated one.** Add: _"SOAP is used as a review scaffold. No Malaysian regulation mandates SOAP; MMC 002/2006 requires contemporaneous, signed, chronological entries, and Malaysian private GP notes today are typically free-text or handwritten."_ Add to README limitations: **no Malaysian GP has reviewed this product.** In front of an external evaluator, naming that is a credibility asset, not a weakness.
+3. **PRD: convert a hidden assumption into a stated one.** Add: _"SOAP is used as a review scaffold. No Malaysian regulation mandates SOAP; MMC 002/2006 requires contemporaneous, signed, chronological entries, and Malaysian private GP notes today are typically free-text or handwritten."_ Add to README limitations: **no Malaysian GP has reviewed this product.** Keep this evidence limitation explicit and do not imply Malaysian clinical validation.
 
 4. **UI — approval is in-consult, not a draft inbox.** Design the review screen for a doctor with the patient still in the room. If a draft queue exists, it is a secondary path, never the hero flow. _(Directly contradicts the US ambient-scribe UX pattern most references will suggest.)_
 
