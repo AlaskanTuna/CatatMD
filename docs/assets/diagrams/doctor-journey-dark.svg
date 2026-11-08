@@ -311,14 +311,14 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
 
         <!-- Swimlanes -->
         <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="998" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / Doctor</text>
+        <text x="54" y="74" class="t-dim" font-size="11.5" font-weight="600">01 / Doctor</text>
 
         <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="998" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / CatatMD, Inside The Trust Boundary</text>
+        <text x="54" y="198" class="t-dim" font-size="11.5" font-weight="600">02 / CatatMD, Inside The Trust Boundary</text>
 
         <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="300" width="998" height="104" rx="10" class="c-lane" stroke-width="1"/>
         <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-2-exception" x="46" y="306" width="986" height="92" rx="8" class="c-security-group" stroke-width="1"/>
-        <text x="54" y="322" class="t-security" font-size="10" font-weight="600">EX / Outside The Boundary</text>
+        <text x="54" y="322" class="t-security" font-size="11.5" font-weight="600">EX / Outside The Boundary</text>
 
         <!-- Phase headers -->
 
@@ -346,8 +346,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-node-label="" x="123" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Consult In Room</text>
-          <text x="123" y="131" class="t-muted" font-size="8" text-anchor="middle">patient still present</text>
+          <text data-node-label="" x="123" y="114" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Consult In Room</text>
+          <text x="123" y="131" class="t-muted" font-size="9.5" text-anchor="middle">patient still present</text>
         </g>
 
         <g id="node-start" data-node-id="start" data-node-label="Start A Consultation" aria-label="Focus Start A Consultation, record, paste or upload, Doctor" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="record, paste or upload" data-node-context="Doctor">
@@ -360,8 +360,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" x="301" y="125.2" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Start A Consultation</text>
-          <text x="301" y="140.1" class="t-muted" font-size="8" text-anchor="middle">record, paste or upload</text>
+          <text data-node-label="" x="301" y="125.2" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Start A Consultation</text>
+          <text x="301" y="140.1" class="t-muted" font-size="9.5" text-anchor="middle">record, paste or upload</text>
         </g>
 
         <g id="node-review" data-node-id="review" data-node-label="Review And Edit" aria-label="Focus Review And Edit, acknowledge every flag, Doctor" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="acknowledge every flag" data-node-context="Doctor">
@@ -374,8 +374,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" x="777" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Review And Edit</text>
-          <text x="777" y="131" class="t-muted" font-size="8" text-anchor="middle">acknowledge every flag</text>
+          <text data-node-label="" x="777" y="114" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Review And Edit</text>
+          <text x="777" y="131" class="t-muted" font-size="9.5" text-anchor="middle">acknowledge every flag</text>
         </g>
 
         <g id="node-approve" data-node-id="approve" data-node-label="Approve" aria-label="Focus Approve, explicit and audited, Doctor" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="explicit and audited" data-node-context="Doctor">
@@ -388,8 +388,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" x="955" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Approve</text>
-          <text x="955" y="131" class="t-muted" font-size="8" text-anchor="middle">explicit and audited</text>
+          <text data-node-label="" x="955" y="114" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Approve</text>
+          <text x="955" y="131" class="t-muted" font-size="9.5" text-anchor="middle">explicit and audited</text>
         </g>
 
         <g id="node-transcript" data-node-id="transcript" data-node-label="Draft Transcript" aria-label="Focus Draft Transcript, speaker-labelled, CatatMD, Inside The Trust Boundary" aria-pressed="false" data-node-kind="database" data-node-sublabel="speaker-labelled" data-node-context="CatatMD, Inside The Trust Boundary">
@@ -400,8 +400,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" x="421" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Draft Transcript</text>
-          <text x="421" y="255" class="t-muted" font-size="8" text-anchor="middle">speaker-labelled</text>
+          <text data-node-label="" x="421" y="238" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Draft Transcript</text>
+          <text x="421" y="255" class="t-muted" font-size="9.5" text-anchor="middle">speaker-labelled</text>
         </g>
 
         <g id="node-analyse" data-node-id="analyse" data-node-label="Analyse" aria-label="Focus Analyse, rules, de-identify, model, CatatMD, Inside The Trust Boundary" aria-pressed="false" data-node-kind="security" data-node-sublabel="rules, de-identify, model" data-node-context="CatatMD, Inside The Trust Boundary">
@@ -412,8 +412,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" x="599" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Analyse</text>
-          <text x="599" y="255" class="t-muted" font-size="8" text-anchor="middle">rules, de-identify, model</text>
+          <text data-node-label="" x="599" y="238" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Analyse</text>
+          <text x="599" y="255" class="t-muted" font-size="9.5" text-anchor="middle">rules, de-identify, model</text>
         </g>
 
         <g id="node-findings" data-node-id="findings" data-node-label="Note And Findings" aria-label="Focus Note And Findings, gaps, flags, cited advice, CatatMD, Inside The Trust Boundary" aria-pressed="false" data-node-kind="backend" data-node-sublabel="gaps, flags, cited advice" data-node-context="CatatMD, Inside The Trust Boundary">
@@ -423,8 +423,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(708 223) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" x="777.1" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Note And Findings</text>
-          <text x="777" y="255" class="t-muted" font-size="8" text-anchor="middle">gaps, flags, cited advice</text>
+          <text data-node-label="" x="777.1" y="238" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Note And Findings</text>
+          <text x="777" y="255" class="t-muted" font-size="9.5" text-anchor="middle">gaps, flags, cited advice</text>
         </g>
 
         <g id="node-locked" data-node-id="locked" data-node-label="Locked Note" aria-label="Focus Locked Note, final, PDF export, CatatMD, Inside The Trust Boundary" aria-pressed="false" data-node-kind="database" data-node-sublabel="final, PDF export" data-node-context="CatatMD, Inside The Trust Boundary">
@@ -435,8 +435,8 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" x="955" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Locked Note</text>
-          <text x="955" y="255" class="t-muted" font-size="8" text-anchor="middle">final, PDF export</text>
+          <text data-node-label="" x="955" y="238" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Locked Note</text>
+          <text x="955" y="255" class="t-muted" font-size="9.5" text-anchor="middle">final, PDF export</text>
         </g>
 
         <g id="node-hosted" data-node-id="hosted" data-node-label="Hosted Speech" aria-label="Focus Hosted Speech, per-consultation consent, Outside The Boundary" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="per-consultation consent" data-node-context="Outside The Boundary">
@@ -446,59 +446,59 @@ svg[data-preset="editorial"][data-animation="trace"] [data-animate="node"] { ani
           <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(232 347) scale(0.6875)">
             <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
           </g>
-          <text data-node-label="" x="301" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Hosted Speech</text>
-          <text x="301" y="379" class="t-muted" font-size="8" text-anchor="middle">per-consultation consent</text>
+          <text data-node-label="" x="301" y="362" class="t-primary" font-size="12.5" font-weight="600" text-anchor="middle">Hosted Speech</text>
+          <text x="301" y="379" class="t-muted" font-size="9.5" text-anchor="middle">per-consultation consent</text>
         </g>
 
         <!-- Edge labels -->
 
         <g data-edge-from="approve" data-edge-to="locked" data-edge-label="terminal" data-edge-key="1" data-edge-id="approve-locked">
           <rect x="930.8" y="171" width="48.4" height="14" rx="3" class="c-mask"/>
-          <text x="955" y="181" class="t-edge-emphasis" font-size="8" text-anchor="middle">terminal</text>
+          <text x="955" y="181" class="t-edge-emphasis" font-size="9.5" text-anchor="middle">terminal</text>
         </g>
 
 
         <g data-edge-from="hosted" data-edge-to="transcript" data-edge-label="text" data-edge-key="4" data-edge-id="hosted-transcript">
           <rect x="383.5" y="347" width="30" height="14" rx="3" class="c-mask"/>
-          <text x="398.5" y="357" class="t-edge-dashed" font-size="8" text-anchor="middle">text</text>
+          <text x="398.5" y="357" class="t-edge-dashed" font-size="9.5" text-anchor="middle">text</text>
         </g>
 
         <g data-edge-from="start" data-edge-to="hosted" data-edge-label="consented audio" data-edge-key="6" data-edge-id="start-hosted">
           <rect x="260" y="233" width="82" height="14" rx="3" class="c-mask"/>
-          <text x="301" y="243" class="t-edge-dashed" font-size="8" text-anchor="middle">consented audio</text>
+          <text x="301" y="243" class="t-edge-dashed" font-size="9.5" text-anchor="middle">consented audio</text>
         </g>
         <g data-edge-from="start" data-edge-to="transcript" data-edge-label="typed or on-device" data-edge-key="7" data-edge-id="start-transcript">
           <rect x="358.3" y="146" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="406.5" y="156" class="t-edge-default" font-size="8" text-anchor="middle">typed or on-device</text>
+          <text x="406.5" y="156" class="t-edge-default" font-size="9.5" text-anchor="middle">typed or on-device</text>
         </g>
 
 
         <!-- Legend -->
         <g data-legend="">
-          <text x="20" y="428" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <text x="20" y="428" class="t-primary" font-size="13.5" font-weight="650">Legend</text>
           <g data-legend-semantic-kind="frontend" data-legend-x="20" data-legend-baseline="448" data-legend-width="100">
             <rect x="20" y="440" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
-            <text x="42" y="448" class="t-muted" font-size="7.5" font-weight="500">Doctor action</text>
+            <text x="42" y="448" class="t-muted" font-size="9" font-weight="500">Doctor action</text>
           </g>
           <g data-legend-semantic-kind="backend" data-legend-x="127" data-legend-baseline="448" data-legend-width="74">
             <rect x="127" y="440" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-            <text x="149" y="448" class="t-muted" font-size="7.5" font-weight="500">CatatMD</text>
+            <text x="149" y="448" class="t-muted" font-size="9" font-weight="500">CatatMD</text>
           </g>
           <g data-legend-semantic-kind="security" data-legend-x="208" data-legend-baseline="448" data-legend-width="87">
             <rect x="208" y="440" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="230" y="448" class="t-muted" font-size="7.5" font-weight="500">Trust gate</text>
+            <text x="230" y="448" class="t-muted" font-size="9" font-weight="500">Trust gate</text>
           </g>
           <g data-legend-semantic-kind="database" data-legend-x="302" data-legend-baseline="448" data-legend-width="100">
             <rect x="302" y="440" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-            <text x="324" y="448" class="t-muted" font-size="7.5" font-weight="500">Stored record</text>
+            <text x="324" y="448" class="t-muted" font-size="9" font-weight="500">Stored record</text>
           </g>
           <g data-legend-semantic-kind="cloud" data-legend-x="409" data-legend-baseline="448" data-legend-width="91">
             <rect x="409" y="440" width="14" height="9" rx="2" class="c-cloud" stroke-width="1"/>
-            <text x="431" y="448" class="t-muted" font-size="7.5" font-weight="500">Third party</text>
+            <text x="431" y="448" class="t-muted" font-size="9" font-weight="500">Third party</text>
           </g>
           <g data-legend-semantic-kind="external" data-legend-x="507" data-legend-baseline="448" data-legend-width="91">
             <rect x="507" y="440" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
-            <text x="529" y="448" class="t-muted" font-size="7.5" font-weight="500">In the room</text>
+            <text x="529" y="448" class="t-muted" font-size="9" font-weight="500">In the room</text>
           </g>
         </g>
       </svg>
