@@ -1,5 +1,5 @@
 /**
- * Word and character error rates for the ASR harness (`docs/trd.md` §20.9).
+ * Word and character error rates for the ASR harness (`docs/TRD.md` §20.9).
  *
  * A port of the scorer behind `evals/reports/fleurs-qwen3-asr-flash-2026-09-05.md`,
  * kept deliberately faithful: a rate computed under different normalisation cannot

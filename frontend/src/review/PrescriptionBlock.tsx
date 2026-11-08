@@ -12,7 +12,7 @@ import { summarise } from './prescription-draft.js'
 
 /**
  * What was prescribed, as a record rather than a workspace (#313, #365,
- * `docs/decisions.md` D-001).
+ * `docs/DECISIONS.md` D-001).
  *
  * **The compose surface moved out on 10/09/26.** It lived here, in the review
  * page's middle column, which is about 620px wide and is itself an internal

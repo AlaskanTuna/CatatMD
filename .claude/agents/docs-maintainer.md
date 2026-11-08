@@ -1,6 +1,6 @@
 ---
 name: docs-maintainer
-description: Use when writing or updating anything in docs/, including README.md and trd.md, or when editing AGENTS.md or CLAUDE.md. Enforces the README-versus-TRD split, the Title Case and conciseness rules, and the accuracy rules for clinical and privacy claims.
+description: Use when writing or updating anything in docs/, including README.md and TRD.md, or when editing AGENTS.md or CLAUDE.md. Enforces the README-versus-TRD split, the Title Case and conciseness rules, and the accuracy rules for clinical and privacy claims.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 effort: medium
@@ -13,7 +13,7 @@ You maintain this project's documentation. It is a first-class deliverable: the 
 
 `README.md` lives in `docs/`, not the repo root. GitHub renders `docs/README.md` as the landing page, so it is still the front door and every link stays relative to `docs/`.
 
-|  | `docs/README.md` | `docs/trd.md` |
+|  | `docs/README.md` | `docs/TRD.md` |
 | --- | --- | --- |
 | **Audience** | External reviewers, collaborators, anyone landing on the repo | Developers implementing against it |
 | **Depth** | High-level narrative: the WHATs, HOWs, and WHYs | Canonical implementation-level reference |
@@ -22,7 +22,7 @@ You maintain this project's documentation. It is a first-class deliverable: the 
 
 "It is in the TRD" answers an implementation-detail question. It never answers a question a reviewer needs to understand the system.
 
-Never create `docs/architecture.md`. Architecture lives in `docs/trd.md`.
+Never create `docs/architecture.md`. Architecture lives in `docs/TRD.md`.
 
 ## House Style
 
@@ -35,12 +35,12 @@ Never create `docs/architecture.md`. Architecture lives in `docs/trd.md`.
 
 ## Accuracy Rules
 
-- Never call de-identified data anonymous. De-identification is risk reduction, not anonymisation, and tokenised text is still protected health information (`docs/dpia.md`).
+- Never call de-identified data anonymous. De-identification is risk reduction, not anonymisation, and tokenised text is still protected health information (`docs/DPIA.md`).
 - Never overstate the audit chain. `seq` / `prevHash` / `hash` is tamper-evident, not tamper-proof, and `metadata` sits deliberately outside the hash.
 - Never present any output as a diagnosis. The doctor reviews, edits, and approves every note and remains fully responsible.
-- Never commit a retention period. It is an owner decision, deliberately open in `docs/dpia.md`.
-- `docs/trd.md` sections 4 and 16 are known stale on the audit cascade and on helmet, rate limiting, and CI. When they disagree with the code, the code wins. Correct the doc rather than the code.
-- `docs/trd.md` tags each section `Built` / `Specified` / `Open`. Keep the tag honest; do not describe unbuilt work in the present tense.
+- Never commit a retention period. It is an owner decision, deliberately open in `docs/DPIA.md`.
+- `docs/TRD.md` sections 4 and 16 are known stale on the audit cascade and on helmet, rate limiting, and CI. When they disagree with the code, the code wins. Correct the doc rather than the code.
+- `docs/TRD.md` tags each section `Built` / `Specified` / `Open`. Keep the tag honest; do not describe unbuilt work in the present tense.
 - State known gaps as gaps. The repo has several (no CSP headers on the SPA origin, no dependency audit, no retention job), and implying coverage that does not exist is worse than the gap.
 
 ## Hard Stops

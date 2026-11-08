@@ -47,7 +47,7 @@ Clinical: `Consultation` and `AuditEvent`.
 - `AuditEvent` is append-only. No update path, no delete path.
 - Erasure is a tombstone, not a row delete. `eraseConsultation()` (`backend/src/audit/erasure.ts`) nulls `Consultation.transcript`, `analysis`, and `editedNote` and sets `erasedAt`. Any new PHI-bearing column must state in the PR which of those three erasure targets it joins, and if it is a fourth, `eraseConsultation` must be updated in the same change.
 - `Consultation.status` is `draft | analyzing | awaiting_review | approved`. Approval is an explicit doctor action, never a default.
-- Never invent a retention period. It is an owner-assigned decision, deliberately open in `docs/dpia.md` under "Open Retention Decision". A TTL, a cron, or a default expiry in a migration is out of bounds without human sign-off.
+- Never invent a retention period. It is an owner-assigned decision, deliberately open in `docs/DPIA.md` under "Open Retention Decision". A TTL, a cron, or a default expiry in a migration is out of bounds without human sign-off.
 
 ## Migration Discipline
 

@@ -19,7 +19,7 @@ paths:
 
 ai-clinical-assistant handles simulated GP consultation data today, and is built to the standard required to handle real data later. Every rule below names a real file or symbol so it can be checked, not merely agreed with.
 
-**The framing claim that governs everything else:** de-identification is risk reduction, not anonymisation. Tokenised text is still protected health information (`docs/dpia.md`, "Plain-Language De-Identification Statement"). Never write code, comments, or docs implying that de-identified content is safe to treat casually.
+**The framing claim that governs everything else:** de-identification is risk reduction, not anonymisation. Tokenised text is still protected health information (`docs/DPIA.md`, "Plain-Language De-Identification Statement"). Never write code, comments, or docs implying that de-identified content is safe to treat casually.
 
 | Rule File                            | Coverage                                         |
 | ------------------------------------ | ------------------------------------------------ |
@@ -35,7 +35,7 @@ ai-clinical-assistant handles simulated GP consultation data today, and is built
 Document the reason in the PR and ask before merging:
 
 - Any new path from raw transcript text toward a provider, or any second provider SDK import.
-- Any new audio egress, whether it leaves the API or the browser. This clause was read as covering raw audio a fortiori when ambient capture was designed, and the sign-off for Soniox was granted on that reading (`docs/trd.md` §20.10); a third would need its own, and that happened: post-Stop refinement with batch `scribe_v2` was signed off separately by @Andersonnn7788 on 16/10/26, scoped as in "The Post-Stop Upload" above (`docs/trd.md` §20.14). That grant does not loosen this rule for a fourth. **A new surface on an existing egress needs a scope extension rather than a fresh sign-off**, because the grants here are written narrowly enough to exclude surfaces they did not name: prescription dictation took one on 10/09/26 (#355). Do not read "same vendor, same socket, same route" as self-evidently covering a surface the grant does not mention.
+- Any new audio egress, whether it leaves the API or the browser. This clause was read as covering raw audio a fortiori when ambient capture was designed, and the sign-off for Soniox was granted on that reading (`docs/TRD.md` §20.10); a third would need its own, and that happened: post-Stop refinement with batch `scribe_v2` was signed off separately by @Andersonnn7788 on 16/10/26, scoped as in "The Post-Stop Upload" above (`docs/TRD.md` §20.14). That grant does not loosen this rule for a fourth. **A new surface on an existing egress needs a scope extension rather than a fresh sign-off**, because the grants here are written narrowly enough to exclude surfaces they did not name: prescription dictation took one on 10/09/26 (#355). Do not read "same vendor, same socket, same route" as self-evidently covering a surface the grant does not mention.
 - Adding a host to `connect-src` in `vercel.json`, or a second `new WebSocket(` site in the SPA.
 - Exporting `markDeidentified`, adding a `as Deidentified` cast, or making `assertNoIdentifiers` unconditional on anything new.
 - Relaxing a production boot guard, or setting `DEID_FAIL_CLOSED=false` outside a unit test.
@@ -55,6 +55,6 @@ These are the deeper references. Read them rather than duplicating them here.
 - `.claude/skills/healthcare-cdss-patterns/` before touching `redflags/` or any clinical scoring.
 - `.claude/skills/better-auth-security-best-practices/` before touching auth wiring.
 - `.claude/skills/cso/` for a full OWASP and STRIDE audit pass, invoked on demand.
-- `docs/trd.md` for implementation detail. Sections 4 and 16 are stale on the audit cascade and on helmet, rate limiting, and CI; trust the code.
-- `docs/dpia.md` for the privacy position, the processor and residency table, and the open residual-risk register.
+- `docs/TRD.md` for implementation detail. Sections 4 and 16 are stale on the audit cascade and on helmet, rate limiting, and CI; trust the code.
+- `docs/DPIA.md` for the privacy position, the processor and residency table, and the open residual-risk register.
 - `.github/PULL_REQUEST_TEMPLATE.md` Clinical-Safety Checklist is mandatory when the diff touches `deid/`, `lib/llm/`, `lib/asr/`, `redflags/`, `guidelines/`, or logging.

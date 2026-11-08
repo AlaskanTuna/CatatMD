@@ -56,7 +56,7 @@ Cases come from `backend/src/fixtures/`, not from a list here, so there is no se
 
 ## The ASR A/B Harness
 
-`asr-ab.ts` posts a local audio file to ILMU and reports what came back. `docs/trd.md` 20.3 cites it as the gate for the hosted-ASR ship decision, and 20.9 uses it to decide whether ambient capture can ride on ILMU at all.
+`asr-ab.ts` posts a local audio file to ILMU and reports what came back. `docs/TRD.md` 20.3 cites it as the gate for the hosted-ASR ship decision, and 20.9 uses it to decide whether ambient capture can ride on ILMU at all.
 
 It is deliberately **not** wired into `bun run evals`. Run it directly, from the repo root:
 
@@ -87,6 +87,6 @@ bunx tsx evals/asr-ab.ts ~/audio/sample.mp4 --runs 3 --segment 8 --wer --ground-
 ### Cost And Data
 
 - **Every run spends billed calls**, one per chunk per repetition. A three-run segmented arm on a 99 s file at 8 s windows is 39 calls.
-- **Synthetic or scripted audio only**, per the `docs/trd.md` 20.1 and 20.2 provenance rules. Never point it at a recording of a real consultation.
+- **Synthetic or scripted audio only**, per the `docs/TRD.md` 20.1 and 20.2 provenance rules. Never point it at a recording of a real consultation.
 - **Nothing is committed.** Audio and ground truth stay outside the repo, and reports land in `reports/`, which is gitignored.
 - **Numbers reach the TRD by hand.** The harness writes a dated report; a human transcribes the figures into the relevant section with provenance stated, per the 20.3 convention.

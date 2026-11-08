@@ -24,7 +24,7 @@ _Documentation gaps surfaced as prompts to ask · Deterministic red-flag detecti
   <img src="https://img.shields.io/badge/runtime-Bun%20%C2%B7%20Node%2024-000000?style=flat-square&logo=bun&logoColor=white" alt="Bun and Node 24" />
 </p>
 
-[**Live Demo**](https://catatmd.vercel.app) · [**Requirements**](./prd.md) · [**Technical Reference**](./trd.md) · [**Privacy Assessment**](./dpia.md) · [**Architecture**](#architecture-at-a-glance)
+[**Live Demo**](https://catatmd.vercel.app) · [**Requirements**](./PRD.md) · [**Technical Reference**](./TRD.md) · [**Privacy Assessment**](./DPIA.md) · [**Architecture**](#architecture-at-a-glance)
 
 _Catat_ — Malay, "to note down". The product documents; the doctor decides.
 
@@ -97,7 +97,7 @@ Five pressures follow, each measured rather than asserted:
 | **A sore-throat score the doctor completes**, with what the transcript plainly said offered but never selected, cited to MOH's guideline and never interpreted                | Justifying decisions on a record that gets audited   |
 | **Review, edit, and explicit approval** before anything is final                                                                                                              | The doctor stays the author, and stays responsible   |
 
-Every field above is **extraction, not generation**: each carries a verbatim span from the transcript, and anything the consultation never raised resolves to `NOT_ASSESSED` rather than being quietly filled in. Acceptance criteria for each capability live in `docs/prd.md` §9.
+Every field above is **extraction, not generation**: each carries a verbatim span from the transcript, and anything the consultation never raised resolves to `NOT_ASSESSED` rather than being quietly filled in. Acceptance criteria for each capability live in `docs/PRD.md` §9.
 
 **Stated honestly, because a doctor will find out in one clinic session:** for a fast three-minute URTI consult this may well be slower than the handwritten line it replaces. The claim is documentation quality and a safety net that does not depend on memory. It is not a time-saving claim, and no time-saved figure is offered anywhere in this repository.
 
@@ -132,9 +132,9 @@ Three claims the journey diagram is drawn to make checkable:
 
 - **The model never sees a patient identifier.** The de-identification gate sits between the stored transcript and the only egress point, and the request-scoped vault restores real names only on the way back.
 - **The model never sees the rules engine's output**, so it cannot suppress a red flag it was never shown.
-- **The model cannot subtract.** Assembly is a union in both directions: deterministic red flags and deterministic gaps stand whether or not the model mentions them (`docs/trd.md` §10, §12).
+- **The model cannot subtract.** Assembly is a union in both directions: deterministic red flags and deterministic gaps stand whether or not the model mentions them (`docs/TRD.md` §10, §12).
 
-`approved` is terminal and reachable only through an explicit doctor action. The hosted transcription path is drawn dashed and outside the boundary because it is the one route by which audio can leave the device, entered only by a recorded per-consultation act (`docs/trd.md` §20).
+`approved` is terminal and reachable only through an explicit doctor action. The hosted transcription path is drawn dashed and outside the boundary because it is the one route by which audio can leave the device, entered only by a recorded per-consultation act (`docs/TRD.md` §20).
 
 ![CatatMD technical stack. Inside the trust boundary: React, TypeScript, Vite and Tailwind on Vercel; Node, Express and Bun on Render, carrying the deid PHI gate, the lib/llm client, and the routes, redflags, guidelines and audit modules; PostgreSQL, Prisma and Supabase. Outside it: the Qwen language model, reachable only through lib/llm, and the hosted ASR provider ILMU, reached only by an API relay under per-consultation consent.](assets/tech-stack.drawio.png)
 
@@ -142,7 +142,7 @@ Three claims the stack diagram is drawn to make checkable:
 
 - **`lib/llm/` is the only text egress**, and everything crossing that line has already passed `deid/`.
 - **`lib/llm/` now carries two egress calls, completion and embedding,** and both accept only de-identified text.
-- **Two audio paths leave the boundary, and neither can be de-identified first.** Speech-to-text runs on the device by default, so it opens only when a doctor has chosen the hosted engine for the device and ticked the per-consultation consent box for that patient. The diagram draws it dashed because it sits outside the boundary, and the audio reaches it only as a relay through the API (`docs/trd.md` §20.4). Ambient capture is the second: it never enters the API at all, streaming from the browser to the provider under a short-lived key the API mints, which is why the browser carries a guard of its own pinning that socket to one module.
+- **Two audio paths leave the boundary, and neither can be de-identified first.** Speech-to-text runs on the device by default, so it opens only when a doctor has chosen the hosted engine for the device and ticked the per-consultation consent box for that patient. The diagram draws it dashed because it sits outside the boundary, and the audio reaches it only as a relay through the API (`docs/TRD.md` §20.4). Ambient capture is the second: it never enters the API at all, streaming from the browser to the provider under a short-lived key the API mints, which is why the browser carries a guard of its own pinning that socket to one module.
 
 Bun workspaces · TypeScript · Zod (shared contracts) · Express 5 · Prisma 6 · better-auth · React 19 + Vite 7 + Tailwind 4 · Supabase Postgres · Vitest · Biome. Hosting: frontend to Vercel, backend to Render, database to Supabase, all three in one region by design.
 
@@ -158,7 +158,7 @@ Bun workspaces · TypeScript · Zod (shared contracts) · Express 5 · Prisma 6 
 | **API**      | https://catatmd-api.onrender.com · health: `/api/health` | Render   |
 | **Database** | not publicly reachable — API-only access                 | Supabase |
 
-All three are on free tiers by design. Render free instances spin down when idle and Supabase free projects auto-pause after roughly a week, so an external scheduler pings `/api/health` every 10 minutes to keep both awake — one ping covers both, because the health check runs a query (`docs/trd.md` §17).
+All three are on free tiers by design. Render free instances spin down when idle and Supabase free projects auto-pause after roughly a week, so an external scheduler pings `/api/health` every 10 minutes to keep both awake — one ping covers both, because the health check runs a query (`docs/TRD.md` §17).
 
 <div align="right"><a href="#top">&#8593;</a></div>
 
@@ -173,12 +173,12 @@ All three are on free tiers by design. Render free instances spin down when idle
 | **Backend**          | De-identification gate, deterministic red-flag engine, Malaysian guideline corpus, structured-extraction pipeline with its evidence-bound assertion check, gaps engine, authentication, synthetic fixtures                                                               |
 | **Frontend**         | Consultation list, four-input capture screen, review screen carrying gap, red-flag and suggestion cards, the approval control, on-device audio capture with draft speaker labels                                                                                         |
 | **Hosted ASR**       | Live in production behind a device engine preference plus a per-consultation consent gate, both required (#154, #155, #190, #254)                                                                                                                                        |
-| **Analysis latency** | Measured 08/09/26 on a 4-minute synthetic consultation: 54 s median end-to-end, all of it model time. Inside the client's 3-minute envelope, outside the 30 s target recorded in August. Reproduce with `bun run --cwd backend bench:workflow` (`docs/trd.md` §12, #224) |
+| **Analysis latency** | Measured 08/09/26 on a 4-minute synthetic consultation: 54 s median end-to-end, all of it model time. Inside the client's 3-minute envelope, outside the 30 s target recorded in August. Reproduce with `bun run --cwd backend bench:workflow` (`docs/TRD.md` §12, #224) |
 | **Ambient capture**  | Building (#268). The consultation streams from the browser to Soniox as it happens, under a short-lived key the API mints; the API never receives the audio. No accuracy figure for that provider exists in this repo yet                                                |
 
-`docs/trd.md` tags every section `Built`, `Specified`, or `Open`, and never describes unwritten code as if it exists. Where implementation contradicted the specification, the TRD records which won and why rather than quietly conforming — see §3 (the assertion schema had to split in two), §5 and §7.
+`docs/TRD.md` tags every section `Built`, `Specified`, or `Open`, and never describes unwritten code as if it exists. Where implementation contradicted the specification, the TRD records which won and why rather than quietly conforming — see §3 (the assertion schema had to split in two), §5 and §7.
 
-**No clinician has reviewed any of it**, and all data is synthetic. See [`prd.md` §12](./prd.md#12-known-limitations).
+**No clinician has reviewed any of it**, and all data is synthetic. See [`PRD.md` §12](./PRD.md#12-known-limitations).
 
 <div align="right"><a href="#top">&#8593;</a></div>
 
@@ -207,7 +207,7 @@ So this project does not compete on transcription. It competes on **the boundary
 
 **Table stakes are named as table stakes.** Doctor-approves-everything, "does not diagnose", audio-not-retained, and SOAP templates are stated by every vendor in this market. They are kept here only in their **enforced** form: a state transition with an audit event, not a sentence in a marketing page.
 
-**Ground already occupied locally is named rather than claimed.** Browser-side NRIC tokenisation ships today at DocReport, and Malaysian CPG citation lookup is held by Qmed AskCPG, co-developed with MOH. Full analysis in `docs/prd.md` §5.
+**Ground already occupied locally is named rather than claimed.** Browser-side NRIC tokenisation ships today at DocReport, and Malaysian CPG citation lookup is held by Qmed AskCPG, co-developed with MOH. Full analysis in `docs/PRD.md` §5.
 
 <div align="right"><a href="#top">&#8593;</a></div>
 
@@ -228,7 +228,7 @@ Switching views never asks the model again and never reinterprets prose. A categ
 
 What _is_ enforced is the payer contract: condition → treatment → itemised medication dispensed → MC days → referral. Two of those fields have no home in SOAP at all, because the Malaysian GP dispenses in-house and issues the MC in the room.
 
-The note therefore carries an operational block alongside the four SOAP strings (`docs/trd.md` §3):
+The note therefore carries an operational block alongside the four SOAP strings (`docs/TRD.md` §3):
 
 | Field                  | Records                                                | When The Transcript Is Silent |
 | ---------------------- | ------------------------------------------------------ | ----------------------------- |
@@ -261,19 +261,19 @@ transcript ──► deid gate ──► LLMClient ──► provider
 
 - **Tokenisation is stable within a request** — `[PATIENT_1]`, `[NRIC_1]` — so the model sees one consistent handle per person across the whole transcript.
 - **The vault is request-scoped.** It is never a singleton, never attached to a database row, never logged, and is discarded when the handler returns.
-- **Identifiers read aloud are tokenised too, with measured gaps.** A spoken IC, phone or record number arrives as words, not digits, so a dedicated detector tokenises number-word runs. On 28 measured readings of one synthetic IC, 18 tokenise whole, 4 up to the transcriber's comma and 6 pass; Tamil numerals and phonetic fragments still pass ([`trd.md` §9, Spoken Digit Runs](./trd.md#spoken-digit-runs)).
-- **Audit events record detector _labels_, never values** (`["NRIC","NAME"]`), so the audit trail cannot become a second leak vector (`docs/trd.md` §15).
+- **Identifiers read aloud are tokenised too, with measured gaps.** A spoken IC, phone or record number arrives as words, not digits, so a dedicated detector tokenises number-word runs. On 28 measured readings of one synthetic IC, 18 tokenise whole, 4 up to the transcriber's comma and 6 pass; Tamil numerals and phonetic fragments still pass ([`TRD.md` §9, Spoken Digit Runs](./TRD.md#spoken-digit-runs)).
+- **Audit events record detector _labels_, never values** (`["NRIC","NAME"]`), so the audit trail cannot become a second leak vector (`docs/TRD.md` §15).
 
 `LLMClient.generate()` accepts only a `Deidentified` branded string, so passing a plain `string` — an accidental leak — is a compile error, not a code-review question. Two further enforcement points were open gaps in earlier drafts and were **closed on 13/08/26**:
 
-- **Minting is now locked, not a convention.** `markDeidentified` is no longer exported. It lives module-private inside `backend/src/deid/`, so branding a raw string anywhere else is a compile error (`docs/trd.md` §5; decision §19 row 1, closed).
-- **`DEID_FAIL_CLOSED` now has runtime effect.** `OpenAICompatibleClient.generate()` re-runs the full detector inventory over the outbound payload immediately before the network call and refuses to send if anything fires (`docs/trd.md` §7; decision §19 row 2, closed).
+- **Minting is now locked, not a convention.** `markDeidentified` is no longer exported. It lives module-private inside `backend/src/deid/`, so branding a raw string anywhere else is a compile error (`docs/TRD.md` §5; decision §19 row 1, closed).
+- **`DEID_FAIL_CLOSED` now has runtime effect.** `OpenAICompatibleClient.generate()` re-runs the full detector inventory over the outbound payload immediately before the network call and refuses to send if anything fires (`docs/TRD.md` §7; decision §19 row 2, closed).
 
 The two sit at different tiers deliberately. The first stops the convenient bypass at compile time; the second catches the determined one — a `value as Deidentified` cast, which no type system can prevent — at runtime. The guard's exception carries **detector labels only, never matched values**, so the failure path cannot itself become a leak.
 
 What remains honest to say: a deliberate cast still compiles. The claim is that it cannot reach a provider undetected, not that it cannot be written.
 
-Detection is pattern-based and best-effort — see [`prd.md` §12](./prd.md#12-known-limitations).
+Detection is pattern-based and best-effort — see [`PRD.md` §12](./PRD.md#12-known-limitations).
 
 <details>
 <summary><strong>Audio Stays On The Device By Default, With One Stated Exception</strong></summary>
@@ -293,11 +293,11 @@ The claim stops there, because on modest clinic hardware the on-device path has 
 | Prescription dictation | 10/09/26 (D-001)         | On-device recognition, or typing                                          |
 | Ambient capture        | 21/09/26 (D-007)         | Press to record, which has an on-device path. Ambient has none of its own |
 
-The rest of the rule holds on both: failure degrades to press-to-record, to the device, or to typing, never to the cloud. Ambient still sends nothing without its per-consultation tick. See [`decisions.md`](./decisions.md).
+The rest of the rule holds on both: failure degrades to press-to-record, to the device, or to typing, never to the cloud. Ambient still sends nothing without its per-consultation tick. See [`DECISIONS.md`](./DECISIONS.md).
 
 **That last clause is the load-bearing one.** Silently switching to hosted transcription because a device is slow would be a privacy control that fails **open** under load, degrading exactly when the doctor is least able to notice. It is written down as rejected rather than left to an implementer's judgement.
 
-The hosted adapter is **built and live**, and reaching it takes two separate acts (`docs/trd.md` §20, §20.4):
+The hosted adapter is **built and live**, and reaching it takes two separate acts (`docs/TRD.md` §20, §20.4):
 
 | Control               | Question it answers               | Scope                                            |
 | --------------------- | --------------------------------- | ------------------------------------------------ |
@@ -318,17 +318,17 @@ The hosted adapter is **built and live**, and reaching it takes two separate act
 | Press to record, hosted       | One finished recording, through our API, to ILMU                                                                                                                                                                                                          | Malaysia                               |
 | Ambient capture               | Streamed from the browser straight to Soniox, under a key our API mints. **A new consultation opens here**                                                                                                                                                | United States                          |
 | Prescription dictation        | One phrase to Soniox, same route. On the device only when streaming is unavailable                                                                                                                                                                        | US, or device                          |
-| Ambient refinement after Stop | The finished recording, once, straight from the browser to ElevenLabs batch speech-to-text under a single-use token our API mints. Untranslated ambient only, off in production until gated, live transcript on any failure ([`trd.md`](./trd.md) §20.14) | Vendor default, not a residency option |
+| Ambient refinement after Stop | The finished recording, once, straight from the browser to ElevenLabs batch speech-to-text under a single-use token our API mints. Untranslated ambient only, off in production until gated, live transcript on any failure ([`TRD.md`](./TRD.md) §20.14) | Vendor default, not a residency option |
 
-**Two destinations leave the region: Soniox, reached by two paths, and ElevenLabs batch refinement after Stop, browser-direct and gated off in production.** Soniox offers the United States, the European Union, Japan and India, and no Malaysian or Singapore option. That is the honest cost of the only streaming recogniser tested here that both handles Malay, English and Chinese switching mid-sentence and tells the speakers apart (ElevenLabs' realtime model could not, [`trd.md`](./trd.md) §20.13), and the transfer basis is recorded as open in [`dpia.md`](./dpia.md) rather than treated as solved. Our servers never hold that audio. ElevenLabs offers no residency option on its default endpoint, and its retention of the uploaded recording is unmeasured ([`trd.md`](./trd.md) §20.14, [`dpia.md`](./dpia.md)).
+**Two destinations leave the region: Soniox, reached by two paths, and ElevenLabs batch refinement after Stop, browser-direct and gated off in production.** Soniox offers the United States, the European Union, Japan and India, and no Malaysian or Singapore option. That is the honest cost of the only streaming recogniser tested here that both handles Malay, English and Chinese switching mid-sentence and tells the speakers apart (ElevenLabs' realtime model could not, [`TRD.md`](./TRD.md) §20.13), and the transfer basis is recorded as open in [`DPIA.md`](./DPIA.md) rather than treated as solved. Our servers never hold that audio. ElevenLabs offers no residency option on its default endpoint, and its retention of the uploaded recording is unmeasured ([`TRD.md`](./TRD.md) §20.14, [`DPIA.md`](./DPIA.md)).
 
-**Prescription dictation streams by default, and it is the one audio path with no consent control left.** Dictate opens the prescription surface and the microphone with it; the disclosure and the per-consultation tick were removed on 10/09/26 on the owner's instruction, so a doctor who touches nothing sends a patient's voice to a United States endpoint on one press. Authorised and scoped to that one surface ([`trd.md`](./trd.md) §20.10). The cost is recorded as a cost rather than argued away: the live count of consent controls there is zero ([`decisions.md`](./decisions.md) D-001). What did not weaken is the trail, which now records `consentAsserted: false` on that path instead of claiming an agreement nobody gave. Every failure still lands back on the device or on typing rather than on the cloud.
+**Prescription dictation streams by default, and it is the one audio path with no consent control left.** Dictate opens the prescription surface and the microphone with it; the disclosure and the per-consultation tick were removed on 10/09/26 on the owner's instruction, so a doctor who touches nothing sends a patient's voice to a United States endpoint on one press. Authorised and scoped to that one surface ([`TRD.md`](./TRD.md) §20.10). The cost is recorded as a cost rather than argued away: the live count of consent controls there is zero ([`DECISIONS.md`](./DECISIONS.md) D-001). What did not weaken is the trail, which now records `consentAsserted: false` on that path instead of claiming an agreement nobody gave. Every failure still lands back on the device or on typing rather than on the cloud.
 
-**Ambient keeps its tick, and lost the other half on 21/09/26.** A new consultation now opens in ambient ([`decisions.md`](./decisions.md) D-007), so the capture-mode half of the rule ships already set and the per-consultation tick is the only control the doctor still exercises there. Nothing streams without it: the start dispatcher refuses, and the API rejects an ambient session request that does not assert it.
+**Ambient keeps its tick, and lost the other half on 21/09/26.** A new consultation now opens in ambient ([`DECISIONS.md`](./DECISIONS.md) D-007), so the capture-mode half of the rule ships already set and the per-consultation tick is the only control the doctor still exercises there. Nothing streams without it: the start dispatcher refuses, and the API rejects an ambient session request that does not assert it.
 
 **The split is deliberate, and it was got wrong once.** For three weeks the engine preference was the whole gate while the interface still said each patient was asked. A remembered agreement is one the next patient never gave, so the per-consultation half was restored and is now pinned by a test that fails if the claim and the control ever part company again (#254).
 
-**A recording returns as timestamped, speaker-labelled draft lines.** Each Doctor/Patient label is a guess from segment timing and what the sentence says, never from the voices. The doctor no longer confirms them line by line: that gate was removed in #233 because the ambient workflow replacing it has no moment to stop and tweak labels. The safety it bought moved rather than went, and the transcript now carries `labelsReviewed: false` so the red-flag engine will not drop a trigger hit on a label nobody stood behind (`docs/trd.md` §20.2).
+**A recording returns as timestamped, speaker-labelled draft lines.** Each Doctor/Patient label is a guess from segment timing and what the sentence says, never from the voices. The doctor no longer confirms them line by line: that gate was removed in #233 because the ambient workflow replacing it has no moment to stop and tweak labels. The safety it bought moved rather than went, and the transcript now carries `labelsReviewed: false` so the red-flag engine will not drop a trigger hit on a label nobody stood behind (`docs/TRD.md` §20.2).
 
 **Ambient capture can interpret for a patient who speaks Urdu, Bengali, Mandarin or Tamil** (#392, #393, #385). The doctor picks the patient's language before starting, and the same Soniox socket returns every line with a machine translation beneath it, so each person reads the whole conversation in their own language.
 
@@ -336,12 +336,12 @@ The hosted adapter is **built and live**, and reaching it takes two separate act
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **What the safety checks read** | The English only. The red-flag engine and de-identification read Latin script, so the other-language half is stored beside each turn and never sent to a model                                                        |
 | **Roles**                       | Taken from the language spoken: English is the doctor and anything else the patient. Still a draft, and still `labelsReviewed: false`                                                                                 |
-| **Consent**                     | The tick says the patient agreed to machine translation. It is written in English only, by the owner's decision (`decisions.md` D-008)                                                                                |
+| **Consent**                     | The tick says the patient agreed to machine translation. It is written in English only, by the owner's decision (`DECISIONS.md` D-008)                                                                                |
 | **Measured**                    | On synthetic voices only (#389). Every translation arrived directly after the words it translated, and the red-flag engine caught 12 of 12 translated warning signs after #390. **Mandarin and Tamil are unmeasured** |
 
-**Machine translation is not an interpreter.** Nothing here measures it on real speech, speakers of Sylheti or Chittagonian are likely poorly served, and a line that comes back untranslated is counted on the review page as one the safety checks could not read. See [`trd.md`](./trd.md) §20.12.
+**Machine translation is not an interpreter.** Nothing here measures it on real speech, speakers of Sylheti or Chittagonian are likely poorly served, and a line that comes back untranslated is counted on the review page as one the safety checks could not read. See [`TRD.md`](./TRD.md) §20.12.
 
-**Auto-Detect reads English, Malay, Mandarin and Tamil, and Cantonese is not supported** (#218, `decisions.md` D-009). The Record tab says so before capture starts.
+**Auto-Detect reads English, Malay, Mandarin and Tamil, and Cantonese is not supported** (#218, `DECISIONS.md` D-009). The Record tab says so before capture starts.
 
 | Language  | Measured On Production's Config, Synthetic Voices Only |
 | --------- | ------------------------------------------------------ |
@@ -350,7 +350,7 @@ The hosted adapter is **built and live**, and reaching it takes two separate act
 | Malay     | 9.4% word error rate                                   |
 | Cantonese | 62.5% character error rate, heard as Mandarin          |
 
-Six read lines per language, so these are indicative, not a benchmark. A Mandarin or Tamil name is tokenised where a self-introduction or a title marks it (#418); one said with neither still reaches the model in its own script. See [`trd.md`](./trd.md) §20.10.
+Six read lines per language, so these are indicative, not a benchmark. A Mandarin or Tamil name is tokenised where a self-introduction or a title marks it (#418); one said with neither still reaches the model in its own script. See [`TRD.md`](./TRD.md) §20.10.
 
 **One request does leave the browser on the on-device path**, and it is named here rather than left to be discovered. The speech model's weights are fetched from a public CDN the first time they are needed, then cached.
 
@@ -363,7 +363,7 @@ Six read lines per language, so these are indicative, not a benchmark. A Mandari
 
 **Removing even that request is configuration, not a rebuild.** `VITE_ASR_MODEL_HOST` points the download at a mirror, the path layout matches the CDN's so mirroring is a file copy, and the last third-party request disappears. The runtime itself is already served from our own origin.
 
-Who observes what, and why those two assets are treated differently, is set out in full in `docs/trd.md` §20.
+Who observes what, and why those two assets are treated differently, is set out in full in `docs/TRD.md` §20.
 
 </details>
 
@@ -380,7 +380,7 @@ All three supported providers speak the OpenAI-compatible protocol and are selec
 
 **Residency, stated accurately.** In-region hosting is **not** "data residency solved". Under the amended PDPA (Act A1719) the whitelist regime is gone, and s.129 now requires an affirmative basis for any transfer of Malaysian data out of Malaysia, which hosting anywhere else _is_.
 
-The claim this project makes is narrower and true: **in-region hosting, a documented s.129 basis, and a region-portable adapter.** This prototype also processes no personal data at all, because every consultation is synthetic (`docs/prd.md` §11).
+The claim this project makes is narrower and true: **in-region hosting, a documented s.129 basis, and a region-portable adapter.** This prototype also processes no personal data at all, because every consultation is synthetic (`docs/PRD.md` §11).
 
 </details>
 
@@ -395,7 +395,7 @@ The safety argument is not "a doctor reviews everything". Doctors do not reliabl
 <details>
 <summary><strong>The Finding It Was Built Against</strong></summary>
 
-Measured **13/08/26** against the live production endpoint. Full method and output in `docs/trd.md` §21.1.
+Measured **13/08/26** against the live production endpoint. Full method and output in `docs/TRD.md` §21.1.
 
 | Transcript                         | Result                                                                                                                                                                        |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -409,7 +409,7 @@ Measured **13/08/26** against the live production endpoint. Full method and outp
 <details>
 <summary><strong>The Four Controls</strong></summary>
 
-Ranked by what makes them hold rather than by how they are worded (`docs/trd.md` §21.3):
+Ranked by what makes them hold rather than by how they are worded (`docs/TRD.md` §21.3):
 
 | Control                                                                    | Tier              | How It Fails                                                   |
 | -------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------- |
@@ -430,7 +430,7 @@ Two properties the diagram is drawn to make checkable:
 <details>
 <summary><strong>Guideline Grounding: One Corpus, Two Citable Vocabularies</strong></summary>
 
-Every citable guideline, the three anchoring sources included, is ingested through one retrieval pipeline rather than hand-copied (`docs/trd.md` §11):
+Every citable guideline, the three anchoring sources included, is ingested through one retrieval pipeline rather than hand-copied (`docs/TRD.md` §11):
 
 | Source                                                             | Covers                                                       | Licence Posture                                     |
 | ------------------------------------------------------------------ | ------------------------------------------------------------ | --------------------------------------------------- |
@@ -460,9 +460,9 @@ Reuse terms for the AMM-hosted MOH CPG library are unconfirmed (issue #250). Thi
 | Invariant                                  | How It Is Enforced                                                                                                                                                                                                                     |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Unknown is never recorded as negative**  | Six explicit states: `PRESENT`, `DENIED`, `CLINICIAN_OBSERVED`, `NOT_ASSESSED`, `UNKNOWN`, `NOT_APPLICABLE`. A fact whose evidence does not match the transcript verbatim is forced to `NOT_ASSESSED` in code                          |
-| **Diagnosis is recorded, never generated** | Populated **only by transcription**. It must carry a verbatim span in which the doctor states the impression, and resolves to `NOT_ASSESSED` where they state none. The model is never asked what the diagnosis is (`docs/prd.md` §10) |
-| **Red flags cannot be suppressed**         | The rules engine is a pure function over the transcript. It runs before the model, and its results are never shown to the model to "reconcile" against. Assembly is a union, never a filter (`docs/trd.md` §10)                        |
-| **Citations cannot be invented**           | The request-time schema narrows `guidelineId` to the live corpus ids, so a citation naming anything else fails validation inside the adapter and never reaches the doctor (`docs/trd.md` §11)                                          |
+| **Diagnosis is recorded, never generated** | Populated **only by transcription**. It must carry a verbatim span in which the doctor states the impression, and resolves to `NOT_ASSESSED` where they state none. The model is never asked what the diagnosis is (`docs/PRD.md` §10) |
+| **Red flags cannot be suppressed**         | The rules engine is a pure function over the transcript. It runs before the model, and its results are never shown to the model to "reconcile" against. Assembly is a union, never a filter (`docs/TRD.md` §10)                        |
+| **Citations cannot be invented**           | The request-time schema narrows `guidelineId` to the live corpus ids, so a citation naming anything else fails validation inside the adapter and never reaches the doctor (`docs/TRD.md` §11)                                          |
 
 **The asymmetry on assertion states is deliberate.** A false `NOT_ASSESSED` costs the doctor one dismissed prompt. A false `DENIED` lets a later clinician rule out a diagnosis on a finding nobody ever checked.
 
@@ -478,9 +478,9 @@ Reuse terms for the AMM-hosted MOH CPG library are unconfirmed (issue #250). Thi
 
 **No EMR write-back — because there is no rail to write back to.** This is a market fact, not MVP triage: the Malaysian private-GP clinic-system market is a fragmented long tail with no published API standard, and the national interoperability layer reaches private **hospitals** from January 2027, not GP clinics. PDF export is the honest interim.
 
-Also deliberately absent (`docs/prd.md` §6):
+Also deliberately absent (`docs/PRD.md` §6):
 
-- **Diagnosis, triage decisions and treatment selection.** Safety boundaries, not deferred features. Recording what the doctor stated is in scope and transcription-bound; producing it is not (`docs/decisions.md` D-001)
+- **Diagnosis, triage decisions and treatment selection.** Safety boundaries, not deferred features. Recording what the doctor stated is in scope and transcription-bound; producing it is not (`docs/DECISIONS.md` D-001)
 - **Red-flag deletion or silent dismissal.** Flags may be acknowledged, never removed
 - **Any edit after approval**, and any autonomous action
 - **Any confidence or uncertainty score**
@@ -505,7 +505,7 @@ The bar is real and it is clearable. The argument is not that this product escap
 - The transcription-bound `diagnosis` field is the intended-purpose hinge
 - The same hinge governs medication: a dictated prescription is recorded and confirmed, never generated
 
-The Act 737 intended-purpose statement is written out in `docs/prd.md` §11. This is a prototype, is not placed on the market, and is not for clinical use.
+The Act 737 intended-purpose statement is written out in `docs/PRD.md` §11. This is a prototype, is not placed on the market, and is not for clinical use.
 
 <div align="right"><a href="#top">&#8593;</a></div>
 
@@ -532,7 +532,7 @@ corpus/cpg/      CPG manifest (tracked) and raw PDFs (gitignored) for ingestion
 docs/            product and workflow docs
 ```
 
-The load-bearing module rule: **no module outside `backend/src/lib/llm/` may import an LLM provider SDK directly** (`docs/trd.md` §2).
+The load-bearing module rule: **no module outside `backend/src/lib/llm/` may import an LLM provider SDK directly** (`docs/TRD.md` §2).
 
 <div align="right"><a href="#top">&#8593;</a></div>
 
@@ -590,7 +590,7 @@ Optional, and only needed to build or refresh the retrieval tier. Poppler (`pdft
 2. Run `bun run corpus:ingest --dry-run` to check matching, extraction, and chunking with no writes.
 3. Run `bun run corpus:ingest` to embed, index, and upload each PDF to the private Supabase Storage bucket.
 
-`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `SUPABASE_GUIDELINES_BUCKET` are optional; without the first two the upload step is skipped. The pipeline is documented in `docs/trd.md` §11.
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `SUPABASE_GUIDELINES_BUCKET` are optional; without the first two the upload step is skipped. The pipeline is documented in `docs/TRD.md` §11.
 
 <div align="right"><a href="#top">&#8593;</a></div>
 
@@ -601,10 +601,10 @@ Optional, and only needed to build or refresh the retrieval tier. Poppler (`pdft
 | Document                                  | Owns                                                                                       |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
 | This file                                 | The reader-facing narrative — what, how, and why                                           |
-| [`prd.md`](./prd.md)                      | Requirements, capabilities, acceptance criteria, scope, limitations                        |
-| [`trd.md`](./trd.md)                      | Canonical implementation reference — contracts, schemas, security posture                  |
-| [`dpia.md`](./dpia.md)                    | Production data-flow, PDPA engineering assessment, retention, rights, and residual risks   |
-| [`superpowers/research/`](./superpowers/) | The research phase behind the positioning and clinical claims, graded by evidence strength |
+| [`PRD.md`](./PRD.md)                      | Requirements, capabilities, acceptance criteria, scope, limitations                        |
+| [`TRD.md`](./TRD.md)                      | Canonical implementation reference — contracts, schemas, security posture                  |
+| [`DPIA.md`](./DPIA.md)                    | Production data-flow, PDPA engineering assessment, retention, rights, and residual risks   |
+| [`research/`](./superpowers/) | The research phase behind the positioning and clinical claims, graded by evidence strength |
 | [`../AGENTS.md`](../AGENTS.md)            | Contributor and agent working conventions, canonical for every tool                        |
 
 <div align="right"><a href="#top">&#8593;</a></div>

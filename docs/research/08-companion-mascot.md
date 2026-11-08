@@ -135,7 +135,7 @@ You can literally lint a candidate model for `commercialUsage === "corporation"`
 Both are mine (INFERRED), but both are the kind of thing QA would raise:
 
 1. **A proprietary, non-auditable binary in the frontend of a clinical-safety product.** Live2D Cubism Core ships as a compiled blob under a licence that explicitly forbids reverse engineering ("The Customer may not reverse engineer, decompile, disassemble, or otherwise attempt to discover the Source Code" — [proprietary agreement](https://www.live2d.com/eula/live2d-proprietary-software-license-agreement_en.html), VERIFIED). The CatatMD SPA renders transcripts and note bodies. Any third-party script on that page sits inside the blast radius of the thing the product is built to protect. The VRM/three.js path is fully MIT and does not have this problem.
-2. **Main-thread and GPU contention with browser-side ASR.** CatatMD's differentiator set includes browser-side speech recognition (see `docs/superpowers/research/05-similar-products.md`). A continuous `requestAnimationFrame` WebGL loop next to real-time transcription competes for exactly the resources that make the transcription feel live. Rive at 43 KB and Lottie mitigate this; a 3D scene does not.
+2. **Main-thread and GPU contention with browser-side ASR.** CatatMD's differentiator set includes browser-side speech recognition (see `docs/research/05-similar-products.md`). A continuous `requestAnimationFrame` WebGL loop next to real-time transcription competes for exactly the resources that make the transcription feel live. Rive at 43 KB and Lottie mitigate this; a 3D scene does not.
 
 ---
 
@@ -402,7 +402,7 @@ The parenthetical is the one honest opening for a mascot. But "appropriate for y
 
 ### 6.2 The Positioning Conflict — The Argument That Actually Settles It
 
-CatatMD's competitive analysis (`docs/superpowers/research/05-similar-products.md`) concludes that its defensible differentiators are: a de-identification gate before the LLM, deterministic red flags the LLM may only add to, ID-constrained citations, and in-region hosting. Every one of those is a claim of the form **"we are the disciplined, safety-first, verifiable one."**
+CatatMD's competitive analysis (`docs/research/05-similar-products.md`) concludes that its defensible differentiators are: a de-identification gate before the LLM, deterministic red flags the LLM may only add to, ID-constrained citations, and in-region hosting. Every one of those is a claim of the form **"we are the disciplined, safety-first, verifiable one."**
 
 That is a positioning built entirely on _restraint_. It is the same argument Microsoft makes when Dragon Copilot's Information Assist refuses to answer "Are there any diagnoses I have missed?" — the refusal _is_ the credibility.
 

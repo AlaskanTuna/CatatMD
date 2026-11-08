@@ -1,6 +1,6 @@
 # 00 — Research Synthesis
 
-> Written by the orchestrating agent from streams 01–07. Each numbered file carries its own sources and its own "What this changes" section; this file consolidates, ranks, and flags conflicts. Nothing here edits `docs/prd.md` or `docs/trd.md` — every delta below is a **proposal awaiting Gate 1**.
+> Written by the orchestrating agent from streams 01–07. Each numbered file carries its own sources and its own "What this changes" section; this file consolidates, ranks, and flags conflicts. Nothing here edits `docs/PRD.md` or `docs/TRD.md` — every delta below is a **proposal awaiting Gate 1**.
 
 **Streams:** 01 GP workday · 02 GP systems/language/billing · 03 domain study · 04 market fit · 05 similar products · 06 competition patterns · 07 OSS engineering. (08, companion mascot, is a separate exploratory stream outside this synthesis's Gate 1 scope.)
 
@@ -77,8 +77,8 @@ Three streams independently converge on the same repositioning:
 
 ## 6. Conflicts With Recorded Decisions — Flagged, Not Reopened
 
-1. **PDF/print export (decisions.md 2026-08-13: moved into MVP; PRD CAP-5).** Stream 02 argues it has no consumer in a TPA-portal/e-invoicing clinic and creates an unfiled PHI artefact; it recommends demoting it in favour of structured JSON + per-section copy. **This contradicts a recorded decision.** Not silently reversed — a human call at Gate 1. Cheapest reconciliation: keep browser print (already nearly free), add per-section copy, skip dedicated PDF generation work.
-2. **Open self-service sign-up.** The research brief states it was **cut**; `docs/decisions.md` (2026-08-13), the PRD Demo Script, and TRD §14/§19 row 4 still record it as **in scope**. Whichever is current, the docs and the decision log disagree with the brief and must be reconciled at Gate 1. If it is cut, §19 row 4 closes for free.
+1. **PDF/print export (DECISIONS.md 2026-08-13: moved into MVP; PRD CAP-5).** Stream 02 argues it has no consumer in a TPA-portal/e-invoicing clinic and creates an unfiled PHI artefact; it recommends demoting it in favour of structured JSON + per-section copy. **This contradicts a recorded decision.** Not silently reversed — a human call at Gate 1. Cheapest reconciliation: keep browser print (already nearly free), add per-section copy, skip dedicated PDF generation work.
+2. **Open self-service sign-up.** The research brief states it was **cut**; `docs/DECISIONS.md` (2026-08-13), the PRD Demo Script, and TRD §14/§19 row 4 still record it as **in scope**. Whichever is current, the docs and the decision log disagree with the brief and must be reconciled at Gate 1. If it is cut, §19 row 4 closes for free.
 3. **"Slower than writing the note unaided" (PRD, Will Not Tolerate).** Streams 01+02 show that for the modal 3-minute URTI consult the tool plausibly _is_ slower than the handwritten line it replaces. Not a scope reversal — but the PRD's own tolerance line currently sets a bar the product may not clear, and the positioning fix (quality + safety net, not speed) needs to reach that sentence too.
 
 **Explicitly validated, no change:** clinical scope (now with numbers), the PHI boundary, deterministic-first red flags, ID-constrained citations, single-provider Qwen, browser-side ASR as the privacy architecture (as demo path it is a risk — see §3), and no-EMR-write-back (strengthened, with a better justification).

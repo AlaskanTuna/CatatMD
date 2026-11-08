@@ -18,14 +18,14 @@ original language, never translated.`
 }
 
 /**
- * `red_flags` (docs/trd.md §12, Operation 2a). A Tier-4 control (docs/trd.md
+ * `red_flags` (docs/TRD.md §12, Operation 2a). A Tier-4 control (docs/TRD.md
  * §21.3) and never relied on alone. Every safety property it states in words is
  * also enforced structurally:
  *
  * - "these are candidates only, never authoritative" is backed by
  *   `RedFlagCandidatesSchema` pinning `source` to `z.literal('model')` and
  *   omitting `ruleId`, so a response is structurally incapable of
- *   impersonating the deterministic rules engine (docs/trd.md §10).
+ *   impersonating the deterministic rules engine (docs/TRD.md §10).
  * - "a red flag carries no citation" is backed by the schema omitting
  *   `guidelineIds`, and by this call never receiving a corpus at all.
  *
@@ -58,11 +58,11 @@ candidate, so report every candidate you find either way.`
 }
 
 /**
- * `suggestions` (docs/trd.md §12, Operation 2b). The half that cites, and the
+ * `suggestions` (docs/TRD.md §12, Operation 2b). The half that cites, and the
  * only half that receives the corpus.
  *
  * - "cite only ids from the corpus below" is backed by `z.enum(corpusIds)` at
- *   decode time (docs/trd.md §11).
+ *   decode time (docs/TRD.md §11).
  * - "never state a diagnosis" has no structural backstop here; `suggestions`
  *   is free text, so it is stated explicitly, alongside the reminder that this
  *   call never sees or influences the rules engine's own output.

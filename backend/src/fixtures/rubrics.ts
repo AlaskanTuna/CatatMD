@@ -1,6 +1,6 @@
 /**
  * Per-fixture grading rubric. Fixtures are gradeable encounters, not clean
- * showcase transcripts (docs/prd.md §14) — each entry states what correct
+ * showcase transcripts (docs/PRD.md §14) — each entry states what correct
  * behaviour looks like for that case, so QA grades against a stated rubric
  * rather than a snapshot of whatever the system happens to produce.
  *
@@ -15,7 +15,7 @@ export interface FixtureRubric {
   expectedBehaviour: string
   /** A behaviour that fails QA outright if observed. */
   failsQaIf: string
-  /** Detector classes (docs/trd.md §9) this fixture seeds, if any. */
+  /** Detector classes (docs/TRD.md §9) this fixture seeds, if any. */
   identifierClasses: readonly string[]
   /**
    * Exactly which deterministic red-flag rules this transcript must raise, by

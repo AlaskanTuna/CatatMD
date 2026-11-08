@@ -124,7 +124,7 @@ describe('only the approve route can approve (issue #10, AC1)', () => {
       'Something outside the approve route sets a consultation to approved. ' +
         'Approval is the transition that makes a clinical record the doctor’s ' +
         'and it may only happen through an explicit clinician action ' +
-        '(docs/prd.md CAP-5). If a new caller is genuinely needed, it must go ' +
+        '(docs/PRD.md CAP-5). If a new caller is genuinely needed, it must go ' +
         'through the same 409-guarded route rather than writing the status.',
     ).toEqual(EXPECTED)
   })

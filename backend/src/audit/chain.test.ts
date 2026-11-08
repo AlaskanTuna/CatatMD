@@ -140,7 +140,7 @@ describe('verifyAuditChain', () => {
   /**
    * The honest limitation, asserted rather than only documented: deleting rows
    * from the end leaves a shorter chain that is internally valid. Only an
-   * auditor holding an earlier head hash can see it (docs/trd.md §15).
+   * auditor holding an earlier head hash can see it (docs/TRD.md §15).
    */
   it('cannot detect a truncated tail on its own', () => {
     const full = buildChain(4)

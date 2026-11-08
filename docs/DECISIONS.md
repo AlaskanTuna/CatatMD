@@ -1,8 +1,8 @@
 # Decisions
 
-Scope decisions that change what this product does, recorded rather than silently applied. `docs/prd.md` Section 1 names this file as the place a post-final scope change must land.
+Scope decisions that change what this product does, recorded rather than silently applied. `docs/PRD.md` Section 1 names this file as the place a post-final scope change must land.
 
-**What belongs here:** a change to what the product will or will not do, where the reasoning matters more than the diff. Implementation choices belong in `docs/trd.md` Section 19. A question still open belongs in Section 19 too, until someone answers it.
+**What belongs here:** a change to what the product will or will not do, where the reasoning matters more than the diff. Implementation choices belong in `docs/TRD.md` Section 19. A question still open belongs in Section 19 too, until someone answers it.
 
 **Entry format:** an id, a date, a status, the decision in one sentence, the reasoning, and what the decision explicitly does not license. Entries are appended and never rewritten. A decision that is later reversed gets a new entry that says so.
 
@@ -15,7 +15,7 @@ Scope decisions that change what this product does, recorded rather than silentl
 | **Date**       | 2026-09-09                                                    |
 | **Status**     | Adopted. Amended 2026-09-10 three times, and 2026-10-06 twice |
 | **Issues**     | #310, #311, #312, #313, #355, #356, #357, #363                |
-| **Supersedes** | Nothing. Clarifies `docs/prd.md` Section 6                    |
+| **Supersedes** | Nothing. Clarifies `docs/PRD.md` Section 6                    |
 
 ### Decision
 
@@ -35,7 +35,7 @@ Section 11's intended-purpose statement already describes exactly this, and is *
 | -------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | Section 11     | "not intended to recommend or select treatment"                 | Unambiguous, and untouched here                                                   |
 | Section 6      | "Diagnosis, triage decisions, prescribing"                      | Ambiguous, and read literally it forbade transcribing a sentence the doctor spoke |
-| `docs/dpia.md` | "does not diagnose, prescribe, or approve a note automatically" | The word "automatically" was already doing the work                               |
+| `docs/DPIA.md` | "does not diagnose, prescribe, or approve a note automatically" | The word "automatically" was already doing the work                               |
 
 **The literal reading was already untrue in the shipped product.** `medicationsDispensed` in the operational block (Section 9, CAP-1) has been populated by extraction since that block shipped: drugs the doctor named, each carrying a verbatim transcript span, resolving to `NOT_ASSESSED` when the doctor said nothing. This decision does not widen scope so much as make the written boundary match behaviour that already exists and was already reviewed.
 
@@ -51,13 +51,13 @@ Section 11's intended-purpose statement already describes exactly this, and is *
 
 |                            |                                                                                                                                                                                                                                               |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **What is added**          | Streaming recognition on the same Soniox socket ambient capture uses, browser-direct, US region (`trd.md` §20.10, issues #356 and #357)                                                                                                       |
+| **What is added**          | Streaming recognition on the same Soniox socket ambient capture uses, browser-direct, US region (`TRD.md` §20.10, issues #356 and #357)                                                                                                       |
 | **What stays the default** | On-device Whisper. A doctor who changes nothing sends no audio anywhere, and no consent tick is offered on that path. **Superseded the same day, see the next amendment**                                                                     |
 | **What stays the floor**   | On-device is also the fallback. Key unset, consent withheld, socket dropped, or hardware below the floor all land back on it or on typing, never silently on the cloud. **The hardware clause narrowed the same day, see the next amendment** |
 | **What gates it**          | The two-control consent rule in `.claude/rules/security.md`, unchanged and now binding on the review page: a standing device preference plus a per-consultation tick that dies with the component                                             |
 | **Who authorised it**      | @Andersonnn7788, 2026-09-10, scoped to prescription dictation on the review page and nothing else                                                                                                                                             |
 
-**Why the original wording was right when it was written.** #313 chose on-device deliberately, reasoning that the review page had no consent surface and that rebuilding one in a third place was worse than removing the question. That reasoning is not overturned so much as paid for: the gate is now built there rather than avoided. What forced the question is measurement in `trd.md` §20: on the 83.4 s reference recording the WebGPU path stamped a real-time factor of 0.89, against 2.14 for the WASM q8 baseline, and §20.1 puts browser WASM generally at 1.5 to 3.0. Anything at or above 1.0 cannot keep pace with speech. Words appearing as the doctor speaks was therefore never reachable on the fallback path most clinic hardware runs, and only marginally reachable on the best of them.
+**Why the original wording was right when it was written.** #313 chose on-device deliberately, reasoning that the review page had no consent surface and that rebuilding one in a third place was worse than removing the question. That reasoning is not overturned so much as paid for: the gate is now built there rather than avoided. What forced the question is measurement in `TRD.md` §20: on the 83.4 s reference recording the WebGPU path stamped a real-time factor of 0.89, against 2.14 for the WASM q8 baseline, and §20.1 puts browser WASM generally at 1.5 to 3.0. Anything at or above 1.0 cannot keep pace with speech. Words appearing as the doctor speaks was therefore never reachable on the fallback path most clinic hardware runs, and only marginally reachable on the best of them.
 
 ### Amended 2026-09-10: Streaming Becomes The Default, At The Cost Of One Control
 
@@ -93,7 +93,7 @@ Section 11's intended-purpose statement already describes exactly this, and is *
 
 **The reason given was usability, and it is recorded as that rather than dressed up.** The disclosure and the tick sat between Dictate and the box on a card already too small for its contents, and the owner asked for them gone. No measurement supports the removal and none was claimed.
 
-**What is genuinely lost is worth naming precisely.** MMC 003/2023 cl.18 wants consent specific to the purpose before capture, and the PDPA 2024 amendment makes voice biometric data requiring explicit consent. The interface no longer asks for either on this path. `docs/dpia.md` carries that as a residual risk rather than a closed one, and the release gate for real data is unchanged: synthetic data only until the controller decides otherwise.
+**What is genuinely lost is worth naming precisely.** MMC 003/2023 cl.18 wants consent specific to the purpose before capture, and the PDPA 2024 amendment makes voice biometric data requiring explicit consent. The interface no longer asks for either on this path. `docs/DPIA.md` carries that as a residual risk rather than a closed one, and the release gate for real data is unchanged: synthetic data only until the controller decides otherwise.
 
 **What was deliberately not done, because it would have been the #228 failure again.** The tick was not folded into the device preference, and no remembered agreement was introduced. There is simply no agreement now, which is a smaller claim than a false one.
 
@@ -201,7 +201,7 @@ Each of these is a safety boundary in its own right, and none is a deferred feat
 
 **The lexicon is a spelling aid, not a formulary.** It holds names and synonyms, and no dose, indication, or recommendation data. The ingested CPG chunks draw the identical line for themselves: "This prototype does not encode drug choice, dose, duration, or treatment thresholds."
 
-**The confirm step is the control.** Published guidance on speech recognition in medication documentation names selection from a list, plus prescriber review before submission, as the mitigations for exactly this failure mode. `docs/trd.md` Section 20.7 reached the same place independently for transcript corrections: "a proposal on screen, never an automatic edit, and never a rewrite of stored text."
+**The confirm step is the control.** Published guidance on speech recognition in medication documentation names selection from a list, plus prescriber review before submission, as the mitigations for exactly this failure mode. `docs/TRD.md` Section 20.7 reached the same place independently for transcript corrections: "a proposal on screen, never an automatic edit, and never a rewrite of stored text."
 
 ---
 
@@ -212,7 +212,7 @@ Each of these is a safety boundary in its own right, and none is a deferred feat
 | **Date**       | 2026-09-09                                                                                             |
 | **Status**     | Adopted                                                                                                |
 | **Issues**     | #250 (open)                                                                                            |
-| **Supersedes** | The hand-written `guideline-corpus-v4` chunk set that anchored `docs/trd.md` Section 11 since issue #8 |
+| **Supersedes** | The hand-written `guideline-corpus-v4` chunk set that anchored `docs/TRD.md` Section 11 since issue #8 |
 
 ### Decision
 
@@ -220,7 +220,7 @@ The 11 hand-written guideline chunks are retired. The three documents behind the
 
 ### What This Decision Does Not License
 
-- **No change to the ID-constrained citation mechanism.** `guidelineId` still fails schema validation for any id outside the live corpus (`docs/trd.md` Section 11).
+- **No change to the ID-constrained citation mechanism.** `guidelineId` still fails schema validation for any id outside the live corpus (`docs/TRD.md` Section 11).
 - **No new clinical content.** The same three documents, now ingested rather than hand-copied, plus the deterministic layers (red-flag triggers, gap checklist) citing them through stable `doc:<id>[#p<n>]` references instead of a curated chunk id.
 - **Issue #250 stays open.** Whether MOH-ARR spans may be sent to the model for grounding at all, distinct from whether they may be displayed, is not answered by this decision. The current posture is that they are sent, de-identified, and display is off.
 - **Page anchors on `doc:` references are deliberately left unset.** No trigger or checklist entry cites a specific page today; this is a scope boundary of the current content, not a limitation of the reference format.
@@ -262,7 +262,7 @@ A provider call gets **one attempt of 90 seconds**, not two of 60. `REQUEST_TIME
 - **No claim about the size of the latency gain.** Splitting one call's output does not imply halving its latency: both halves repeat the transcript and system preamble, the output may not divide evenly, and four concurrent generations can meet a provider concurrency or token-rate limit that one did not. It is a hypothesis until the benchmark says otherwise, and the benchmark had to be repaired first because its `retrieval` stage never ran retrieval.
 - **No claim that this makes analysis fast enough.** Whether synchronous analysis behind the Vercel rewrite is viable at all is still open, and is settled by measurement rather than by this decision.
 - **No cover for the transient-failure regression.** A 429 or 5xx now fails immediately on **every** chat operation, not just analysis. That is accepted, not unnoticed.
-- **No retrospective trust in the timing table.** `docs/trd.md` Section 19's `retrieval` row measures the suggestions call without retrieval, so production is slower than it reads.
+- **No retrospective trust in the timing table.** `docs/TRD.md` Section 19's `retrieval` row measures the suggestions call without retrieval, so production is slower than it reads.
 
 ---
 
@@ -298,7 +298,7 @@ The owner's words were that the sentence is not important to show, and that the 
 
 **The difference from D-001 is the half worth reading.** Dictation lost its disclosure **and** its tick, so the honest count of consent controls there is zero. Ambient loses the disclosure only. A doctor still has to tick a box per patient before anything streams, so what went is the explanation, not the asking.
 
-**What is genuinely lost is worth naming precisely.** MMC 003/2023 cl.18 wants consent specific to the purpose before capture, and a purpose stated without a recipient is a weaker statement of it. `docs/dpia.md` carries that as a residual risk rather than a closed one, and the release gate for real data is unchanged: synthetic data only until the controller decides otherwise.
+**What is genuinely lost is worth naming precisely.** MMC 003/2023 cl.18 wants consent specific to the purpose before capture, and a purpose stated without a recipient is a weaker statement of it. `docs/DPIA.md` carries that as a residual risk rather than a closed one, and the release gate for real data is unchanged: synthetic data only until the controller decides otherwise.
 
 ### What This Decision Does Not License
 
@@ -360,7 +360,7 @@ Three parts, all of which are needed for any of them to be correct:
 
 ### Decision
 
-An approved consultation's printed report is a separate document with its own field contract (`docs/trd.md` §26), not a print rendering of the §23 EHR export payload and not governed by that contract's field list.
+An approved consultation's printed report is a separate document with its own field contract (`docs/TRD.md` §26), not a print rendering of the §23 EHR export payload and not governed by that contract's field list.
 
 ### Reasoning
 
@@ -433,7 +433,7 @@ The owner's words were that a coming consultation should land on ambient scribe 
 | **Date**    | 2026-09-28                                                                  |
 | **Status**  | Adopted                                                                     |
 | **Issues**  | #389, #390, #391, #392, #393                                                |
-| **Follows** | `docs/trd.md` §20.10's grant, extended the same day to translation (§20.12) |
+| **Follows** | `docs/TRD.md` §20.10's grant, extended the same day to translation (§20.12) |
 
 ### Decision
 
@@ -486,13 +486,13 @@ The same two-way translation now pairs English with Mandarin (`zh`) or Tamil (`t
 | **Date**   | 2026-10-07                                                              |
 | **Status** | Adopted                                                                 |
 | **Issues** | #218, #418                                                              |
-| **Builds** | §20.10 "Measured 07/10/26" in `docs/trd.md`, which supplies the numbers |
+| **Builds** | §20.10 "Measured 07/10/26" in `docs/TRD.md`, which supplies the numbers |
 
 ### Decision
 
 Each language goes to the path below, and Cantonese is stated as not supported on the Record tab rather than left to fail quietly.
 
-| Language               | Path                                                    | Measured on that path (synthetic voices, `docs/trd.md` §20.10)            |
+| Language               | Path                                                    | Measured on that path (synthetic voices, `docs/TRD.md` §20.10)            |
 | ---------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
 | English, Manglish      | Ambient Auto-Detect, or on-device press-to-record       | English measured elsewhere (§20.1); not re-run here                       |
 | Malay                  | Ambient Auto-Detect, or the ILMU relay                  | 9.4% WER                                                                  |
@@ -546,7 +546,7 @@ A dropped socket is reopened on its own, with the audio spoken during the outage
 - **No audio stored.** The queue lives in memory for at most 60 seconds and goes only to the socket.
 - **No new egress or surface.** A reopened socket uses the same minting route, vendor, region and audit row as the first; each reopen is its own audited mint.
 - **No cap bypass.** A reconnect never extends a capture past the cap the API minted.
-- **What reverses it:** a server-side draft column, taken through `db-migrator`, `eraseConsultation` and `docs/dpia.md` together.
+- **What reverses it:** a server-side draft column, taken through `db-migrator`, `eraseConsultation` and `docs/DPIA.md` together.
 
 ---
 
@@ -594,7 +594,7 @@ Measured against a precision corpus of 134 clinical Mandarin, Cantonese, Tamil a
 
 ### What This Decision Does Not License
 
-- **No claim that Mandarin or Tamil is de-identified.** Cued names are; the rest is the residual risk recorded in `docs/dpia.md`.
+- **No claim that Mandarin or Tamil is de-identified.** Cued names are; the rest is the residual risk recorded in `docs/DPIA.md`.
 - **No bare surname or given-name list for either script,** and no widening of the cues, without the precision corpus still passing unchanged.
 
 ## D-012: One Sore-Throat Score, From NAG's Own Table, Completed By The Doctor
@@ -624,7 +624,7 @@ A consultation on the respiratory profile that plainly reports a sore throat car
 ### Why One Score, And Why NAG's
 
 - **Both sources tabulate the same instrument.** Abdullah et al. 2024 call it McIsaac and differ only at its edges: 38 °C itself scores, age 45 itself does not, and the node criterion is "tender" without "swollen". Two near-identical forms would ask the doctor the same questions twice.
-- **NAG is the national guideline** and the corpus's primary anchor (`docs/trd.md` §11).
+- **NAG is the national guideline** and the corpus's primary anchor (`docs/TRD.md` §11).
 - **The earlier corpus summary was wrong.** It recorded NAG's score as four criteria with no age term and "fever by history". The guideline's table has five rows, including age, and a measured temperature.
 
 ### Why Suggestions, And Why They Read Narrowly
@@ -656,9 +656,9 @@ The evidence shown is the whole sentence, so the doctor can see what was read.
 
 ### Decision
 
-Speech recognition stays on Soniox for ambient, dictation and translated capture, and this decision is about the **realtime** model only. Scribe v2 Realtime was measured on English, Malay, Mandarin and Tamil with code-switching, and does not diarise, drops a speaker under overlap, and fabricates or rewrites short turns when tuned to commit per turn. Numbers and method: `docs/trd.md` §20.13.
+Speech recognition stays on Soniox for ambient, dictation and translated capture, and this decision is about the **realtime** model only. Scribe v2 Realtime was measured on English, Malay, Mandarin and Tamil with code-switching, and does not diarise, drops a speaker under overlap, and fabricates or rewrites short turns when tuned to commit per turn. Numbers and method: `docs/TRD.md` §20.13.
 
-Batch `scribe_v2` is not decided here: it diarised and read the four languages well, and is an open owner question (`docs/trd.md` §20.13).
+Batch `scribe_v2` is not decided here: it diarised and read the four languages well, and is an open owner question (`docs/TRD.md` §20.13).
 
 ### Why
 
@@ -692,7 +692,7 @@ Batch `scribe_v2` is not decided here: it diarised and read the four languages w
 - **After Stop, on an untranslated ambient consultation,** the whole recording is re-transcribed with batch ElevenLabs `scribe_v2`, and that is the transcript the doctor reviews.
 - **On any failure the live Soniox transcript is used,** with a notice, never silently.
 - **Default on when configured,** with a per-device opt-out.
-- **Decided by @Andersonnn7788 on 2026-10-16** (option b), together with the audio-egress sign-off. Mechanism and controls: `docs/trd.md` §20.14.
+- **Decided by @Andersonnn7788 on 2026-10-16** (option b), together with the audio-egress sign-off. Mechanism and controls: `docs/TRD.md` §20.14.
 - **Production stays inert** until the owner confirms the vendor account's "use data to improve models" setting is off and the Render account holder sets `ELEVENLABS_API_KEY`.
 - **Refinement depends on #435.** Batch writes identifiers as words, which the current de-identification gate cannot see (§20.13 measured the synthetic IC number returned as words in 8 of 8 results), so this change must not merge before #435.
 
@@ -713,5 +713,5 @@ Batch `scribe_v2` is not decided here: it diarised and read the four languages w
 - **No relay through `/api/*`.**
 - **No panel disclosure naming the vendor.** The switch and the busy label stay vendor-neutral (D-004).
 - **No setting of any key.** That belongs to the Render account holder, after the retention setting is confirmed.
-- **No claim that retention, the token's single use, or long-recording behaviour is measured.** The list is in `docs/trd.md` §20.14.
+- **No claim that retention, the token's single use, or long-recording behaviour is measured.** The list is in `docs/TRD.md` §20.14.
 - **What reverses it:** a failed measurement gate, a vendor retention answer the owner will not accept, or the owner withdrawing the sign-off. Unsetting `ELEVENLABS_API_KEY` switches it off without a deploy.

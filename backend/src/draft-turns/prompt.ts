@@ -1,5 +1,5 @@
 /**
- * System prompt for the hosted-transcript labelling pass (docs/trd.md §20.3).
+ * System prompt for the hosted-transcript labelling pass (docs/TRD.md §20.3).
  *
  * A Tier-4 control like the analysis prompts (§21.3), never relied on alone:
  * the schema pins the shape (Tier 1), and the reconstruction guard in

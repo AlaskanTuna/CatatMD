@@ -29,7 +29,7 @@ export {
 /**
  * Short failure categories for `consultation.analysis_failed`. A closed set,
  * never the raw error text — a thrown value on the analyse path routinely
- * carries transcript fragments (docs/trd.md §15).
+ * carries transcript fragments (docs/TRD.md §15).
  */
 export type AnalysisFailureReason =
   | 'deidentification_failed'
@@ -81,7 +81,7 @@ export interface AnalysisVersions {
 }
 
 /**
- * The `AuditEvent.action` taxonomy from docs/trd.md §15, as a discriminated
+ * The `AuditEvent.action` taxonomy from docs/TRD.md §15, as a discriminated
  * union rather than a free string.
  *
  * §15 proposes exactly this ("constraining its shape to a discriminated union
@@ -257,7 +257,7 @@ export type AuthAuditEvent = { action: 'auth.session.created' }
  *
  * Audited for the reason the column exists at all: it records a governance
  * decision rather than a preference, and a bare mutable integer cannot answer
- * "what was the policy on this date, and who set it". `docs/dpia.md` requires
+ * "what was the policy on this date, and who set it". `docs/DPIA.md` requires
  * the decision to name its rationale and accountable owner; without a trail the
  * accountable owner is only ever whoever set it last.
  *
@@ -376,7 +376,7 @@ export type BatchSessionFailureReason = 'rejected' | 'rate_limited' | 'unavailab
  * consultation for the same structural reason ephemeral analysis does: no
  * `Consultation` exists at relay time. These rows are the server-observed half
  * of a pair; `consultation.asr_hosted_used`, written at creation, remains the
- * client-asserted linkage (docs/trd.md §15).
+ * client-asserted linkage (docs/TRD.md §15).
  *
  * Audited despite persisting nothing, and for the same reason as above: an
  * unaudited audio egress would be a hole in the property the PHI boundary
@@ -433,7 +433,7 @@ export type AsrAuditEvent =
       metadata: { reason: LiveSessionFailureReason; mode: LiveAsrMode }
     }
   /**
-   * Refinement after Stop (#436, docs/trd.md §20.14). Like the pair above, it
+   * Refinement after Stop (#436, docs/TRD.md §20.14). Like the pair above, it
    * records a **minted credential**, not an upload: the browser sends the
    * finished recording to the vendor without passing through here, so the
    * issuing of the single-use token is the last moment the server sees.

@@ -698,7 +698,7 @@ describe('analyse output', () => {
   })
 
   /**
-   * docs/prd.md §10 requires a field the consultation never touched to read as
+   * docs/PRD.md §10 requires a field the consultation never touched to read as
    * unestablished rather than absent, and the review screen cannot render a
    * `NOT_ASSESSED` it was never sent. These were computed, fed to `deriveGaps`,
    * and then discarded before this.

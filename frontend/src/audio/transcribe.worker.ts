@@ -16,7 +16,7 @@ import {
 } from './protocol.js'
 
 /**
- * On-device speech recognition (issue #2, docs/trd.md §20).
+ * On-device speech recognition (issue #2, docs/TRD.md §20).
  *
  * **No audio byte reaches the API.** Transcription runs entirely in this
  * worker, in the doctor's browser, and the only thing that leaves it is text
@@ -40,8 +40,8 @@ import {
  * `whisper-small`, and the size is a measured decision rather than a default.
  *
  * `base` was tried first and rejected: on Malaysian English it rendered
- * "auntie" as "until" and dropped "pasar malam" entirely (docs/trd.md §20.1,
- * decisions.md 13/08). Those are not exotic edge cases in a Malaysian GP
+ * "auntie" as "until" and dropped "pasar malam" entirely (docs/TRD.md §20.1,
+ * DECISIONS.md 13/08). Those are not exotic edge cases in a Malaysian GP
  * consultation, they are the register the transcript is written in, and a model
  * that silently drops them produces a clean-looking transcript that is wrong.
  *
@@ -111,7 +111,7 @@ async function loadWasm() {
      * q8, which is the library's own WASM default made explicit and pinned.
      * The quantised decoder refuses to open under default session options,
      * and the fix for that is the disabled optimisation pass below, not a
-     * different dtype (docs/trd.md section 20 records the diagnosis).
+     * different dtype (docs/TRD.md section 20 records the diagnosis).
      */
     dtype: 'q8',
     /*
@@ -327,7 +327,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
       streamer: new ChunkCounter(),
       /*
        * Pinned to English, never read from a locale or from the patient's
-       * recorded language (docs/prd.md §12).
+       * recorded language (docs/PRD.md §12).
        *
        * Declaring the wrong language does not produce an error, it produces
        * fluent nonsense: §20.1 measured a 238-word grammatical loop out of 50
@@ -345,7 +345,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
       chunk_length_s: CHUNK_LENGTH_S,
       stride_length_s: STRIDE_LENGTH_S,
       /*
-       * Segment timestamps feed the draft speaker labels (docs/trd.md §20.2).
+       * Segment timestamps feed the draft speaker labels (docs/TRD.md §20.2).
        * Measured on this exact config before being relied on: 17 clean,
        * monotonic segments over an 83 s recording, at a real cost of roughly
        * +50% transcription wall clock. The known failure shapes elsewhere

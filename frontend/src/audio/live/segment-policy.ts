@@ -12,7 +12,7 @@ export type SegmentBounds = {
    *
    * This is the boundary-quality knob, and it errs long deliberately, because
    * the two ways of being wrong are not symmetric. Too long merely defers the
-   * cut to the ceiling, and docs/trd.md 20.7 measures longer windows as the
+   * cut to the ceiling, and docs/TRD.md 20.7 measures longer windows as the
    * cheaper direction. Too short reintroduces the short-window penalty the
    * floor exists to avoid.
    */
@@ -20,7 +20,7 @@ export type SegmentBounds = {
 }
 
 /*
- * The window docs/trd.md 20.7 specifies, held as configuration rather than
+ * The window docs/TRD.md 20.7 specifies, held as configuration rather than
  * constants for a measured reason: 20.9 records that the floor was measured on
  * `qwen3-asr-flash` and "is not known to transfer to a different recogniser".
  * A measurement against the provider actually in use should move these numbers
@@ -49,7 +49,7 @@ export type SegmentState = {
  * starts cold each time and loses the surrounding speech it disambiguates with.
  *
  * How expensive is provider-specific, which is the whole reason the floor is a
- * parameter. docs/trd.md 20.7 measured a cliff below it on `qwen3-asr-flash`,
+ * parameter. docs/TRD.md 20.7 measured a cliff below it on `qwen3-asr-flash`,
  * and 20.9 records that the result "is not known to transfer to a different
  * recogniser". Do not read that cliff as this system's penalty.
  *
@@ -61,7 +61,7 @@ export function shouldCut(state: SegmentState, bounds: SegmentBounds): boolean {
   return state.elapsedMs >= bounds.floorMs && state.silentMs >= bounds.silenceHoldMs
 }
 
-/** A window nobody spoke in, which docs/trd.md 20.7 drops rather than sends. */
+/** A window nobody spoke in, which docs/TRD.md 20.7 drops rather than sends. */
 export function isSilentThroughout(state: SegmentState): boolean {
   return state.voicedMs === 0
 }

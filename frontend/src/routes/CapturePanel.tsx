@@ -244,7 +244,7 @@ export function CapturePanel({
   /*
    * Nothing on this tab is saved until the doctor submits, and no clinical
    * text may go to web storage, so a reload here loses the consultation (#256,
-   * `docs/decisions.md` D-010). The browser's own leave-page prompt is the
+   * `docs/DECISIONS.md` D-010). The browser's own leave-page prompt is the
    * whole of the protection, and it is raised only while there is something to
    * lose: a live capture, or a transcript not yet submitted.
    */

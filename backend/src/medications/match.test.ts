@@ -5,7 +5,7 @@ import { type MedicationCandidate, matchMedication, normalise } from './match.js
 /**
  * The safety argument for this module lives in these tests (issue #311).
  *
- * `docs/decisions.md` D-001 puts automatic substitution of a drug name
+ * `docs/DECISIONS.md` D-001 puts automatic substitution of a drug name
  * outside the boundary: "a candidate is offered; the doctor accepts it".
  * Look-alike sound-alike confusion is a leading medication-error class, and
  * ISMP names selection from a list as the control for exactly this. So the

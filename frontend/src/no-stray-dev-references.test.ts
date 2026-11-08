@@ -197,7 +197,7 @@ describe('no internal document references ship to the browser', () => {
   })
 
   it('reads a reference in a comment and a reference in a string differently', () => {
-    const commented = stripComments("/* see docs/trd.md §20 */\nconst a = 'fine'\n")
+    const commented = stripComments("/* see docs/TRD.md §20 */\nconst a = 'fine'\n")
     expect(commented).not.toMatch(/trd\.md/)
     expect(commented).toMatch(/fine/)
 
@@ -217,7 +217,7 @@ describe('no internal document references ship to the browser', () => {
    * reading them as such desynchronises every comment after them.
    */
   it('does not read a quote inside a regex character class as a string', () => {
-    const source = 'const B = /([.!?]+)\\s+(?=[A-Z0-9"\'])/g\n/* see docs/trd.md */\nconst a = 1\n'
+    const source = 'const B = /([.!?]+)\\s+(?=[A-Z0-9"\'])/g\n/* see docs/TRD.md */\nconst a = 1\n'
     const stripped = stripComments(source)
     expect(stripped).not.toMatch(/trd\.md/)
     expect(stripped).toMatch(/const a = 1/)

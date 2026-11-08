@@ -17,7 +17,7 @@ import { CONFUSABLE_TARGETS } from '../../redflags/mishears.js'
 
 /**
  * The clinical vocabularies live capture primes the recogniser with, and the
- * first of the three accuracy layers docs/trd.md §20.7 describes.
+ * first of the three accuracy layers docs/TRD.md §20.7 describes.
  *
  * Two of them, one per mode: the consultation register ambient capture sends,
  * and the prescription register dictation sends (issue #356). Everything below
@@ -314,7 +314,7 @@ export function asrContextTerms(): string[] {
  * **A different domain, not a subset.** `MALAY_CLINICAL_TERMS` and
  * `CONFUSABLE_TARGETS` are deliberately excluded: a prescription phrase carries
  * no symptoms, and sixty-odd terms of symptom register against fifteen seconds
- * of drug audio is the wrong-domain context effect docs/trd.md §20.7.1 measured,
+ * of drug audio is the wrong-domain context effect docs/TRD.md §20.7.1 measured,
  * where an English clinical context scored *worse than no context at all* on
  * Malay audio. What is left is the register a dictated prescription is actually
  * in: a drug name, an amount, a frequency, a duration and a food timing.

@@ -16,7 +16,7 @@ const gap = (id: string, question: string, rationale: string): InformationGap =>
   priority: 'medium',
 })
 
-describe('stripDiagnosticProse (docs/prd.md §10)', () => {
+describe('stripDiagnosticProse (docs/PRD.md §10)', () => {
   it('leaves an assessment that summarises findings without naming a diagnosis', () => {
     const input = note('Cough and sore throat for 3 days, throat erythematous on exam.')
     const result = stripDiagnosticProse(input, [])

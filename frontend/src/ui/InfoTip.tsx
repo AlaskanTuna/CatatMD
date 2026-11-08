@@ -38,7 +38,7 @@ import { cn } from '../lib/cn.js'
  * **Nothing load-bearing goes inside it.** A fact the reader must have in order
  * to make the choice in front of them belongs in the visible copy, in the same
  * breath as the choice. This carries the elaboration, never the disclosure that
- * consent depends on (docs/trd.md section 20).
+ * consent depends on (docs/TRD.md section 20).
  *
  * `layered` is for tips inside a `<dialog>`, where the UA stylesheet's
  * `overflow: auto` clips an absolutely positioned child however high its
@@ -324,7 +324,7 @@ export function InfoTip({
           'inline-flex size-5 items-center justify-center rounded-full transition-colors',
           tone === 'warning'
             ? // Alpha tint, not a token: this sits on the opaque header card, where a
-              // tint and a solid colour are the same pixels (see docs/decisions.md).
+              // tint and a solid colour are the same pixels (see docs/DECISIONS.md).
               'text-urgent hover:bg-urgent/12 focus-visible:bg-urgent/12'
             : 'text-ink-muted hover:bg-sunken hover:text-ink focus-visible:bg-sunken focus-visible:text-ink',
         )}

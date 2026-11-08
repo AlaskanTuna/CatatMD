@@ -4,7 +4,7 @@ import { proposeMishearCorrections } from '../backend/src/redflags/index.js'
 import { proposeModelCorrections } from '../backend/src/transcript-cleanup/index.js'
 
 /**
- * Answers the one question `docs/trd.md` §20.9 makes this feature conditional
+ * Answers the one question `docs/TRD.md` §20.9 makes this feature conditional
  * on: **does the constrained model pass find correct corrections the measured
  * table does not?**
  *

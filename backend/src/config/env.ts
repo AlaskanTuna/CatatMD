@@ -80,7 +80,7 @@ const EnvSchema = z.object({
   SONIOX_RT_MODEL: z.string().default('stt-rt-v5'),
 
   // ElevenLabs batch speech-to-text, which refines an untranslated ambient
-  // transcript after Stop (#436, docs/trd.md §20.14). Optional on the same
+  // transcript after Stop (#436, docs/TRD.md §20.14). Optional on the same
   // terms as Soniox: unset, the config route offers no refinement and the mint
   // answers 503, so production stays inert until the account holder sets it.
   //
@@ -109,7 +109,7 @@ const EnvSchema = z.object({
   // measured confusable table (issue #309).
   //
   // Off by default, and that is a clinical decision rather than a rollout one.
-  // docs/trd.md §20.9 sets the bar this feature has to clear before it is worth
+  // docs/TRD.md §20.9 sets the bar this feature has to clear before it is worth
   // running at all: "the model pass earns its place only if it finds correct
   // corrections the table does not", and nothing has measured that yet. Turning
   // it on is a decision someone should make with a number in front of them,

@@ -5,7 +5,7 @@
  * **These are engineering targets measured on synthetic fixtures. They are not
  * clinical validation and must never be reported as clinical performance.** No
  * clinician has reviewed the trigger list, the guideline corpus, or any fixture
- * (`docs/prd.md` §12). The distinction is stated here because this file is
+ * (`docs/PRD.md` §12). The distinction is stated here because this file is
  * where the numbers come from, and the numbers are what get quoted.
  */
 

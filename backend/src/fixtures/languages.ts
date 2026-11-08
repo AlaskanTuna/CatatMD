@@ -2,7 +2,7 @@
  * Synthetic consultation lines in the languages Auto-detect ambient capture
  * hints beyond English and Malay, plus Cantonese, which it does not (#218).
  * The same lines were read by synthetic voices to measure recognition on the
- * production config (`docs/trd.md` §20.10, "Measured 07/10/26").
+ * production config (`docs/TRD.md` §20.10, "Measured 07/10/26").
  *
  * The fuller code-switched consultations belong to `corpus.ts` (#249). These
  * are monolingual on purpose: they pin what the gate does with native script.

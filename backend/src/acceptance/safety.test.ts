@@ -34,7 +34,7 @@ afterAll(() => {
  * **These are engineering targets, not clinical validation.** They demonstrate
  * that the system behaves as specified on synthetic inputs. No clinician has
  * reviewed the trigger list, the corpus, or any fixture, and no real-world
- * clinical performance is claimed or implied — see `docs/prd.md` §12.
+ * clinical performance is claimed or implied — see `docs/PRD.md` §12.
  */
 
 // ─── Privacy gateway ─────────────────────────────────────────────────────────

@@ -70,7 +70,7 @@ export const TextRangeSchema = z.object({
  * static recognition config that crosses the audio egress, so a caller chooses
  * which language and never what is sent for it. Urdu and Bengali were measured
  * on this vendor; Mandarin and Tamil were added unmeasured on the owner's
- * grant (docs/decisions.md D-008, docs/trd.md §20.12).
+ * grant (docs/DECISIONS.md D-008, docs/TRD.md §20.12).
  */
 export const InterpretedLanguageSchema = z.enum(['ur', 'bn', 'zh', 'ta'])
 
@@ -116,7 +116,7 @@ export const TranscriptTurnSchema = z
     endSeconds: z.number().nonnegative().optional(),
     /**
      * The same turn in the consultation's other language, when it was captured
-     * through two-way machine translation (docs/trd.md §20.12).
+     * through two-way machine translation (docs/TRD.md §20.12).
      *
      * **`text` above is always Latin script, the English or Malay the
      * recogniser left untranslated, and nothing that reaches a model reads
@@ -173,7 +173,7 @@ export const TranscriptTurnSchema = z
  * even now that hosted transcription passes through it, because nothing ties a
  * relayed recording to the consultation later submitted with this field. It is
  * an honest provenance record for a cooperating client, never a security
- * control. See docs/trd.md §3.
+ * control. See docs/TRD.md §3.
  *
  * Two values mean audio left the doctor's device, by different routes:
  *
@@ -181,7 +181,7 @@ export const TranscriptTurnSchema = z
  *   `POST /api/asr/transcriptions`, which relays it to the provider (#154).
  * - `asr_live`: ambient capture streams the consultation from the browser
  *   straight to the provider, under a short-lived key the API minted
- *   (docs/trd.md §20.10). The API never holds this audio, so the server-side
+ *   (docs/TRD.md §20.10). The API never holds this audio, so the server-side
  *   half of the record is the minted session rather than the audio itself.
  *
  * Both egresses are server-observed and audited at the point the API can see
@@ -232,7 +232,7 @@ export const TranscriptSchema = z.object({
   labelsReviewed: z.boolean().optional(),
   /**
    * Whether any pass of this consultation went through two-way machine
-   * translation, and with which languages (docs/trd.md §20.12).
+   * translation, and with which languages (docs/TRD.md §20.12).
    *
    * **Provenance for the doctor, not a control.** It tells the review page that
    * some English on screen is a machine translation, and it outlives the
@@ -254,7 +254,7 @@ export const TranscriptSchema = z.object({
   /**
    * Whether this consultation's recording was uploaded for refinement after
    * Stop, and whether the refined transcript is the one used (#436,
-   * docs/trd.md §20.14).
+   * docs/TRD.md §20.14).
    *
    * **Present whenever an upload started, including one that was refused.** A
    * refined transcript the client did not use still sent the whole recording
@@ -283,7 +283,7 @@ export const HostedAsrSegmentSchema = z.object({
 
 /**
  * What `POST /api/asr/transcriptions` returns. `segments` is empty on today's
- * path: the provider does not honour `verbose_json` (docs/trd.md §20.3,
+ * path: the provider does not honour `verbose_json` (docs/TRD.md §20.3,
  * finding 5), and the frontend's `usable()` gate already falls back to plain
  * prose on an empty array. The field stays so provider-side segments can start
  * flowing without a contract change.
@@ -368,7 +368,7 @@ export const DraftTurnsResponseSchema = z.object({
  * surfaces as the mint failing closed, never as audio reaching another region.
  *
  * None of the four is Malaysia or Singapore. That is a real cost, recorded in
- * docs/dpia.md rather than softened here.
+ * docs/DPIA.md rather than softened here.
  */
 export const LiveAsrRegionSchema = z.enum(['us', 'eu', 'jp', 'in'])
 
@@ -434,7 +434,7 @@ export const LiveSessionConfigSchema = z.object({
    * Languages to bias toward, not restrict to. The set is constrained and
    * excludes Indonesian, because Malay is tagged Indonesian often enough to
    * matter and every vendor supporting code-switching advises naming the
-   * languages expected (issue #218, docs/trd.md 20.7.1).
+   * languages expected (issue #218, docs/TRD.md 20.7.1).
    */
   languageHints: z
     .array(z.string().regex(/^[a-z]{2,3}$/))
@@ -462,7 +462,7 @@ export const LiveSessionConfigSchema = z.object({
      * Clinical vocabulary to prime recognition toward, in the language of the
      * consultation (issue #307).
      *
-     * **This is the accuracy layer, not a refinement.** docs/trd.md 20.7.1
+     * **This is the accuracy layer, not a refinement.** docs/TRD.md 20.7.1
      * measured the same Malay clip going from "Dr. Sayyabah Taksudali Maharaj"
      * with no context to one word wrong with a clinical Malay vocabulary that
      * contained none of the sentence's content words. The effect is domain and
@@ -481,7 +481,7 @@ export const LiveSessionConfigSchema = z.object({
   }),
   /**
    * Two-way translation between English and one other language, asked of the
-   * recogniser in the socket's first frame (docs/trd.md §20.12).
+   * recogniser in the socket's first frame (docs/TRD.md §20.12).
    *
    * Closed literals and a closed enum only, because this crosses the audio
    * egress like everything else here. Absent on every config except the
@@ -521,7 +521,7 @@ export const LiveAsrConfigSchema = z.object({
   availableTranslations: z.array(InterpretedLanguageSchema).optional(),
   /**
    * Whether this deployment can refine an untranslated ambient transcript after
-   * Stop (#436, docs/trd.md §20.14).
+   * Stop (#436, docs/TRD.md §20.14).
    *
    * Set only on the untranslated ambient config, and only when the API holds a
    * batch key, so the dictation and translated configs are byte-identical to
@@ -559,7 +559,7 @@ export const LiveSessionRequestSchema = z
     consent: z.boolean().optional(),
     mode: LiveAsrModeSchema.default('ambient'),
     /**
-     * Pair this language with English in both directions (docs/trd.md §20.12).
+     * Pair this language with English in both directions (docs/TRD.md §20.12).
      * Ambient only: dictation is one doctor reading out a prescription, and the
      * second refine refuses the pair rather than quietly dropping the field.
      */
@@ -631,9 +631,9 @@ export { formatSoapSubjective, NOT_ESTABLISHED, toSoapNote } from './note-templa
 
 /**
  * Six explicit states, so a fact the consultation never established can never
- * be represented as denied. See docs/prd.md §10 (Unknown ≠ Negative) — the
+ * be represented as denied. See docs/PRD.md §10 (Unknown ≠ Negative) — the
  * absolute half of that rule, measured failing in 5 of 5 runs without it
- * (docs/trd.md §21.1).
+ * (docs/TRD.md §21.1).
  */
 export const AssertionStateSchema = z.enum([
   'PRESENT',
@@ -665,7 +665,7 @@ const ClinicalAssertionShape = z.object({
  * decoding an optional property is simply absent from `required`, and the model
  * takes that permission every time: measured against qwen-flash on a 3,085-word
  * consultation, **0 of 18** `PRESENT`/`DENIED` assertions carried a span. The
- * evidence check (docs/trd.md §21.4) then downgraded every one of them, so a
+ * evidence check (docs/TRD.md §21.4) then downgraded every one of them, so a
  * thorough consultation produced a note asserting nothing and 23 documentation
  * gaps. The safety property held; the product did not.
  *
@@ -673,7 +673,7 @@ const ClinicalAssertionShape = z.object({
  * verbatim** on the same transcript, with `diagnosis` correctly `PRESENT`.
  *
  * The empty string is permitted so `NOT_ASSESSED` stays the cheapest path
- * (docs/trd.md §3, ratification condition 1): a field the transcript never
+ * (docs/TRD.md §3, ratification condition 1): a field the transcript never
  * touched costs `"value":"","evidence":""` and nothing more. The condition
  * forbids a field being implicitly required to be *filled*, which this respects
  * — it requires only that the key be present.
@@ -709,7 +709,7 @@ export const LlmClinicalAssertionSchema = z.object({
  * 'NOT_ASSESSED' }` is a complete, valid assertion costing no further tokens,
  * and nothing here implicitly requires a field to be filled.
  *
- * The span requirement binds `state`, not `value` (docs/trd.md §21.4):
+ * The span requirement binds `state`, not `value` (docs/TRD.md §21.4):
  * `value` may carry a normalised concept label. Scoping it to vocabulary
  * instead would force `NOT_ASSESSED` onto legitimate paraphrase.
  */
@@ -722,14 +722,14 @@ export const ClinicalAssertionSchema = ClinicalAssertionShape.refine(
 )
 
 /**
- * A fixed key set, not a model-chosen one. docs/prd.md §10 requires that a
+ * A fixed key set, not a model-chosen one. docs/PRD.md §10 requires that a
  * field the transcript never touches is never defaulted to `DENIED` *or
  * silently omitted* — only a fixed key set can guarantee the second half, and
  * it is what lets gaps be derived deterministically in code (a Tier-2 control)
  * rather than asked of the model.
  *
- * Keys are taken verbatim from the completeness checklist in docs/prd.md §9
- * (CAP-2). docs/trd.md §12 deferred this shape; this is it. One key list feeds
+ * Keys are taken verbatim from the completeness checklist in docs/PRD.md §9
+ * (CAP-2). docs/TRD.md §12 deferred this shape; this is it. One key list feeds
  * both the permissive decoding schema and the strict persistence schema, so
  * the two cannot drift.
  */
@@ -786,14 +786,14 @@ export const LlmClinicalFactsSchema = buildClinicalFacts(
 
 /**
  * The payer-enforced record schema — condition → treatment → itemised
- * medication dispensed → MC days → referral (docs/prd.md §1). Two of those
+ * medication dispensed → MC days → referral (docs/PRD.md §1). Two of those
  * fields have no home in SOAP, so a SOAP-only note is incomplete against the
  * contract the clinic signed.
  *
  * Every field here is extraction, never generation. `diagnosis` carries the
  * stricter constraint: it records only an impression the doctor stated, and
  * absent that span it resolves to `NOT_ASSESSED`. The system may not produce a
- * diagnosis the doctor did not say (docs/prd.md §10).
+ * diagnosis the doctor did not say (docs/PRD.md §10).
  */
 const buildOperationalBlock = <T extends z.ZodType>(field: T) =>
   z.object({
@@ -808,7 +808,7 @@ const buildOperationalBlock = <T extends z.ZodType>(field: T) =>
      *
      * Ten dispensed items is far beyond any single GP consultation.
      *
-     * Lowered from twenty on 14/08/26 (GitHub issue #96, docs/trd.md §6).
+     * Lowered from twenty on 14/08/26 (GitHub issue #96, docs/TRD.md §6).
      * Gemini expands a bounded array into `maxItems` copies of the item schema
      * before measuring it against its own schema budget, so twenty assertion
      * objects pushed `clinical_facts` past that budget and every request
@@ -951,7 +951,7 @@ export type EvidenceLink = z.infer<typeof EvidenceLinkSchema>
  * `verbatimAllowed` is legally load-bearing, not metadata: MOH NAG 2024 is
  * all-rights-reserved and may be summarised and linked but never quoted, while
  * the two CC-licensed sources may be. A `quote` on a chunk that forbids one is
- * a corpus-authoring defect and fails here (docs/trd.md §11).
+ * a corpus-authoring defect and fails here (docs/TRD.md §11).
  */
 export const GuidelineChunkSchema = z
   .object({
@@ -1060,7 +1060,7 @@ export const ConsultationAnalysisSchema = z.object({
   /**
    * The reviewed checklist, surfaced rather than discarded.
    *
-   * `docs/prd.md` §10 requires that a field the consultation never touched
+   * `docs/PRD.md` §10 requires that a field the consultation never touched
    * reads as unestablished rather than as absent, and Demo Script step 5 asks
    * an evaluator to see exactly that. Both are unsatisfiable if the facts stay
    * inside the analysis pipeline: a UI cannot render a `NOT_ASSESSED` it was
@@ -1077,7 +1077,7 @@ export const ConsultationAnalysisSchema = z.object({
   /**
    * Each established checklist field paired with the verbatim transcript span
    * behind it, so a doctor can check what the system read rather than trusting
-   * it (GitHub issue #10, docs/trd.md §19 row 17).
+   * it (GitHub issue #10, docs/TRD.md §19 row 17).
    *
    * **These trace checklist fields, never note sentences.** The note is
    * generated prose from a separate model call (§12) and is not composed from
@@ -1102,7 +1102,7 @@ export const ConsultationAnalysisSchema = z.object({
    * The model already produces this and `makeSuggestionsAndRedFlagsSchema`
    * documents why it exists: an empty `suggestions` array conflates "out of
    * scope, suggestions suppressed" with "in scope, nothing to suggest"
-   * (docs/trd.md §19 row 7). That reasoning only pays off if the distinction
+   * (docs/TRD.md §19 row 7). That reasoning only pays off if the distinction
    * survives to the UI, and until now it was dropped when the analysis was
    * assembled, leaving the review screen to hedge with "this **may be** outside
    * the corpus's scope" about something the system already knew.
@@ -1212,7 +1212,7 @@ export const SIG_FOOD_TIMINGS = ['before', 'after', 'with'] as const
 export type SigFoodTiming = (typeof SIG_FOOD_TIMINGS)[number]
 
 /**
- * One medication the doctor dictated and then confirmed (`docs/decisions.md`
+ * One medication the doctor dictated and then confirmed (`docs/DECISIONS.md`
  * D-001).
  *
  * **Doctor-authored, and separate from `medicationsDispensed` for that reason.**
@@ -1415,14 +1415,14 @@ export const ConsultationSchema = z.object({
   analysis: ConsultationAnalysisSchema.nullable(),
 })
 
-// ─── LLM response contracts (docs/trd.md §12) ────────────────────────────────
+// ─── LLM response contracts (docs/TRD.md §12) ────────────────────────────────
 
 /**
  * Operation 1a. The 34-assertion checklist (29 clinical fields plus the five
  * operational ones) and nothing else. The prompt never asks for a diagnosis,
  * differential, or impression, only for the diagnosis the doctor stated.
  *
- * Split out from `note_and_gaps` on 13/08/26 (docs/trd.md §19 row 19). One
+ * Split out from `note_and_gaps` on 13/08/26 (docs/TRD.md §19 row 19). One
  * combined response averaged 3,337 completion tokens and ranged over 533 of
  * them, and it is that variance rather than the mean that pushed runs past the
  * provider's reliable ceiling and past CAP-1's 30s budget: 2 of 8 measured runs
@@ -1440,7 +1440,7 @@ export const ClinicalFactsResponseSchema = z.object({
  * Operation 1b. The generated-prose half, run concurrently with 1a against the
  * same transcript. It carries no dependency on the facts call: the note is
  * written from the transcript rather than composed from the assertions
- * (docs/trd.md §12), so ordering the two would only cost wall-clock.
+ * (docs/TRD.md §12), so ordering the two would only cost wall-clock.
  */
 export const NoteAndGapsResponseSchema = z.object({
   note: MedicalRecordNoteSchema,
@@ -1466,7 +1466,7 @@ export const NoteAndGapsResponseSchema = z.object({
  * because it must stay a real judgement about the presentation. It is an
  * explicit signal rather than an inference from an empty `suggestions` array,
  * since that inference would conflate "out of scope, suggestions suppressed"
- * with "in scope, nothing to suggest" (docs/trd.md §19 row 7), and the review
+ * with "in scope, nothing to suggest" (docs/TRD.md §19 row 7), and the review
  * page renders those two, plus "nothing was retrieved", as three distinct
  * sentences. Deriving it from an empty corpus instead would collapse the
  * distinction the UI exists to make.
@@ -1521,7 +1521,7 @@ export const makeSuggestionsSchema = (corpusIds: readonly [string, ...string[]])
     ),
   })
 
-// ─── API contracts (docs/trd.md §13) ─────────────────────────────────────────
+// ─── API contracts (docs/TRD.md §13) ─────────────────────────────────────────
 
 /*
  * `title` is the one clinical field this projection carries, and the widening
@@ -1570,7 +1570,7 @@ export const ConsultationListItemSchema = ConsultationSchema.pick({
  *
  * **It makes de-identification exact rather than probabilistic.** Detection in
  * `backend/src/deid/` is pattern- and gazetteer-based, and is documented as
- * best-effort in `docs/prd.md` §12. A registered patient supplies a known
+ * best-effort in `docs/PRD.md` §12. A registered patient supplies a known
  * identifier list for the consultation, so the vault can be seeded with real
  * values and the detectors demoted to a backstop for whatever was never
  * registered — a spouse named in passing, a number read aloud.
@@ -1784,7 +1784,7 @@ export const ErasePatientResultSchema = z.object({
  * `RETENTION_DEFAULT_YEARS` is a **configurable default reflecting the common
  * clinical-records retention convention, which the clinic data controller must
  * review and adopt or override.** It is not a legal determination and not a
- * statutory requirement; `docs/dpia.md` states that the period must be verified
+ * statutory requirement; `docs/DPIA.md` states that the period must be verified
  * against Malaysian legal and professional-recordkeeping advice, and nothing
  * here substitutes for that.
  *
@@ -1955,7 +1955,7 @@ export const CopilotTurnSchema = z.object({
 })
 
 /**
- * Bounded for the same reason `medicationsDispensed` is (docs/trd.md §21.3):
+ * Bounded for the same reason `medicationsDispensed` is (docs/TRD.md §21.3):
  * an unbounded history is a runaway prompt, and the digest already carries the
  * consultation state, so old turns are conversational context rather than the
  * record. The oldest turns are dropped, never summarised, because a summary of
@@ -2127,7 +2127,7 @@ export const MAX_LIVE_CYCLES = 200
 export const LIVE_DELTA_LOOKBACK_SEGMENTS = 1
 
 /**
- * Floor on the gap between model-backed cycles (docs/trd.md §20.7). It is a
+ * Floor on the gap between model-backed cycles (docs/TRD.md §20.7). It is a
  * minimum interval, not a timer: a cycle also waits for the previous one to
  * return, so the real cadence is the slower of this and provider latency.
  */
@@ -2137,7 +2137,7 @@ export const LIVE_ANALYSIS_INTERVAL_MS = 12_000
  * The previous cycle's result, handed back unchanged by the client.
  *
  * **There is deliberately no field here carrying the running transcript.**
- * docs/trd.md §20.8 adopts the fold over re-extraction, and expressing it in
+ * docs/TRD.md §20.8 adopts the fold over re-extraction, and expressing it in
  * the type rather than in a convention is what stops a later caller quietly
  * resending a growing transcript to buy accuracy.
  *
@@ -2157,7 +2157,7 @@ export const LiveAnalysisResponseSchema = z.object({
   /**
    * Derived by `deriveGaps` over the merged facts, never asked of the model.
    * Live or not, absence detection stays an enumeration over assertion states
-   * (docs/trd.md §20.8.1: judges score 0.50 to 0.63 at spotting what is
+   * (docs/TRD.md §20.8.1: judges score 0.50 to 0.63 at spotting what is
    * missing, which is guessing).
    */
   gaps: z.array(InformationGapSchema),
@@ -2168,7 +2168,7 @@ export const LiveAnalysisResponseSchema = z.object({
 /**
  * The deterministic pane. Separate from the response above because the
  * cadences differ by roughly 40x: rules run on every closed segment and must
- * feel immediate, while the model fold is allowed to lag (docs/trd.md §20.8.1).
+ * feel immediate, while the model fold is allowed to lag (docs/TRD.md §20.8.1).
  */
 export const LiveFlagsResponseSchema = z.object({
   redFlags: z.array(RedFlagSchema),
@@ -2178,7 +2178,7 @@ export const LiveFlagsResponseSchema = z.object({
 
 /**
  * The one address the browser may upload a finished ambient recording to, for
- * re-transcription after Stop (#436, docs/trd.md §20.14).
+ * re-transcription after Stop (#436, docs/TRD.md §20.14).
  *
  * **A literal, compared exactly.** It is the third audio egress, and the
  * second the API never sees, so the same belt-and-braces as
@@ -2194,7 +2194,7 @@ export const BATCH_ASR_UPLOAD_URL = 'https://api.elevenlabs.io/v1/speech-to-text
  *
  * The ambient session cap is 1800 s, and the minute above it is slack for the
  * recorder's last chunk and the stop drain. **Provisional until the
- * measurement gate** (docs/trd.md §20.14): the batch evaluation only ran files
+ * measurement gate** (docs/TRD.md §20.14): the batch evaluation only ran files
  * of at most 40 s, so nothing has yet measured a recording this long.
  */
 export const MAX_BATCH_RECORDING_SECONDS = 1_860
@@ -2215,7 +2215,7 @@ const BatchKeytermSchema = z
  * **Literals throughout, and `.strict()`, and both are the control.** The SPA
  * parses what our own API sends against this, so even a compromised or
  * misconfigured API cannot have it ask for `scribe_v2_medical`, which the
- * evaluation measured merging voices (docs/trd.md §20.13), or for speaker
+ * evaluation measured merging voices (docs/TRD.md §20.13), or for speaker
  * roles, which would be a second role mechanism beside `voteRolesBySpeaker`.
  * The keyterms are the ambient vocabulary, bounded the way the vendor bounds
  * them. Nothing here is derived from a request, for the reason
@@ -2311,7 +2311,7 @@ export const RefinementCheckResponseSchema = z.object({
  *
  * Both words travel. The doctor is choosing between them, so a payload carrying
  * only `suggested` would ask them to approve a replacement without showing what
- * it displaces, and `docs/trd.md` §20.7 admits this feature only as "a proposal
+ * it displaces, and `docs/TRD.md` §20.7 admits this feature only as "a proposal
  * on screen, never an automatic edit".
  *
  * `start` is a character offset into the turn's stored text, so the client can
@@ -2354,7 +2354,7 @@ export const MishearProposalSchema = z.object({
  * Reported rather than inferred from an empty array, because "the pass found
  * nothing" and "the pass never ran" are different facts and a doctor reading a
  * correction surface should not have them collapsed. `disabled` is the default
- * posture: `docs/trd.md` §20.9 requires the model pass to earn its place
+ * posture: `docs/TRD.md` §20.9 requires the model pass to earn its place
  * against the free deterministic table before it is turned on.
  */
 export const TranscriptCleanupStatusSchema = z.enum(['ok', 'failed', 'disabled'])

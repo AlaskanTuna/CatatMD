@@ -201,7 +201,7 @@ export class OpenAICompatibleClient implements LLMClient {
   }
 
   async generate<T>(request: GenerateRequest<T>): Promise<T> {
-    // The egress guard (docs/trd.md §19 row 2). `Deidentified` guarantees the
+    // The egress guard (docs/TRD.md §19 row 2). `Deidentified` guarantees the
     // *shape* of what arrives here, not its *provenance*, so a value could in
     // principle be branded without ever passing through detection (§5).
     // `markDeidentified` has been module-private to `deid/index.ts` since
@@ -227,7 +227,7 @@ export class OpenAICompatibleClient implements LLMClient {
       // Raising it is not a fix for truncation and has been measured making
       // things worse: at 16,384 the model emitted all 16,384 tokens without
       // terminating. A response that will not stop needs a structural bound
-      // (docs/trd.md §21.3, Tier 1) rather than a bigger budget to fill.
+      // (docs/TRD.md §21.3, Tier 1) rather than a bigger budget to fill.
       max_tokens: request.maxTokens ?? 8192,
       messages: [
         { role: 'system', content: request.system },

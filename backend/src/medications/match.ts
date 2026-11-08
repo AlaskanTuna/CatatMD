@@ -9,7 +9,7 @@ import { SIG_STOPWORDS } from './vocabulary.js'
  * **Nothing here rewrites anything.** A candidate names what was heard and
  * what it might be, and the doctor picks. `MedicationCandidate` has no field
  * that can hold corrected text and this module exports no function that
- * applies one, which is the structural form of the rule in `docs/decisions.md`
+ * applies one, which is the structural form of the rule in `docs/DECISIONS.md`
  * D-001: "a candidate is offered; the doctor accepts it".
  *
  * Pure functions: no I/O, no clock, no randomness.

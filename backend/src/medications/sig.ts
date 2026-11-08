@@ -184,7 +184,7 @@ const firstUnclaimed = <T>(text: string, rules: readonly Rule<T>[], claims: Clai
  * dictation names several drugs and this function reads a phrase, not a list,
  * so a slice taken for drug one runs on into drug two whenever the matcher
  * offered no candidate to bound it: a brand name is outside the lexicon by
- * `docs/decisions.md` D-001, which makes that the ordinary case rather than the
+ * `docs/DECISIONS.md` D-001, which makes that the ordinary case rather than the
  * rare one. The furthest claim is the last character this sig can honestly
  * account for, and the text beyond it belongs to nobody yet (#369).
  *

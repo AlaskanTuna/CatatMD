@@ -60,7 +60,7 @@ import { z } from 'zod'
  * Dev proxies `/api` to the API on :3001; production points at the Render
  * origin. Cross-site in production, so `credentials: 'include'` is not
  * optional: the session cookie is `SameSite=None` and is simply not sent
- * without it (docs/trd.md §13).
+ * without it (docs/TRD.md §13).
  */
 const BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -443,7 +443,7 @@ export const api = {
 
   /**
    * Mints the single-use token that uploads one finished ambient recording for
-   * refinement after Stop (#436, docs/trd.md §20.14).
+   * refinement after Stop (#436, docs/TRD.md §20.14).
    *
    * **Only ever called by `AmbientCapture` after Stop**, on an untranslated
    * session whose consent tick is still held, with a recording in hand. The
@@ -494,7 +494,7 @@ export const api = {
 
   /**
    * Structures one dictated medication phrase into draft fields plus spelling
-   * candidates (#313, `docs/decisions.md` D-001).
+   * candidates (#313, `docs/DECISIONS.md` D-001).
    *
    * Read-only despite the POST, and it stores nothing: the doctor confirms by
    * sending the whole list through `patch` above, which is why there is no
@@ -538,7 +538,7 @@ export const api = {
    * back.** The running transcript is deliberately not part of it: the API
    * folds the delta into the previous state rather than re-reading the
    * consultation, so each cycle costs one window rather than a growing
-   * transcript (docs/trd.md §20.8).
+   * transcript (docs/TRD.md §20.8).
    */
   liveAnalysis: (
     consultationId: string,

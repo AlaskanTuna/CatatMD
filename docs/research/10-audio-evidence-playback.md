@@ -2,7 +2,7 @@
 
 > Research behind the question "can a doctor click a transcript sentence and hear the audio that produced it, and is that worth building?" Gathered 08/09/26. Sources are linked inline and graded for strength. Read this before designing anything that retains, plays back, or links consultation audio.
 
-**This file is orientation, not legal advice.** It summarises published guidance so an agent does not rediscover it. It deliberately **does not set a retention period** and must not be cited to justify one: that decision stays open and belongs to the clinic data controller (`docs/dpia.md`, "Open Retention Decision").
+**This file is orientation, not legal advice.** It summarises published guidance so an agent does not rediscover it. It deliberately **does not set a retention period** and must not be cited to justify one: that decision stays open and belongs to the clinic data controller (`docs/DPIA.md`, "Open Retention Decision").
 
 ---
 

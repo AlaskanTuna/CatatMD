@@ -14,7 +14,7 @@
  * unit pin and `evals/copilot-proposals.ts` cannot drift apart. A pin that has
  * quietly stopped meaning what the measurement means is worse than no pin.
  *
- * Measured at 0 of 90 turns on the shipped prompt (§25 of `docs/trd.md`), so it
+ * Measured at 0 of 90 turns on the shipped prompt (§25 of `docs/TRD.md`), so it
  * watches a failure that is not currently happening. It is kept because both
  * prompt revisions trialled for #185 moved the model toward talking about
  * cards, and the second began asserting that a card was waiting when none had

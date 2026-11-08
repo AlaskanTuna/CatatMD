@@ -66,7 +66,7 @@ export const EMPTY_DRAFT: PrescriptionDraft = {
  * will happily let anything act on; #311 guarantees only that the matcher never
  * rewrites text, so confirm-before-apply is a property this layer has to
  * re-establish rather than inherit. Automatic substitution of a drug name is a
- * named row in `docs/decisions.md` D-001's Not Built table, because look-alike
+ * named row in `docs/DECISIONS.md` D-001's Not Built table, because look-alike
  * sound-alike confusion is a leading medication-error class.
  */
 export function acceptCandidate(
@@ -193,7 +193,7 @@ export function lineKeys(parsedFrom: string, lines: readonly PrescriptionLine[])
 /**
  * The table, from the parse and the doctor's edits.
  *
- * **A near-match is never ticked for the doctor** (`docs/decisions.md` D-001,
+ * **A near-match is never ticked for the doctor** (`docs/DECISIONS.md` D-001,
  * amended 06/10/26). Only an exact name starts ticked, so pressing Confirm
  * accepts it; a reading the matcher had to guess at is undecided until the
  * doctor ticks it, picks another reading, types a name or leaves it out. An

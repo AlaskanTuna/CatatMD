@@ -16,7 +16,7 @@ const bareFacts = (overrides: Record<string, unknown> = {}) =>
 const bareOperational = (overrides: Record<string, unknown> = {}) =>
   LlmOperationalBlockSchema.parse(overrides)
 
-describe('applyEvidenceCheck (docs/trd.md §21.4)', () => {
+describe('applyEvidenceCheck (docs/TRD.md §21.4)', () => {
   it('downgrades a DENIED assertion carrying no evidence span to NOT_ASSESSED', () => {
     const facts = bareFacts({
       symptoms: { fever: { state: 'DENIED', value: 'no fever', evidence: '' } },

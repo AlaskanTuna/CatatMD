@@ -18,7 +18,7 @@ import { joinTokens, type LiveSegment, type LiveToken, uncertainRanges } from '.
  * **The pairing is measured, not assumed.** #389 streamed synthetic dialogues
  * and found, in about 3,600 final tokens, every translation run arriving
  * directly after the original chunk it translates, and `<end>` never arriving
- * before it (docs/trd.md §20.12). So a translation joins the utterance that is
+ * before it (docs/TRD.md §20.12). So a translation joins the utterance that is
  * open when it arrives. That is not a nicety: `findDeniedAbility` composes an
  * emergency flag from turn adjacency alone, and a translated "No." on the
  * wrong turn would silently drop it.
@@ -42,7 +42,7 @@ export type OtherLanguage = NonNullable<TranscriptTurn['otherLanguage']>
  * written in Gurmukhi, must not reach `turn.text` either.
  *
  * Chinese and Tamil are caught here although the gate's `SCRIPT` detector
- * leaves them alone on purpose (docs/trd.md §20.12): that detector also guards
+ * leaves them alone on purpose (docs/TRD.md §20.12): that detector also guards
  * the untranslated Auto-detect path, where both are read natively. This module
  * runs on translated sessions only, where the English is the text and the
  * original belongs in `otherLanguage`. A combining mark is stripped too, which
