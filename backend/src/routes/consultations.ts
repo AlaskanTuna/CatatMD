@@ -1,67 +1,52 @@
-import type { Consultation, Prisma } from '@prisma/client'
 import {
-  CaptureModeSchema,
-  type ConsultationAnalysis,
   ConsultationAnalysisSchema,
-  ConsultationDetailSchema,
   ConsultationListItemSchema,
-  ConsultationTitleSchema,
-  type Disposition,
-  type DispositionInput,
-  DispositionInputSchema,
   ERASE_BATCH_LIMIT,
   EraseConsultationsInputSchema,
-  type GuidelineChunk,
-  type InformationGap,
   LiveAnalysisResponseSchema,
   LiveAnalysisStateSchema,
   LiveFlagsResponseSchema,
   MAX_LIVE_DELTA_CHARACTERS,
   MAX_LIVE_DELTA_TURNS,
-  MAX_PRESCRIPTIONS,
   MAX_TRANSCRIPT_TURNS,
-  type MedicalRecordNote,
-  MedicalRecordNoteSchema,
-  NoteTemplateSchema,
   PrescriptionParseResponseSchema,
-  PrescriptionSchema,
-  type SoapNote,
-  SoapNoteSchema,
   STALE_ANALYSIS_MS,
-  type Transcript,
   type TranscriptCleanupStatus,
   TranscriptCorrectionsResponseSchema,
   TranscriptSchema,
-  toSoapNote,
 } from '@shared/types'
 import { type RequestHandler, Router } from 'express'
 import { z } from 'zod'
-import { analyseNote, buildEvidenceLinks } from '../analysis/index.js'
 import { analyseLiveWindow, foldFacts, foldOperational } from '../analysis/live.js'
 import { deriveConsultationTitle } from '../analysis/title.js'
 import { audioRetentionEnabled, readAudio, storeAudio, sweepExpiredAudio } from '../audio/index.js'
 import { eraseConsultation } from '../audit/erasure.js'
 import {
-  type AnalysisFailureReason,
   getAuditHistory,
   recordAuditEvent,
   type TranscriptCleanupFailureReason,
 } from '../audit/index.js'
-import { scoresFor } from '../calculators/index.js'
 import {
-  type ClinicalProfile,
   DEFAULT_PROFILE_ID,
   getClinicalProfile,
   ProfileIdSchema,
 } from '../clinical-profiles/index.js'
 import { getActiveClinicalVersions } from '../clinical-versions/index.js'
 import { env } from '../config/env.js'
+import {
+  batchMetadata,
+  classifyFailure,
+  PatchBodySchema,
+  rehydrateAssertions,
+  runAnalysis,
+  toDetailWithApprover,
+  updateConsultation,
+} from '../consultations/index.js'
 import { DeidentificationError, deidentifyTranscript } from '../deid/index.js'
-import { deriveGaps, withGapProvenance } from '../gaps/index.js'
-import { withLegacyCitations } from '../guidelines/index.js'
+import { deriveGaps } from '../gaps/index.js'
 import { assertOwnedConsultation, assertOwnedPatient } from '../lib/authz.js'
 import { HttpError } from '../lib/http-error.js'
-import { getLLMDescriptor, LLMResponseError } from '../lib/llm/index.js'
+import { getLLMDescriptor } from '../lib/llm/index.js'
 import { logger, timeStage } from '../lib/logger.js'
 import { prisma } from '../lib/prisma.js'
 import {
@@ -71,11 +56,10 @@ import {
   parseSigWithSpan,
 } from '../medications/index.js'
 import { inFlightGate, parseAudioBody } from '../middleware/audio-body.js'
-import { evaluateRedFlags, mergeRedFlags, proposeMishearCorrections } from '../redflags/index.js'
-import { retrieveGuidelines } from '../retrieval/index.js'
-import { generateSuggestions } from '../suggestions/index.js'
-import type { SuppressedSuggestionId } from '../suggestions/safety.js'
+import { evaluateRedFlags, proposeMishearCorrections } from '../redflags/index.js'
 import { proposeModelCorrections } from '../transcript-cleanup/index.js'
+
+export { toDetailWithApprover }
 
 export const consultationsRouter = Router()
 
@@ -84,212 +68,6 @@ export const consultationsRouter = Router()
 export function doctorId(req: { doctorId?: string }): string {
   if (!req.doctorId) throw new HttpError(401, 'unauthenticated', 'Authentication required.')
   return req.doctorId
-}
-
-/**
- * Maps a persisted row onto the wire contract, validating on the way out — the
- * JSON columns are `Json?` to Prisma, so this is the only place their shape is
- * actually checked.
- */
-/**
- * Reads dispositions, projecting a pre-#10 row forward rather than migrating it.
- *
- * A consultation reviewed before dispositions existed carries only a list of
- * ids, and every id in it meant "acknowledged". Deriving that on read is
- * lossless and leaves the stored data untouched, which is preferable to a
- * backfill that rewrites clinical review history to fit a newer shape.
- *
- * `decidedAt` is unknowable for those rows. `updatedAt` is the closest honest
- * answer: the decision happened at or before the row was last written.
- */
-function dispositionsFor(
-  stored: Prisma.JsonValue | null,
-  legacyIds: Prisma.JsonValue | null,
-  fallbackAt: Date,
-) {
-  if (stored !== null && stored !== undefined) return stored
-  return ((legacyIds as string[] | null) ?? []).map((id) => ({
-    id,
-    state: 'acknowledged' as const,
-    decidedAt: fallbackAt,
-  }))
-}
-
-function persistedProfileId(analysis: Prisma.JsonValue | null) {
-  if (analysis === null || typeof analysis !== 'object' || Array.isArray(analysis)) return undefined
-
-  const parsed = ProfileIdSchema.safeParse((analysis as Record<string, unknown>).profileId)
-  return parsed.success ? parsed.data : undefined
-}
-
-function toDetail(
-  row: Consultation,
-  approvedBy: string | null = null,
-  patient: { id: string; name: string | null } | null = null,
-) {
-  const analysis =
-    row.analysis === null || row.analysis === undefined
-      ? null
-      : withGapProvenance(
-          withLegacyCitations(row.analysis as unknown as ConsultationAnalysis | null),
-        )
-
-  const detail = ConsultationDetailSchema.parse({
-    id: row.id,
-    status: row.status,
-    // `?? null` for the same reason the JSON columns below carry it: a row
-    // built before this column existed, or by a caller that did not select it,
-    // arrives as `undefined`, and the contract distinguishes "no title" from
-    // "field absent" only by rejecting the second.
-    title: row.title ?? null,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    transcript: row.transcript ?? null,
-    analysis,
-    editedNote: row.editedNote ?? null,
-    editedMedicalRecordNote: row.editedMedicalRecordNote ?? null,
-    prescriptions: row.prescriptions ?? null,
-    noteTemplate: row.noteTemplate ?? 'soap',
-    /*
-     * Not the default a new consultation gets, which is `ambient` and is
-     * written at the create route below (#378). `row` is the full Prisma model
-     * and the column is `NOT NULL`, so this branch is statically unreachable
-     * outside the suite's stand-in store. It stays `manual` because that is the
-     * reading that understates the egress rather than claiming one that did
-     * not happen.
-     */
-    captureMode: row.captureMode ?? 'manual',
-    approvedAt: row.approvedAt,
-    approvedBy,
-    patient,
-    acknowledgedRedFlagIds: row.acknowledgedRedFlagIds ?? [],
-    reviewedGapIds: row.reviewedGapIds ?? [],
-    redFlagDispositions: dispositionsFor(
-      row.redFlagDispositions,
-      row.acknowledgedRedFlagIds,
-      row.updatedAt,
-    ),
-    gapDispositions: dispositionsFor(row.gapDispositions, row.reviewedGapIds, row.updatedAt),
-  })
-
-  /*
-   * `profileId` predates the shared detail schema and lives inside the
-   * analysis JSON rather than as a column. Preserve this one validated key so
-   * CatatAI can select the same corpus as the analysis; legacy analyses keep
-   * the schema's ordinary shape and therefore use its default profile.
-   */
-  const profileId = persistedProfileId(row.analysis)
-  if (profileId === undefined || detail.analysis === null) return detail
-
-  return {
-    ...detail,
-    analysis: { ...detail.analysis, profileId },
-  }
-}
-
-/**
- * Attaches the approving clinician's name (issue #26).
- *
- * Resolved from `doctorId` rather than from the approval audit event, because
- * `assertOwnedConsultation` scopes every read and write on that column, so the
- * owner is the only account that can reach the approve transition at all. If a
- * clinic or admin boundary is ever added, that stops being true and the actor
- * on the `consultation.approved` event becomes the authority instead. The
- * `AuditEvent` row already records it, so the fix is a join, not a migration.
- *
- * Costs a query only on approved consultations; there is nothing to name until
- * the transition has happened.
- */
-/** Exported so the copilot route projects a consultation exactly as GET does. */
-export async function toDetailWithApprover(row: Consultation) {
-  /*
-   * Resolved on every read, not only after approval, because a doctor reading
-   * an unapproved note needs to know whose note it is just as much — arguably
-   * more, since that is the point at which they can still act on it.
-   *
-   * An erased patient resolves to null rather than to a tombstoned name: the
-   * filing link survives for the audit chain, but nothing identifying should
-   * come back through a screen after erasure.
-   */
-  const patient = row.patientId
-    ? await prisma.patient.findFirst({
-        where: { id: row.patientId, erasedAt: null },
-        select: { id: true, name: true },
-      })
-    : null
-
-  if (row.approvedAt === null) return toDetail(row, null, patient)
-
-  const doctor = await prisma.user.findUnique({
-    where: { id: row.doctorId },
-    select: { name: true },
-  })
-  return toDetail(row, doctor?.name ?? null, patient)
-}
-
-/**
- * Must stay byte-identical to the serialisation inside `deidentifyTranscript`,
- * so evidence offsets computed against the raw text line up with the
- * de-identified text the model saw. Duplicated rather than imported because
- * `deid/` does not export it — see the note in the handover.
- */
-/**
- * Deterministic gaps first, model gaps additive — the same rule the red-flag
- * engine follows. `deriveGaps` reads the structured facts, so its output is
- * reproducible; the model may only add to it, never remove an entry.
- */
-function mergeGaps(derived: InformationGap[], modelGaps: InformationGap[]): InformationGap[] {
-  const seen = new Set(derived.map((gap) => gap.id))
-  return [...derived, ...modelGaps.filter((gap) => !seen.has(gap.id))]
-}
-
-/**
- * Rehydrates every `value` and `evidence` string anywhere in an assertion tree.
- *
- * Recursive rather than a per-field map, for two reasons. The structure is not
- * uniform: `ClinicalFacts` nests assertions two levels under four groups, while
- * `OperationalBlock` is flat except for `medicationsDispensed`, which is an
- * array of them. And a hard-coded field list would silently stop covering a
- * field the moment the 29-key checklist grows, which is the same failure the
- * clinical-version guard exists to prevent.
- *
- * `evidence` in particular is a verbatim span from the *de-identified*
- * transcript by construction, so it carries `[PATIENT_1]`-style tokens
- * essentially always rather than occasionally.
- */
-function rehydrateAssertions<T>(node: T, rehydrate: (value: string) => string): T {
-  if (Array.isArray(node)) {
-    return node.map((item) => rehydrateAssertions(item, rehydrate)) as T
-  }
-  if (node !== null && typeof node === 'object') {
-    return Object.fromEntries(
-      Object.entries(node).map(([key, value]) =>
-        (key === 'value' || key === 'evidence') && typeof value === 'string'
-          ? [key, rehydrate(value)]
-          : [key, rehydrateAssertions(value, rehydrate)],
-      ),
-    ) as T
-  }
-  return node
-}
-
-function classifyFailure(error: unknown): AnalysisFailureReason {
-  if (error instanceof DeidentificationError) return 'deidentification_failed'
-  if (error instanceof LLMResponseError) return 'llm_response_invalid'
-  return 'internal_error'
-}
-
-/**
- * Whether an ambient transcript's recording also went to the refinement vendor
- * after Stop, and whether its transcript was kept (#436). Two booleans because
- * a refused refinement still sent the audio, and a row that could only say
- * "refined" would hide that egress.
- */
-function batchMetadata(transcript: Transcript): { batchUploaded: boolean; batchUsed: boolean } {
-  return {
-    batchUploaded: transcript.batchTranscription !== undefined,
-    batchUsed: transcript.batchTranscription?.used === true,
-  }
 }
 
 // ─── Routes (docs/trd.md §13) ────────────────────────────────────────────────
@@ -442,194 +220,6 @@ consultationsRouter.get('/:id/history', async (req, res) => {
   await assertOwnedConsultation(req.params.id, doctorId(req))
   res.json({ events: await getAuditHistory(req.params.id) })
 })
-
-/**
- * The analyse pipeline. Ordering here is a safety property, not a preference:
- * de-identify first, run the deterministic rules on the raw transcript
- * in-process, send only de-identified content to the model, then merge as a
- * union so a model response can never suppress a rule hit.
- *
- * Shared by the stored route below and the ephemeral one (#80) so the two
- * cannot drift. Demo Mode's claim is that it narrates the real pipeline, and
- * that claim is only worth making while there is literally one pipeline.
- *
- * It persists nothing and writes no audit row: both are the caller's job,
- * because that is exactly where the two routes legitimately differ.
- */
-async function runAnalysis(
-  transcript: Transcript,
-  profile: ClinicalProfile,
-  consultationId?: string,
-): Promise<{
-  analysis: ConsultationAnalysis
-  detected: readonly string[]
-  discardedFieldIds: readonly string[]
-  suppressedSuggestionIds: readonly SuppressedSuggestionId[]
-}> {
-  const { text, vault, detected } = await timeStage('deidentification', () =>
-    deidentifyTranscript(transcript),
-  )
-
-  // Labels and a count, never the matched values (GitHub issue #15).
-  logger.info('de-identification complete', {
-    ...(consultationId === undefined ? {} : { consultationId }),
-    detectorLabels: detected,
-    detectorCount: detected.length,
-  })
-
-  // Runs on the raw transcript, in-process, regardless of model output. It
-  // never leaves the API, so it needs no gate.
-  const ruleFlags = await timeStage('rules', () =>
-    evaluateRedFlags(transcript, profile.redFlagTriggers),
-  )
-
-  // Like the rules, read from the raw transcript in-process and never sent
-  // anywhere (#221). The doctor completes and scores it; nothing reads it back.
-  const scores = scoresFor(transcript, profile.id)
-
-  const [noteResult, { retrieved, result: suggestionResult }] = await Promise.all([
-    // Not wrapped in a stage of its own: `analyseNote` times its two concurrent
-    // calls separately, as `extraction` and `note_generation` (#340). One timer
-    // around the pair could not say which of them ran long.
-    analyseNote(text, text, profile),
-    timeStage('retrieval', async () => {
-      let retrieved: GuidelineChunk[] = []
-      try {
-        retrieved = await retrieveGuidelines(text, { profileId: profile.id })
-      } catch (error) {
-        // Retrieval is the only source of a citable corpus. A failure means no
-        // citable corpus is available for this consultation; it does not fall
-        // back to any previously curated corpus.
-        logger.warn('guideline retrieval failed; no citable corpus available', {
-          errorClass: 'retrieval_error',
-          errorName: error instanceof Error ? error.name : 'unknown',
-        })
-      }
-      const result = await generateSuggestions(text, profile, retrieved)
-      return { retrieved, result }
-    }),
-  ])
-
-  const rehydrate = (value: string) => vault.rehydrate(value)
-
-  /**
-   * Attributes a span to the turn it came from, for the evidence trace (#10).
-   *
-   * Resolved by locating the rehydrated span rather than asked of the model,
-   * so a link is only ever attributed to a turn that demonstrably contains it.
-   * A span matching zero turns, or more than one, resolves to nothing: a
-   * confidently wrong attribution on a clinical record is worse than an absent
-   * one, and "which of these two turns" is not a question this can answer.
-   */
-  const attribute = (
-    span: string,
-  ): {
-    speaker?: Transcript['turns'][number]['speaker']
-    offsetSeconds?: number
-    endSeconds?: number
-  } => {
-    const needle = span.replace(/\s+/g, ' ').trim().toLowerCase()
-    if (needle.length === 0) return {}
-    const hits = transcript.turns.filter((turn) =>
-      turn.text.replace(/\s+/g, ' ').toLowerCase().includes(needle),
-    )
-    const turn = hits.length === 1 ? hits[0] : undefined
-    if (turn === undefined) return {}
-    return {
-      speaker: turn.speaker,
-      ...(turn.offsetSeconds === undefined ? {} : { offsetSeconds: turn.offsetSeconds }),
-      // Only ever alongside a start, matching the turn it was copied from: an
-      // end with nothing to seek from cannot be played, and the pair is what
-      // `TranscriptTurnSchema` orders against.
-      ...(turn.offsetSeconds === undefined || turn.endSeconds === undefined
-        ? {}
-        : { endSeconds: turn.endSeconds }),
-    }
-  }
-
-  const analysis = {
-    note: {
-      subjective: rehydrate(noteResult.note.subjective),
-      objective: rehydrate(noteResult.note.objective),
-      assessment: rehydrate(noteResult.note.assessment),
-      plan: rehydrate(noteResult.note.plan),
-    },
-    medicalRecordNote: {
-      presentingComplaint: rehydrate(noteResult.medicalRecordNote.presentingComplaint),
-      historyOfPresentingComplaint: rehydrate(
-        noteResult.medicalRecordNote.historyOfPresentingComplaint,
-      ),
-      pastMedicalHistory: rehydrate(noteResult.medicalRecordNote.pastMedicalHistory),
-      socialHistory: rehydrate(noteResult.medicalRecordNote.socialHistory),
-      familyHistory: rehydrate(noteResult.medicalRecordNote.familyHistory),
-      objective: rehydrate(noteResult.medicalRecordNote.objective),
-      assessment: rehydrate(noteResult.medicalRecordNote.assessment),
-      plan: rehydrate(noteResult.medicalRecordNote.plan),
-    },
-    profileId: profile.id,
-    gaps: mergeGaps(
-      deriveGaps(noteResult.clinicalFacts, noteResult.operational, profile.gapChecklist),
-      noteResult.gaps,
-    ).map((gap) => ({
-      ...gap,
-      question: rehydrate(gap.question),
-      rationale: rehydrate(gap.rationale),
-    })),
-    /*
-     * `mergeRedFlags` is still a bare concat, and this map still runs after it
-     * on whatever it returned. Nothing here filters, reorders, dedupes or
-     * re-ranks: it rehydrates the two text fields and attaches where the
-     * evidence was heard, so a doctor can play the sentence that raised the
-     * flag rather than take it on trust (#293).
-     *
-     * `attribute` returns nothing for a span it cannot place in exactly one
-     * turn, and a flag with no link renders exactly as it did before. A flag's
-     * presence, severity and order never depend on any of this.
-     */
-    redFlags: mergeRedFlags(ruleFlags, suggestionResult.redFlags).map((flag) => {
-      const evidence = rehydrate(flag.evidence)
-      const { speaker, ...timing } = attribute(evidence)
-      return {
-        ...flag,
-        label: rehydrate(flag.label),
-        evidence,
-        ...(speaker === undefined ? {} : { evidenceLink: { speaker, ...timing } }),
-      }
-    }),
-    // The reviewed checklist, surfaced rather than discarded. Without these
-    // the UI cannot render a `NOT_ASSESSED` it was never sent, and docs/prd.md
-    // §10's "unestablished, never absent" requirement has nothing to display
-    // (Demo Script step 5).
-    clinicalFacts: rehydrateAssertions(noteResult.clinicalFacts, rehydrate),
-    operational: rehydrateAssertions(noteResult.operational, rehydrate),
-    suggestions: suggestionResult.suggestions.map((suggestion) => ({
-      ...suggestion,
-      text: rehydrate(suggestion.text),
-    })),
-    // Carried rather than dropped. An empty `suggestions` array cannot tell the
-    // reader whether the corpus had nothing to say or was never consulted, which
-    // is the conflation this flag exists to prevent (docs/trd.md §19 row 7).
-    outOfScope: suggestionResult.outOfScope,
-    ...(retrieved.length === 0 ? {} : { retrievedGuidelines: retrieved }),
-    ...(scores.length === 0 ? {} : { scores }),
-    // Built from the post-evidence-check facts, so every link is a span that
-    // survived §21.4 rather than one the model asserted. Checklist fields only:
-    // the note is independent prose and has no traceable provenance (#10).
-    evidenceLinks: buildEvidenceLinks(noteResult.clinicalFacts, noteResult.operational).map(
-      (link) => {
-        const evidence = rehydrate(link.evidence)
-        return { ...link, evidence, ...attribute(evidence) }
-      },
-    ),
-  }
-
-  return {
-    analysis,
-    detected,
-    discardedFieldIds: noteResult.discardedFieldIds,
-    suppressedSuggestionIds: suggestionResult.suppressedSuggestionIds ?? [],
-  }
-}
 
 consultationsRouter.post('/:id/analyze', async (req, res) => {
   const actor = doctorId(req)
@@ -1293,85 +883,6 @@ consultationsRouter.post('/:id/live-analysis', async (req, res) => {
   }
 })
 
-const PatchBodySchema = z
-  .object({
-    /*
-     * Renaming stays available after approval, and that is a decision rather
-     * than an oversight.
-     *
-     * `approved` is terminal and no clinical content may change after it. A
-     * filing label is not clinical content: it is how the record is found
-     * later, and an approved consultation is precisely the one somebody will
-     * need to find. Locking it would make the archive unsearchable at exactly
-     * the moment it starts being an archive. The note, the flags and the
-     * dispositions remain immutable, and every rename writes an audit event, so
-     * the change is attributable.
-     */
-    title: ConsultationTitleSchema.optional(),
-    /*
-     * Captured into the record after it exists, which is what lets the capture
-     * panel live on the consultation screen rather than on a page of its own.
-     *
-     * Gated to `draft` below, and deliberately not folded into the
-     * `awaiting_review` gate the clinical fields use: those two states protect
-     * opposite things. A transcript may only be set *before* anything has been
-     * derived from it, because every finding, gap and evidence span is anchored
-     * to it — replacing it afterwards would leave an analysis attributed to
-     * words nobody said.
-     */
-    transcript: TranscriptSchema.optional(),
-    editedNote: SoapNoteSchema.partial().optional(),
-    editedMedicalRecordNote: MedicalRecordNoteSchema.partial().optional(),
-    /*
-     * The whole confirmed list, not a delta. A prescription is authored by the
-     * doctor rather than merged into a server-side base like the note fields
-     * above, so there is nothing to merge onto and a partial would be
-     * ambiguous about whether an absent entry was removed or untouched.
-     */
-    prescriptions: z.array(PrescriptionSchema).max(MAX_PRESCRIPTIONS).optional(),
-    noteTemplate: NoteTemplateSchema.optional(),
-    captureMode: CaptureModeSchema.optional(),
-    acknowledgedRedFlagIds: z.array(z.string()).optional(),
-    reviewedGapIds: z.array(z.string()).optional(),
-    redFlagDispositions: z.array(DispositionInputSchema).optional(),
-    gapDispositions: z.array(DispositionInputSchema).optional(),
-  })
-  .refine((body) => Object.keys(body).length > 0, { message: 'empty patch' })
-  /*
-   * Capture is patched on its own, because it returns early below. Accepting a
-   * transcript alongside a clinical field would take the capture branch and
-   * silently drop the rest, which is worse than refusing the request.
-   */
-  .refine((body) => body.transcript === undefined || Object.keys(body).length === 1, {
-    message: 'transcript must be patched on its own',
-  })
-  .refine((body) => body.editedNote === undefined || body.editedMedicalRecordNote === undefined, {
-    message: 'supply one note edit representation at a time',
-  })
-
-/**
- * Applies decisions onto the stored set, last decision per id winning.
- *
- * A doctor revising a judgement is legitimate, so this is not append-only the
- * way `acknowledgedRedFlagIds` is. The invariant that column protects is
- * untouched by that: the red flag itself still lives in `analysis` and is never
- * removed or downgraded here, and every change writes an `AuditEvent`, so the
- * history of a reversal survives even though only the current state is stored.
- */
-function applyDispositions(
-  stored: Prisma.JsonValue | null,
-  incoming: DispositionInput[],
-  decidedAt: Date,
-) {
-  const next = new Map(
-    ((stored as Disposition[] | null) ?? []).map((entry) => [entry.id, entry] as const),
-  )
-  for (const decision of incoming) {
-    next.set(decision.id, { ...decision, decidedAt })
-  }
-  return [...next.values()]
-}
-
 consultationsRouter.patch('/:id', async (req, res) => {
   const actor = doctorId(req)
   const consultation = await assertOwnedConsultation(req.params.id, actor)
@@ -1380,305 +891,8 @@ consultationsRouter.patch('/:id', async (req, res) => {
   if (!parsed.success) {
     throw new HttpError(400, 'invalid_body', 'No valid changes supplied.')
   }
-  const patch = parsed.data
 
-  /*
-   * The state gate applies to clinical content, and a filing name is not
-   * clinical content.
-   *
-   * A rename carries no note text, no finding and no disposition, so nothing it
-   * can change is part of the record `approved` freezes. Letting it through is
-   * what keeps an archive searchable, since the consultations somebody needs to
-   * find later are exactly the signed ones. Any patch touching anything else
-   * still meets the original gate unchanged, and a mixed patch is judged by the
-   * clinical half rather than excused by the title.
-   */
-  const presentationOnly = Object.keys(patch).every(
-    (key) => key === 'title' || key === 'noteTemplate' || key === 'captureMode',
-  )
-
-  if (patch.captureMode !== undefined && consultation.transcript !== null) {
-    throw new HttpError(409, 'invalid_state', 'Capture Mode is locked after transcript capture.')
-  }
-
-  /*
-   * Capture has the opposite gate to every other field: a transcript may only
-   * be set while the record is still `draft`, because everything downstream is
-   * anchored to it. It is checked before the clinical gate rather than beside
-   * it, so a transcript patch is never excused by a state that exists to
-   * protect derived content.
-   */
-  if (patch.transcript !== undefined) {
-    if (consultation.status !== 'draft') {
-      throw new HttpError(
-        409,
-        'invalid_state',
-        'The transcript can only be set before the consultation is analysed.',
-      )
-    }
-    const captured = await prisma.consultation.update({
-      where: { id: consultation.id },
-      data: {
-        transcript: patch.transcript,
-        /*
-         * Reconciled in the same write that closes the lock, because this is
-         * the last moment the mode can be made true (#378).
-         *
-         * `asr_live` is the only source that means the browser streamed to the
-         * provider, so anything else is a consultation captured some other way
-         * and the mode says so, whatever it was configured to before. A doctor
-         * who opened in ambient and then pasted, uploaded, or recorded
-         * press-to-record leaves a row that claims a stream that never
-         * happened, and it is uncorrectable from the next line onward.
-         *
-         * Server-side rather than in the browser, and that is the whole point:
-         * the Record tab also moves the mode when ambient is unavailable, but
-         * that write can fail, and the failure is silent enough that the
-         * doctor carries on recording. This one cannot be skipped.
-         */
-        ...(patch.transcript.source === 'asr_live' ? {} : { captureMode: 'manual' }),
-      },
-    })
-    await recordAuditEvent({
-      action: 'consultation.edited',
-      actorId: actor,
-      consultationId: consultation.id,
-    })
-    /*
-     * Recorded here as well as on create, because capture moved: a hosted
-     * transcript now usually arrives by this route rather than with the row.
-     * Losing the fact on the path that became the common one would have made
-     * the audit trail quietly stop answering which consultations used a hosted
-     * relay (docs/trd.md §15).
-     */
-    if (patch.transcript.source === 'asr_hosted') {
-      await recordAuditEvent({
-        action: 'consultation.asr_hosted_used',
-        actorId: actor,
-        consultationId: consultation.id,
-      })
-    }
-    if (patch.transcript.source === 'asr_live') {
-      await recordAuditEvent({
-        action: 'consultation.asr_live_used',
-        actorId: actor,
-        consultationId: consultation.id,
-        metadata: batchMetadata(patch.transcript),
-      })
-    }
-    res.json({ consultation: await toDetailWithApprover(captured) })
-    return
-  }
-
-  if (!presentationOnly && consultation.status !== 'awaiting_review') {
-    throw new HttpError(
-      409,
-      'invalid_state',
-      consultation.status === 'approved'
-        ? 'An approved consultation is final and cannot be edited.'
-        : 'This consultation is not open for review.',
-    )
-  }
-
-  /**
-   * The PATCH body is a `Partial<SoapNote>`, but `editedNote` on the wire is a
-   * complete `SoapNote` — so a partial edit has to land on a complete base.
-   * That base is the doctor's existing copy, or the AI's note the first time
-   * they touch it. Merging onto `{}` instead would persist a half-note that
-   * fails validation on the way back out.
-   *
-   * `analysis.note` is only ever *read* here. The AI's original output is
-   * never written to, so the two stay independently inspectable.
-   */
-  let nextEditedNote: SoapNote | undefined
-  let nextEditedMedicalRecordNote: MedicalRecordNote | undefined
-  if (patch.editedMedicalRecordNote !== undefined) {
-    const base =
-      consultation.editedMedicalRecordNote ??
-      (consultation.analysis as { medicalRecordNote?: unknown } | null)?.medicalRecordNote ??
-      null
-    const merged = MedicalRecordNoteSchema.safeParse({
-      ...(base as Record<string, unknown> | null),
-      ...patch.editedMedicalRecordNote,
-    })
-    if (!merged.success) {
-      throw new HttpError(
-        409,
-        'invalid_state',
-        'This consultation has no categorized note to edit yet.',
-      )
-    }
-    nextEditedMedicalRecordNote = merged.data
-    nextEditedNote = toSoapNote(merged.data)
-  }
-  if (patch.editedNote !== undefined) {
-    const storedAnalysis = ConsultationAnalysisSchema.safeParse(consultation.analysis)
-    if (storedAnalysis.success && storedAnalysis.data.medicalRecordNote !== undefined) {
-      throw new HttpError(409, 'invalid_state', 'This categorized note must be edited by category.')
-    }
-    const base =
-      consultation.editedNote ?? (consultation.analysis as { note?: unknown } | null)?.note ?? null
-    const merged = SoapNoteSchema.safeParse({
-      ...(base as Record<string, unknown> | null),
-      ...patch.editedNote,
-    })
-    if (!merged.success) {
-      throw new HttpError(409, 'invalid_state', 'This consultation has no note to edit yet.')
-    }
-    nextEditedNote = merged.data
-  }
-
-  // Acknowledgment is additive: a red flag can be acknowledged, never removed,
-  // and the AI's own output in `analysis` is never overwritten by an edit.
-  const previousFlags = new Set((consultation.acknowledgedRedFlagIds as string[] | null) ?? [])
-  const previousGaps = new Set((consultation.reviewedGapIds as string[] | null) ?? [])
-  const newFlags = (patch.acknowledgedRedFlagIds ?? []).filter((id) => !previousFlags.has(id))
-  const newGaps = (patch.reviewedGapIds ?? []).filter((id) => !previousGaps.has(id))
-
-  /*
-   * A decision is only an event when it changes something. Re-sending the same
-   * state on an unrelated patch would otherwise fill the audit trail with
-   * restatements and bury the reversals, which are the entries anyone reading
-   * this back actually cares about.
-   */
-  const decidedAt = new Date()
-  const priorFlagState = new Map(
-    ((consultation.redFlagDispositions as Disposition[] | null) ?? []).map(
-      (entry) => [entry.id, entry] as const,
-    ),
-  )
-  const priorGapState = new Map(
-    ((consultation.gapDispositions as Disposition[] | null) ?? []).map(
-      (entry) => [entry.id, entry] as const,
-    ),
-  )
-  const changed = (prior: Map<string, Disposition>, decision: DispositionInput) => {
-    const before = prior.get(decision.id)
-    return before?.state !== decision.state || before?.reason !== decision.reason
-  }
-  const flagDecisions = (patch.redFlagDispositions ?? []).filter((d) => changed(priorFlagState, d))
-  const gapDecisions = (patch.gapDispositions ?? []).filter((d) => changed(priorGapState, d))
-
-  const updated = await prisma.consultation.update({
-    where: { id: consultation.id },
-    data: {
-      ...(patch.title === undefined ? {} : { title: patch.title }),
-      ...(patch.noteTemplate === undefined ? {} : { noteTemplate: patch.noteTemplate }),
-      ...(patch.captureMode === undefined ? {} : { captureMode: patch.captureMode }),
-      ...(nextEditedNote === undefined ? {} : { editedNote: nextEditedNote }),
-      ...(nextEditedMedicalRecordNote === undefined
-        ? {}
-        : { editedMedicalRecordNote: nextEditedMedicalRecordNote }),
-      ...(patch.prescriptions === undefined ? {} : { prescriptions: patch.prescriptions }),
-      ...(patch.acknowledgedRedFlagIds === undefined
-        ? {}
-        : { acknowledgedRedFlagIds: [...previousFlags, ...newFlags] }),
-      ...(patch.reviewedGapIds === undefined
-        ? {}
-        : { reviewedGapIds: [...previousGaps, ...newGaps] }),
-      ...(patch.redFlagDispositions === undefined
-        ? {}
-        : {
-            redFlagDispositions: applyDispositions(
-              consultation.redFlagDispositions,
-              patch.redFlagDispositions,
-              decidedAt,
-            ),
-          }),
-      ...(patch.gapDispositions === undefined
-        ? {}
-        : {
-            gapDispositions: applyDispositions(
-              consultation.gapDispositions,
-              patch.gapDispositions,
-              decidedAt,
-            ),
-          }),
-    },
-  })
-
-  if (patch.title !== undefined) {
-    await recordAuditEvent({
-      action: 'consultation.renamed',
-      actorId: actor,
-      consultationId: consultation.id,
-    })
-  }
-  if (patch.editedNote !== undefined) {
-    await recordAuditEvent({
-      action: 'consultation.edited',
-      actorId: actor,
-      consultationId: consultation.id,
-    })
-  }
-  if (patch.editedMedicalRecordNote !== undefined) {
-    await recordAuditEvent({
-      action: 'consultation.edited',
-      actorId: actor,
-      consultationId: consultation.id,
-    })
-  }
-  if (patch.prescriptions !== undefined) {
-    await recordAuditEvent({
-      action: 'consultation.prescription_recorded',
-      actorId: actor,
-      consultationId: consultation.id,
-      metadata: { prescriptionCount: patch.prescriptions.length },
-    })
-  }
-
-  if (patch.noteTemplate !== undefined) {
-    await recordAuditEvent({
-      action: 'consultation.template_selected',
-      actorId: actor,
-      consultationId: consultation.id,
-      metadata: { template: patch.noteTemplate },
-    })
-  }
-  for (const redFlagId of newFlags) {
-    await recordAuditEvent({
-      action: 'redflag.acknowledged',
-      actorId: actor,
-      consultationId: consultation.id,
-      metadata: { redFlagId },
-    })
-  }
-  for (const gapId of newGaps) {
-    await recordAuditEvent({
-      action: 'gap.reviewed',
-      actorId: actor,
-      consultationId: consultation.id,
-      metadata: { gapId },
-    })
-  }
-
-  /*
-   * The decision is audited; the reason text is not.
-   *
-   * A dismissal reason is clinician free text about a specific patient, so it
-   * is clinical content and falls under the same rule as note bodies and
-   * transcripts: ids and event types only. It is stored once, on the
-   * consultation, which is the clinical record and the right home for it.
-   * Copying it into `AuditEvent` would put unredacted clinical prose in a
-   * second table whose whole purpose is to be widely readable for verification.
-   */
-  for (const decision of flagDecisions) {
-    await recordAuditEvent({
-      action: 'redflag.disposition_set',
-      actorId: actor,
-      consultationId: consultation.id,
-      metadata: { redFlagId: decision.id, state: decision.state },
-    })
-  }
-  for (const decision of gapDecisions) {
-    await recordAuditEvent({
-      action: 'gap.disposition_set',
-      actorId: actor,
-      consultationId: consultation.id,
-      metadata: { gapId: decision.id, state: decision.state },
-    })
-  }
-
+  const updated = await updateConsultation(consultation, parsed.data, actor)
   res.json({ consultation: await toDetailWithApprover(updated) })
 })
 
