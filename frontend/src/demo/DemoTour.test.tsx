@@ -601,6 +601,30 @@ describe('tour anchors', () => {
  * spotlight together. Each of these bugs lived in the timing between those
  * three rather than in any one of them (#346, #338, #347).
  */
+function CurrentPath() {
+  return <output data-testid="path">{useLocation().pathname}</output>
+}
+
+/** A navigation the tour did not ask for, as a sidebar link would make. */
+function Wander() {
+  const navigate = useNavigate()
+  return (
+    <button type="button" onClick={() => navigate('/guidelines')}>
+      Wander off
+    </button>
+  )
+}
+
+/** A spotlight target that mounts after the route settles. */
+function LateSuggestion() {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), 300)
+    return () => clearTimeout(timer)
+  }, [])
+  return ready ? <div data-tour="suggestion">Cited suggestion</div> : null
+}
+
 describe('the walkthrough in motion', () => {
   const scrollIntoView = vi.fn()
 
@@ -700,20 +724,6 @@ describe('the walkthrough in motion', () => {
     } as DOMRect
   }
 
-  function CurrentPath() {
-    return <output data-testid="path">{useLocation().pathname}</output>
-  }
-
-  /** A navigation the tour did not ask for, as a sidebar link would make. */
-  function Wander() {
-    const navigate = useNavigate()
-    return (
-      <button type="button" onClick={() => navigate('/guidelines')}>
-        Wander off
-      </button>
-    )
-  }
-
   function renderTour(from: string, page: ReactNode = null) {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     render(
@@ -804,15 +814,6 @@ describe('the walkthrough in motion', () => {
     mockTourApi()
     // Where the live Citations anchor measured: 1507px down a 900px viewport.
     vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(box(1507, 180))
-
-    function LateSuggestion() {
-      const [ready, setReady] = useState(false)
-      useEffect(() => {
-        const timer = setTimeout(() => setReady(true), 300)
-        return () => clearTimeout(timer)
-      }, [])
-      return ready ? <div data-tour="suggestion">Cited suggestion</div> : null
-    }
 
     renderTour('/patients', <LateSuggestion />)
     await startTour()

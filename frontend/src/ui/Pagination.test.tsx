@@ -5,6 +5,11 @@ import { clampPage, Pagination, paginate } from './Pagination.js'
 
 afterEach(cleanup)
 
+function ScrollWrapper({ target }: { target: HTMLElement }) {
+  const ref = useRef<HTMLElement | null>(target)
+  return <Pagination page={1} pageCount={3} onPageChange={vi.fn()} scrollTo={ref} />
+}
+
 describe('Pagination', () => {
   let originalScrollIntoView: PropertyDescriptor | undefined
   let scrollIntoViewSpy: ReturnType<typeof vi.fn>
@@ -62,11 +67,7 @@ describe('Pagination', () => {
   it('scrolls a ref target into view on page change', () => {
     const target = document.createElement('div')
     target.textContent = 'Section heading'
-    function Wrapper() {
-      const ref = useRef<HTMLElement | null>(target)
-      return <Pagination page={1} pageCount={3} onPageChange={vi.fn()} scrollTo={ref} />
-    }
-    render(<Wrapper />)
+    render(<ScrollWrapper target={target} />)
     fireEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(scrollIntoViewSpy).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' })
     expect(scrollIntoViewSpy.mock.instances[0]).toBe(target)
