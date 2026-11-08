@@ -4,7 +4,7 @@ import { lexiconFor, MEDICATION_LEXICON, MEDICATION_LEXICON_VERSION } from './le
 
 /**
  * The lexicon is a spelling aid, not a formulary (issue #311,
- * `docs/decisions.md` D-001). These tests are what stop it drifting into one.
+ * `docs/DECISIONS.md` D-001). These tests are what stop it drifting into one.
  */
 
 /** Brands a Malaysian GP says out loud. D-001 puts every one of them outside. */

@@ -156,7 +156,7 @@ const TRANSLATION_UNAVAILABLE_ERROR =
 /**
  * Shown when refinement after Stop did not produce a transcript that passed
  * every check, so the live one is used (#436). Never silent, and vendor
- * neutral: the panel names no processor (`docs/decisions.md` D-004), and a
+ * neutral: the panel names no processor (`docs/DECISIONS.md` D-004), and a
  * failure notice is not the place to start.
  */
 const REFINE_FAILED_NOTICE =
@@ -646,7 +646,7 @@ export function AmbientCapture({
       }
 
       /*
-       * Refinement after Stop (#436, docs/trd.md §20.14): the whole recording is
+       * Refinement after Stop (#436, docs/TRD.md §20.14): the whole recording is
        * re-transcribed in one batch pass, and that transcript replaces the live
        * one only when every check passes. Each condition is a reason not to
        * start the second egress at all: the panel must still be the one Stop
@@ -1300,7 +1300,7 @@ export function AmbientCapture({
           through to it would say the audio is processed in Malaysia on the one
           path that streams to the United States. The residency disclosure was
           removed here on 10/09/26 on the owner's instruction, so the tick is
-          the whole of what this surface asks (`docs/decisions.md` D-004). */}
+          the whole of what this surface asks (`docs/DECISIONS.md` D-004). */}
       <ConsentGate
         agreed={agreed}
         onAgreedChange={setAgreed}
@@ -1446,7 +1446,7 @@ export function AmbientCapture({
                     processor nor the region when the consent gate below still
                     did, and it does not name them now the gate has stopped:
                     the removal was a decision about what this surface shows
-                    (`docs/decisions.md` D-004), not a licence for a title bar
+                    (`docs/DECISIONS.md` D-004), not a licence for a title bar
                     read mid-consultation to become the disclosure instead.
                   */}
                   <p className="text-ink-muted text-xs">Ambient scribe</p>

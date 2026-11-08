@@ -292,7 +292,7 @@ function batchMetadata(transcript: Transcript): { batchUploaded: boolean; batchU
   }
 }
 
-// ─── Routes (docs/trd.md §13) ────────────────────────────────────────────────
+// ─── Routes (docs/TRD.md §13) ────────────────────────────────────────────────
 
 consultationsRouter.get('/', async (req, res) => {
   const rows = await prisma.consultation.findMany({
@@ -363,7 +363,7 @@ consultationsRouter.post('/', async (req, res) => {
       /*
        * Written rather than left to the column default (#378), because the two
        * are applied by different hands at different times: migrations run from
-       * a dev machine and the API deploys on a merge (docs/trd.md §17). Stating
+       * a dev machine and the API deploys on a merge (docs/TRD.md §17). Stating
        * it here means a backend that ships ahead of its migration still opens a
        * consultation where the doctor expects it, and it is what lets a test
        * see the default at all, since the suite's store has no column defaults.
@@ -373,7 +373,7 @@ consultationsRouter.post('/', async (req, res) => {
        * moment it lands, so an unconditional `'ambient'` would stamp a pasted,
        * uploaded or fixture-seeded consultation with a claim that audio
        * streamed to the provider, permanently and with no way to correct it.
-       * That is the falsehood `docs/decisions.md` D-007 refuses to write onto
+       * That is the falsehood `docs/DECISIONS.md` D-007 refuses to write onto
        * historical rows, arriving through the create route instead. Where the
        * transcript says `asr_live` it did stream, and the same request audits
        * it as `consultation.asr_live_used` below, so the two must agree.
@@ -397,7 +397,7 @@ consultationsRouter.post('/', async (req, res) => {
   })
 
   // A client-asserted fact, recorded at the first point the transcript source
-  // and a consultation id coexist (docs/trd.md §15).
+  // and a consultation id coexist (docs/TRD.md §15).
   if (parsed.data.transcript?.source === 'asr_hosted') {
     await recordAuditEvent({
       action: 'consultation.asr_hosted_used',
@@ -430,7 +430,7 @@ consultationsRouter.get('/:id', async (req, res) => {
 /**
  * Full audit history for one consultation, oldest first.
  *
- * NOT in docs/trd.md §13's route table — added because issue #12's acceptance
+ * NOT in docs/TRD.md §13's route table — added because issue #12's acceptance
  * criterion "the full event history for a consultation is retrievable in
  * chronological order" has no route behind it otherwise. Flagged for TRD
  * ratification rather than assumed; delete it if §13 is meant to stay closed.
@@ -597,7 +597,7 @@ async function runAnalysis(
       }
     }),
     // The reviewed checklist, surfaced rather than discarded. Without these
-    // the UI cannot render a `NOT_ASSESSED` it was never sent, and docs/prd.md
+    // the UI cannot render a `NOT_ASSESSED` it was never sent, and docs/PRD.md
     // §10's "unestablished, never absent" requirement has nothing to display
     // (Demo Script step 5).
     clinicalFacts: rehydrateAssertions(noteResult.clinicalFacts, rehydrate),
@@ -608,7 +608,7 @@ async function runAnalysis(
     })),
     // Carried rather than dropped. An empty `suggestions` array cannot tell the
     // reader whether the corpus had nothing to say or was never consulted, which
-    // is the conflation this flag exists to prevent (docs/trd.md §19 row 7).
+    // is the conflation this flag exists to prevent (docs/TRD.md §19 row 7).
     outOfScope: suggestionResult.outOfScope,
     ...(retrieved.length === 0 ? {} : { retrievedGuidelines: retrieved }),
     ...(scores.length === 0 ? {} : { scores }),
@@ -771,7 +771,7 @@ consultationsRouter.post('/:id/analyze', async (req, res) => {
     res.json({ consultation: await toDetailWithApprover(updated) })
   } catch (error) {
     // The doctor's only retry path is triggering analysis again — nothing
-    // retries autonomously (docs/prd.md CAP-5).
+    // retries autonomously (docs/PRD.md CAP-5).
     await prisma.consultation.update({
       where: { id: consultation.id },
       data: { status: previousStatus },
@@ -833,7 +833,7 @@ const EphemeralBodySchema = z.object({
  * `Consultation`**, which is the whole point: Demo Mode has to be
  * self-contained and wiped the moment it is exited, and if nothing is
  * persisted there is nothing to wipe. That sidesteps the retention decision in
- * docs/trd.md §19 rather than pre-empting it, and it avoids adding an erasure
+ * docs/TRD.md §19 rather than pre-empting it, and it avoids adding an erasure
  * endpoint to serve a demo, which would route around a control that exists for
  * audit integrity.
  *
@@ -897,7 +897,7 @@ consultationsRouter.post('/analyze-ephemeral', async (req, res) => {
  * One window of a running ambient consultation (#219).
  *
  * Bounded for a window rather than a whole consultation, which is only
- * affordable because a cycle never carries the running transcript: docs/trd.md
+ * affordable because a cycle never carries the running transcript: docs/TRD.md
  * §20.8 adopts the fold over re-extraction, and `LiveAnalysisStateSchema` has
  * no field a growing transcript could travel in.
  */
@@ -924,7 +924,7 @@ const PrescriptionParseBodySchema = z.object({
 
 /**
  * Turn one dictated medication phrase into draft fields plus spelling
- * candidates (#312, `docs/decisions.md` D-001).
+ * candidates (#312, `docs/DECISIONS.md` D-001).
  *
  * **Read-only, and it stores nothing.** The doctor confirms, and confirming is
  * an ordinary `PATCH /api/consultations/:id { prescriptions }` down the same
@@ -1264,7 +1264,7 @@ consultationsRouter.post('/:id/live-analysis', async (req, res) => {
     )
 
     // Deterministic, over the merged facts. The model is never asked what is
-    // missing; see `deriveGaps` and docs/trd.md §20.8.1.
+    // missing; see `deriveGaps` and docs/TRD.md §20.8.1.
     const gaps = deriveGaps(clinicalFacts, operational, profile.gapChecklist).map((gap) => ({
       ...gap,
       question: rehydrate(gap.question),
@@ -1449,7 +1449,7 @@ consultationsRouter.patch('/:id', async (req, res) => {
      * transcript now usually arrives by this route rather than with the row.
      * Losing the fact on the path that became the common one would have made
      * the audit trail quietly stop answering which consultations used a hosted
-     * relay (docs/trd.md §15).
+     * relay (docs/TRD.md §15).
      */
     if (patch.transcript.source === 'asr_hosted') {
       await recordAuditEvent({

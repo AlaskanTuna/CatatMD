@@ -411,7 +411,7 @@ describe('consent', () => {
   /*
    * The inverse of the test that stood here until 10/09/26, which asserted the
    * panel named Soniox, the United States, and that our server never holds the
-   * audio. The owner removed that paragraph (`docs/decisions.md` D-004), so
+   * audio. The owner removed that paragraph (`docs/DECISIONS.md` D-004), so
    * this pins the new state as tightly as the old one was pinned: the tick is
    * what this surface asks, and it asks it without naming a recipient.
    *
@@ -1133,7 +1133,7 @@ describe('the conversation theatre', () => {
 
     // The owner asked for the short form here. This test used to hold the
     // other half too, that the disclosure survived elsewhere on the page; that
-    // paragraph was removed on 10/09/26 (`docs/decisions.md` D-004). What is
+    // paragraph was removed on 10/09/26 (`docs/DECISIONS.md` D-004). What is
     // still worth pinning is that a title bar the doctor reads mid-consultation
     // did not become the residency disclosure by default once the gate stopped
     // being one.
@@ -1393,7 +1393,7 @@ describe('translation', () => {
 })
 
 /*
- * Refinement after Stop (#436, docs/trd.md §20.14). The finished recording is
+ * Refinement after Stop (#436, docs/TRD.md §20.14). The finished recording is
  * re-transcribed in one batch pass and that transcript replaces the live one,
  * but only when every check passes; any failure keeps the live transcript and
  * says so.

@@ -24,7 +24,7 @@ import { START_FAILED_ERROR } from './use-dictation-stream.js'
  * prescription was stacked in that column and most of it was below the fold,
  * which is what made a wired Accept button read as dead.
  *
- * **One table of lines, read from the whole box** (`docs/decisions.md` D-001,
+ * **One table of lines, read from the whole box** (`docs/DECISIONS.md` D-001,
  * amended 06/10/26). One parse returns every drug said, each with its own sig,
  * and the box is read again shortly after the doctor stops editing it. An exact
  * name starts ticked, a near-match waits for a tick, and a line with a sig but

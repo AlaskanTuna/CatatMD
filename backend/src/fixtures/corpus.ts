@@ -1,10 +1,10 @@
 import { type Fixture, FixtureSchema } from '@shared/types'
 
 /**
- * Synthetic demo/test consultations (docs/prd.md §14, GitHub issue #11).
+ * Synthetic demo/test consultations (docs/PRD.md §14, GitHub issue #11).
  * Every transcript is invented — see README.md. `source: 'fixture'` on every
  * transcript is load-bearing: it is the honest provenance record that
- * distinguishes these from a real paste/upload/ASR capture (docs/trd.md §3).
+ * distinguishes these from a real paste/upload/ASR capture (docs/TRD.md §3).
  *
  * Each fixture's expected grading behaviour is documented in `rubrics.ts`,
  * keyed by this file's `id`s, so QA can grade against a stated rubric rather
@@ -13,8 +13,8 @@ import { type Fixture, FixtureSchema } from '@shared/types'
 export const FIXTURES: readonly Fixture[] = [
   // ─── urti-gap-heavy ───────────────────────────────────────────────────────
   // Identifiers: none (patient gives a first name only, no other identifier).
-  // Exercises: CAP-2 (docs/prd.md §9), the Unknown ≠ Negative rule (§10), and
-  // the fabricated-negative failure mode measured in docs/trd.md §21.1 — the
+  // Exercises: CAP-2 (docs/PRD.md §9), the Unknown ≠ Negative rule (§10), and
+  // the fabricated-negative failure mode measured in docs/TRD.md §21.1 — the
   // model fabricated "denies haemoptysis" in 5 of 5 runs on a sparse
   // transcript. Cough, sore throat, and fever are established; haemoptysis,
   // chest pain, dyspnoea, SpO2, and respiratory rate are never raised by
@@ -70,7 +70,7 @@ export const FIXTURES: readonly Fixture[] = [
 
   // ─── urti-hard-red-flag ───────────────────────────────────────────────────
   // Identifiers: patient name only (honorific + patronymic), no other class.
-  // Exercises: CAP-3 (docs/prd.md §9) — carries unambiguous, doctor-observed
+  // Exercises: CAP-3 (docs/PRD.md §9) — carries unambiguous, doctor-observed
   // evidence for three overlapping deterministic escalation triggers
   // (inability to swallow/maintain oral intake, significant dyspnoea, and
   // stridor/airway compromise), so the rule-sourced flag fires regardless of
@@ -131,7 +131,7 @@ export const FIXTURES: readonly Fixture[] = [
 
   // ─── urti-diagnosis-not-assessed ─────────────────────────────────────────
   // Identifiers: none.
-  // Exercises: docs/prd.md §10 "diagnosis is recorded, never generated" and
+  // Exercises: docs/PRD.md §10 "diagnosis is recorded, never generated" and
   // CAP-1's acceptance criterion — the doctor examines, dispenses, and issues
   // an MC without ever naming a condition, so `diagnosis` must resolve
   // NOT_ASSESSED. An inferred label here is a safety-constraint breach.
@@ -243,7 +243,7 @@ export const FIXTURES: readonly Fixture[] = [
   },
 
   // ─── urti-identifier-dense-routine ───────────────────────────────────────
-  // Identifiers: all seven detector classes from docs/trd.md §9 — PATIENT
+  // Identifiers: all seven detector classes from docs/TRD.md §9 — PATIENT
   // (name with honorific + `bin` patronymic, repeated across turns for
   // token-stability testing), NRIC, PHONE, ADDRESS, DOB, MRN (clinic
   // registration number), EMAIL.

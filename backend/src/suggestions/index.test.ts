@@ -202,7 +202,7 @@ describe('generateSuggestions - empty corpus', () => {
   })
 })
 
-describe('generateSuggestions - schema-enforced citation rejection (docs/trd.md §11)', () => {
+describe('generateSuggestions - schema-enforced citation rejection (docs/TRD.md §11)', () => {
   it('rejects a citation naming a guideline id outside the corpus', async () => {
     await generateSuggestions(content, getClinicalProfile(), [sampleChunk])
 
@@ -234,7 +234,7 @@ describe('generateSuggestions - schema-enforced citation rejection (docs/trd.md 
   })
 })
 
-describe('generateSuggestions - red flags cannot impersonate the rule engine (docs/trd.md §10)', () => {
+describe('generateSuggestions - red flags cannot impersonate the rule engine (docs/TRD.md §10)', () => {
   it('rejects a red flag that claims source: "rule"', async () => {
     await generateSuggestions(content)
 
@@ -260,7 +260,7 @@ describe('generateSuggestions - red flags cannot impersonate the rule engine (do
   })
 })
 
-describe('generateSuggestions - outOfScope signal (docs/trd.md §19 row 7)', () => {
+describe('generateSuggestions - outOfScope signal (docs/TRD.md §19 row 7)', () => {
   it('accepts outOfScope: true from the half that always runs', async () => {
     await generateSuggestions(content)
 

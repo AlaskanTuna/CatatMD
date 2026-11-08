@@ -23,7 +23,7 @@ import { isStructurallyValidNric, NRIC_PATTERN, NRIC_UNHYPHENATED_PATTERN } from
 import { scanSpokenNumbers } from './spoken-numbers.js'
 
 /**
- * Detector inventory for the Malaysian context (docs/trd.md §9).
+ * Detector inventory for the Malaysian context (docs/TRD.md §9).
  *
  * Detectors are `pattern + score + context`, matching Microsoft Presidio's
  * `PatternRecognizer` contract rather than flat boolean regex: a low-confidence
@@ -32,7 +32,7 @@ import { scanSpokenNumbers } from './spoken-numbers.js'
  * matters for a component whose recall cannot be guaranteed.
  *
  * This is not a clinical-grade NER system and is not presented as one. See
- * docs/prd.md §12 — pattern detectors may miss an unmarked name, and the
+ * docs/PRD.md §12 — pattern detectors may miss an unmarked name, and the
  * published evidence says an ML NER would miss Malay names disproportionately
  * too. Raw transcripts are therefore still treated as sensitive at rest.
  */
@@ -266,7 +266,7 @@ function detectEmail(text: string): Match[] {
  *
  * Every other detector here reads Latin script, so a name written in one of
  * these passes them untouched, and `assertNoIdentifiers` re-runs the same
- * detectors and shares the gap. Two-way translation (docs/trd.md §20.12) makes
+ * detectors and shares the gap. Two-way translation (docs/TRD.md §20.12) makes
  * Bengali and Urdu a designed part of the product for the first time; the SPA
  * keeps them out of model-bound text, and this is the same rule at the gate
  * itself, whatever a client sends. The whole run is one span, because nothing
@@ -277,7 +277,7 @@ function detectEmail(text: string): Match[] {
  * **Chinese and Tamil are deliberately not**, although the same gap applies:
  * ambient capture hints both, and tokenising every Mandarin sentence would
  * blind the note to consultations that work today. That gap is recorded in
- * docs/trd.md §20.12 rather than closed here.
+ * docs/TRD.md §20.12 rather than closed here.
  */
 const SCRIPT_CHARACTERS =
   '\\u0980-\\u09FF\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF\\u0900-\\u097F'
@@ -640,7 +640,7 @@ function longRunLabel(digits: string): DetectorLabel {
 }
 
 /**
- * An identifier read aloud and written as number words (#435, docs/trd.md §9,
+ * An identifier read aloud and written as number words (#435, docs/TRD.md §9,
  * "Spoken Digit Runs").
  *
  * Batch transcription never wrote the synthetic IC as digits in 32 results, so
@@ -1058,7 +1058,7 @@ const NATIVE_NAME_PATTERNS: RegExp[] = [
  * speech, and no Latin detector reads them either. A cue is the only footing
  * that does not tokenise ordinary speech: "我叫" or "என் பெயர்" before the
  * name, or a title such as 先生 or திரு beside it. A name said with no cue still
- * reaches the model, which `docs/decisions.md` D-011 records.
+ * reaches the model, which `docs/DECISIONS.md` D-011 records.
  *
  * Once a name has been found by its cue, its other mentions in the same text
  * are found too, so "我叫陈美玲。陈美玲今年三十岁" does not send the second one.

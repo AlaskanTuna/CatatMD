@@ -127,7 +127,7 @@ export function mergeFlags(shown: readonly RedFlag[], incoming: readonly RedFlag
  * The render-path guard: refuse anything that is not an extension of what the
  * doctor has already read.
  *
- * Belt and braces behind the server's own monotone fold. docs/trd.md §20.8.1
+ * Belt and braces behind the server's own monotone fold. docs/TRD.md §20.8.1
  * measures full rewriting at 13.8 Normalized Erasure against zero for a forced
  * prefix, and a doctor reading mid-sentence should never watch a line vanish,
  * so a payload that would retract one is dropped rather than rendered.

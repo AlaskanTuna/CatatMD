@@ -6,7 +6,7 @@ import { asrContextTerms } from './vocabulary.js'
 
 /**
  * The only module that may talk to ElevenLabs, behind the third audio egress
- * (#436, docs/trd.md §20.14).
+ * (#436, docs/TRD.md §20.14).
  *
  * **It never sees audio.** After Stop on an untranslated ambient consultation,
  * the browser uploads the finished recording straight to the vendor's batch

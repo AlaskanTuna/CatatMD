@@ -133,7 +133,7 @@ describe('recordAuditEvent', () => {
    * The union is the control: every `metadata` shape in the taxonomy holds
    * identifiers, detector labels or version strings and nothing else. This
    * walks the whole taxonomy and asserts no written value ever resembles
-   * clinical prose (issue #12; docs/trd.md §15).
+   * clinical prose (issue #12; docs/TRD.md §15).
    */
   it('writes no transcript text, note content or vault entry for any action', async () => {
     const everyAction: ConsultationAuditEvent[] = [

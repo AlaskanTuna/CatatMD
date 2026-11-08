@@ -16,7 +16,7 @@ import { SourcesPanel } from './SafetyCards.js'
  * **One question, several scores.** Scores that share an item share its
  * answer, so the doctor is not asked twice. Each total sums only its own items
  * and cites only its own source, because the sources disagree and a merged
- * reading would claim an agreement neither makes (docs/trd.md §11).
+ * reading would claim an agreement neither makes (docs/TRD.md §11).
  *
  * Answers live in this component's state alone. They are not written into the
  * note or saved, and never into web storage, which clinical content may not

@@ -2,15 +2,15 @@
 # Use docs/* (not docs/) so the ! lines below can re-include specific files.
 docs/*
 !docs/README.md
-!docs/prd.md
-!docs/trd.md
-!docs/proposal.md
+!docs/PRD.md
+!docs/TRD.md
 .claude/
 .codex/
 .agents/
 AGENTS.md
 CLAUDE.md
 GEMINI.md
+docs/agents/
 .cursorrules
 .windsurfrules
 RTK.md

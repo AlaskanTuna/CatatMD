@@ -55,7 +55,7 @@ authRouter.post('/auth/guest', async (_req, res) => {
 
 /**
  * better-auth owns everything else under `/api/auth/**` — sign-up, sign-in,
- * sign-out, session. Mounted, never re-implemented (docs/trd.md §13).
+ * sign-out, session. Mounted, never re-implemented (docs/TRD.md §13).
  *
  * Must be registered before `express.json()`: better-auth reads the raw request
  * stream itself, and a body parser that has already consumed it leaves the

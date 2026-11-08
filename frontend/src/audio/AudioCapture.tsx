@@ -45,7 +45,7 @@ import type { TranscriptSegment, WorkerRequest, WorkerResponse } from './protoco
  *
  * On-device stays the default and the floor: nothing switches the doctor to
  * hosted, and an on-device failure degrades to typing or pasting, never to the
- * cloud (docs/trd.md section 20).
+ * cloud (docs/TRD.md section 20).
  */
 
 /**
@@ -84,7 +84,7 @@ type Phase =
 /**
  * What the doctor is told when the budget expires or the worker dies. Both
  * point back at typing or pasting: on-device failure degrades to the paste
- * path, never to a hosted fallback (docs/trd.md section 20).
+ * path, never to a hosted fallback (docs/TRD.md section 20).
  */
 const STALL_ERROR = `Transcription was stopped after ${Math.round(
   STALL_TIMEOUT_MS / 60_000,
@@ -102,7 +102,7 @@ const WORKER_DIED_ERROR =
  * on-device path and the paste path. Nothing here switches the doctor
  * automatically in either direction: a hosted failure never silently runs the
  * local worker, exactly as a local failure never silently uploads
- * (docs/trd.md section 20).
+ * (docs/TRD.md section 20).
  *
  * Deliberately one message for every upstream reason. The relay's own codes
  * separate rejected audio from a billing state from a timeout, but none of
@@ -827,7 +827,7 @@ export function AudioCapture({
       )}
 
       {/*
-        Above the controls, not at the foot where docs/trd.md section 20.4
+        Above the controls, not at the foot where docs/TRD.md section 20.4
         first put it. A disabled button leaves the tab order, so at the foot a
         keyboard user reaches Start and the file picker only to have them
         skipped, and arrives at the one control that unlocks them last. Read

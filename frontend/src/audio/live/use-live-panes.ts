@@ -22,7 +22,7 @@ import {
  * Two cadences, because the two halves cost different things. Red flags are
  * deterministic and in-process on the API, so they run on every closed segment
  * and are the surface that feels immediate. The model fold runs at most every
- * `LIVE_ANALYSIS_INTERVAL_MS` and is allowed to lag: docs/trd.md §20.8.1 puts
+ * `LIVE_ANALYSIS_INTERVAL_MS` and is allowed to lag: docs/TRD.md §20.8.1 puts
  * the deterministic safety pass in the hot path and lets the card follow.
  *
  * **Nothing here is persisted.** `useState` and `useRef` only: no
@@ -225,7 +225,7 @@ export function useLivePanes(consultationId: string | null) {
        * sequencing above makes this nearly unreachable, but it is the one
        * mechanism that can still catch a retraction before the doctor sees it,
        * and a line vanishing mid-sentence is the failure the fold exists to
-       * prevent (docs/trd.md §20.8.1).
+       * prevent (docs/TRD.md §20.8.1).
        */
       if (result.state.cycle <= lastCycleRendered.current) return
       lastCycleRendered.current = result.state.cycle

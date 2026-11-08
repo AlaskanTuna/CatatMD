@@ -11,7 +11,7 @@ import {
 
 /**
  * Bumped whenever an entry is added, removed, or its selector, priority,
- * wording or source changes. Recorded with every analysis (docs/trd.md §15)
+ * wording or source changes. Recorded with every analysis (docs/TRD.md §15)
  * so a past set of gaps can be traced back to the checklist that produced it.
  * v7 replaces the old corpus chunk ids in every `cited` source with `doc:`
  * document references against the NAG, Abdullah et al. 2024 and Ooi et al. 2022.
@@ -106,7 +106,7 @@ const UNSOURCED_UTI: GapChecklistSource = {
 }
 
 /**
- * Materiality rule (GitHub issue #6; docs/prd.md §12 alert fatigue).
+ * Materiality rule (GitHub issue #6; docs/PRD.md §12 alert fatigue).
  *
  * `ClinicalFactsSchema` is a fixed 29-key set (12 symptoms, 8 history, 5
  * observations, 4 examination) plus 5 operational-block fields. Not every
@@ -132,7 +132,7 @@ const UNSOURCED_UTI: GapChecklistSource = {
  *      (advice-only visits), so flagging it would be a false positive rather
  *      than a completeness gap.
  *
- * `priority` is a volume/ordering signal only (docs/prd.md §10) — it never
+ * `priority` is a volume/ordering signal only (docs/PRD.md §10) — it never
  * gates whether an entry is included here, and it carries no safety meaning
  * on its own.
  */

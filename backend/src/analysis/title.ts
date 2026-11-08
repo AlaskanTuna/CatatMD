@@ -6,12 +6,12 @@ import type { ClinicalFacts } from '@shared/types'
  * **Composed in code, never generated.** A title is the most prominent text in
  * the product: it is the record's identity in every list and the first line on
  * the detail page. Asking a model for one would put generated prose in exactly
- * the position where `docs/prd.md` §10 forbids it, because a sentence like
+ * the position where `docs/PRD.md` §10 forbids it, because a sentence like
  * "likely bacterial tonsillitis" is a diagnosis nobody said, and §21.1 measured
  * the model fabricating eight findings on a sparse transcript in 5 of 5 runs.
  * A three-minute upper-respiratory consult is that sparse case.
  *
- * So this is a tier-2 control rather than a tier-4 one (`docs/trd.md` §21.3):
+ * So this is a tier-2 control rather than a tier-4 one (`docs/TRD.md` §21.3):
  * it can only name findings that already survived the evidence check, and it
  * structurally cannot state a diagnosis because it never reads the operational
  * block where `diagnosis` lives.

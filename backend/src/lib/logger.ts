@@ -47,7 +47,7 @@ const LEVELS = { debug: 10, info: 20, warn: 30, error: 40 } as const
 
 export type LogLevel = keyof typeof LEVELS
 
-/** Stages timed by `timeStage`, matching the pipeline in docs/trd.md §12. */
+/** Stages timed by `timeStage`, matching the pipeline in docs/TRD.md §12. */
 export const PIPELINE_STAGES = [
   'deidentification',
   'extraction',

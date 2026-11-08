@@ -84,7 +84,7 @@ describe('Malay idioms, uncertainty, and question particles fail open', () => {
     expect(ruleIds(patient('Takpe, sakit dada sikit je.'))).toContain('chest-pain')
   })
 
-  it('fires through uncertainty, because unknown is never negative (docs/prd.md §10)', () => {
+  it('fires through uncertainty, because unknown is never negative (docs/PRD.md §10)', () => {
     expect(ruleIds(patient('Tak tahu lah, kadang-kadang sakit dada.'))).toContain('chest-pain')
     expect(ruleIds(patient('Tak pasti, tapi dada rasa ketat.'))).toContain('chest-pain')
   })
@@ -254,7 +254,7 @@ describe('genuine Malay denials still suppress', () => {
   })
 })
 
-describe('measured ASR devoicing variants (docs/trd.md §20.3, issue #192)', () => {
+describe('measured ASR devoicing variants (docs/TRD.md §20.3, issue #192)', () => {
   // Both measured ASR arms harden the first consonant of Malay clinical words
   // ("patut" for "batuk", "sempuk" for "semput"), so the emergency matchers
   // tolerate the variant wherever its reading is bounded. Zero tolerance for

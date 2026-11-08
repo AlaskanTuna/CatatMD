@@ -32,7 +32,7 @@ export function Privacy() {
 
         <Section title="What This System Holds">
           <p>
-            CatatMD is an evaluation prototype. Every consultation transcript in it is synthetic and
+            CatatMD is a research prototype. Every consultation transcript in it is synthetic and
             was written for testing. No real patient data has ever been entered, and the system is
             not connected to any clinical record system.
           </p>

@@ -13,7 +13,7 @@ import type { DraftTurn } from '@shared/types'
  * drift in the comparison while structurally excluding it from the result.
  * Anything that changes the words themselves, a paraphrase, a dropped or
  * reordered word, a translation, a pseudonym token split in two, fails the
- * alignment and discards the whole draft (docs/trd.md §20.5).
+ * alignment and discards the whole draft (docs/TRD.md §20.5).
  */
 
 type Span = { start: number; end: number; canon: string }

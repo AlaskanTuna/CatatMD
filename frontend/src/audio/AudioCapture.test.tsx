@@ -797,7 +797,7 @@ describe('prewarming the speech model', () => {
 
     // Pinned exactly so a refactor cannot drift back to `{ audio: true }`,
     // which would re-enable the DSP behind the devoicing family measured in
-    // docs/trd.md §20.3 ("patut" for "batuk").
+    // docs/TRD.md §20.3 ("patut" for "batuk").
     expect(gumCalls).toEqual([
       {
         audio: {
@@ -1127,7 +1127,7 @@ describe('on-device failure copy', () => {
   /*
    * The local failure paths must never mention the hosted option. Offering the
    * cloud at the moment on-device transcription just failed is precisely the
-   * funnel docs/trd.md section 20 forbids, and it is an easy regression to
+   * funnel docs/TRD.md section 20 forbids, and it is an easy regression to
    * introduce while editing nearby copy.
    */
   const NEVER = /hosted|ilmu|upload/i

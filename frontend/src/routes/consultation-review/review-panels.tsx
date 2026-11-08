@@ -190,7 +190,7 @@ export function LivePanel({ title, live }: { title: string; live: LivePanes }) {
         /* Answered prompts are moved, never deleted. A gap the doctor has just
            covered disappearing from under their eye reads as the list losing
            track of the conversation, which is the churn the live design exists
-           to avoid (docs/trd.md §20.8.1). */
+           to avoid (docs/TRD.md §20.8.1). */
         <p className="mt-1 text-2xs text-ink-muted">
           {live.answered.length} covered so far:{' '}
           {live.answered.map((gap) => gap.question).join(' · ')}

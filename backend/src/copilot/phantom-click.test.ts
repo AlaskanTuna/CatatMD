@@ -9,7 +9,7 @@ import { hasPhantomClickInstruction } from './phantom-click.js'
  * revisions trialled for #185 both moved the model toward talking about cards,
  * and one of them started claiming a card was waiting when none was; both were
  * rejected on the measurements, but the next attempt will push the same way.
- * See §25 of `docs/trd.md`.
+ * See §25 of `docs/TRD.md`.
  *
  * The false-positive cases matter as much as the true ones. This runs over
  * clinical prose, where `pressure` is in every set of vitals, so a detector that

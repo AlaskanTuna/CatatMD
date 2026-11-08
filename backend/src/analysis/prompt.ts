@@ -1,5 +1,5 @@
 /**
- * System prompts for the two halves of Operation 1 (docs/trd.md §12).
+ * System prompts for the two halves of Operation 1 (docs/TRD.md §12).
  *
  * These are Tier-4 controls (§21.3) and are never relied on alone: the
  * `NOT_ASSESSED` default is enforced structurally by the schema (Tier 1) and

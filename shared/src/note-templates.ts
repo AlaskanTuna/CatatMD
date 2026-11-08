@@ -1,4 +1,4 @@
-import type { MedicalRecordNote, SoapNote } from './index.js'
+import type { MedicalRecordNote, SoapNote } from './note.js'
 
 export const NOT_ESTABLISHED = 'Not established'
 

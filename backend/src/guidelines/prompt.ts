@@ -2,7 +2,7 @@ import type { GuidelineChunk } from '@shared/types'
 
 /**
  * Serialises the given corpus into the `suggestions_and_red_flags` system
- * prompt (docs/trd.md §11, §12). Callers pass the full corpus they want the
+ * prompt (docs/TRD.md §11, §12). Callers pass the full corpus they want the
  * model to cite from, which is now the retrieved CPG chunks
  * (`backend/src/retrieval/`).
  *

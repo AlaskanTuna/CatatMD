@@ -3,7 +3,7 @@ import { BATCH_ASR_UPLOAD_URL, BatchSessionSchema, LiveAsrConfigSchema } from '@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
- * Route-level tests for the batch refinement mint (#436, docs/trd.md §20.14).
+ * Route-level tests for the batch refinement mint (#436, docs/TRD.md §20.14).
  *
  * Mirrors `asr-live-sessions.test.ts`, because the property is the same one a
  * step later: **the route never receives audio.** The browser uploads the

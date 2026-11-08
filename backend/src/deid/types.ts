@@ -15,7 +15,7 @@ declare const brand: unique symbol
 export type Deidentified = string & { readonly [brand]: 'deidentified' }
 
 /**
- * Minting is **not** exported (docs/trd.md §19 row 1, closed 13/08/26).
+ * Minting is **not** exported (docs/TRD.md §19 row 1, closed 13/08/26).
  *
  * This function used to be exported, which meant any file could import it and
  * brand a raw string without detection ever running — the type system

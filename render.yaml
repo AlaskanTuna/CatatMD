@@ -38,7 +38,7 @@ services:
         value: qwen3.7-flash
       # Hosted-ASR relay (#154). Key only: base URL and model ride the defaults
       # in backend/src/config/env.ts. Remember this file is not authoritative
-      # for a live service; set the key in the dashboard (docs/trd.md §17).
+      # for a live service; set the key in the dashboard (docs/TRD.md §17).
       - key: ILMU_API_KEY
         sync: false
       # Ambient capture (#268). The browser streams to Soniox directly under a
@@ -52,7 +52,7 @@ services:
       # recording to ElevenLabs under a single-use token this service mints.
       # Set only by the account holder, only once the vendor account's "use
       # data to improve models" setting is off, and only with a
-      # speech-to-text-only key carrying a credit quota (docs/trd.md §17).
+      # speech-to-text-only key carrying a credit quota (docs/TRD.md §17).
       - key: ELEVENLABS_API_KEY
         sync: false
       # Consultation audio retention (#293). How many hours a recording is kept
@@ -67,12 +67,12 @@ services:
       #
       # Declared anyway, because a variable that exists only in a dashboard is a
       # variable nobody knows to set. .env.example carries the vendor comparison
-      # (Abridge and Nuance DAX 30 days, Nabla 14) and docs/dpia.md carries the
+      # (Abridge and Nuance DAX 30 days, Nabla 14) and docs/DPIA.md carries the
       # open MMC cl.19 question that the choice turns on.
       - key: AUDIO_RETENTION_HOURS
         sync: false
       # Layer 3 of the transcript-correction chain (issue #309). Pinned off here
-      # rather than left to a dashboard default, because docs/trd.md 20.9 makes
+      # rather than left to a dashboard default, because docs/TRD.md 20.9 makes
       # turning it on conditional on a measurement that has not been taken:
       # the pass has to find corrections the measured table cannot. Flipping
       # this is a clinical decision, so it belongs in a diff.

@@ -102,7 +102,7 @@ export function HelpButton() {
                 &middot;
               </span>
               {/* A pull request preview has no pipeline behind it, so there the
-                promise would be false (docs/trd.md §17, Pull Request Previews). */}
+                promise would be false (docs/TRD.md §17, Pull Request Previews). */}
               {import.meta.env.VITE_PREVIEW_STUB === 'true' ? (
                 <>
                   This is a preview build. Its backend is a stub, so the analysis is a placeholder

@@ -68,7 +68,7 @@ describe('loadAudioSettings', () => {
 
   /*
    * The review page's dictation-engine choice was removed on 06/10/26
-   * (`docs/decisions.md` D-001). A device that saved one keeps it in storage
+   * (`docs/DECISIONS.md` D-001). A device that saved one keeps it in storage
    * until its next save, and it must not reach anything: dictation always
    * prefers streaming now, so a stored 'local' read back would pin a doctor to
    * a choice no screen can show or change.

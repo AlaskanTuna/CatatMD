@@ -4,7 +4,7 @@ import { cn } from '../lib/cn.js'
 /**
  * The six states, rendered as a fixed vocabulary.
  *
- * `NOT_ASSESSED` is the reason this component exists. `docs/prd.md` §10
+ * `NOT_ASSESSED` is the reason this component exists. `docs/PRD.md` §10
  * requires that a field the consultation never touched reads as *unestablished*
  * rather than as absent or normal, and §21.1 measured a model fabricating
  * "denies haemoptysis" in 5 of 5 runs without that guarantee. So the state is

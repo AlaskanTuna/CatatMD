@@ -49,10 +49,10 @@ type OpenWindow = {
  * are bare clusters, which a recogniser rejects. Cycling the recorder instead
  * costs a sub-frame gap at each boundary and buys a self-contained file per
  * window, which is what lets these blobs reach a provider exactly as recorded
- * (docs/trd.md 20.9).
+ * (docs/TRD.md 20.9).
  *
  * This emits segments and does not upload them. Nothing here opens a microphone
- * either, so the session-scoped consent that docs/trd.md 20.4 requires belongs
+ * either, so the session-scoped consent that docs/TRD.md 20.4 requires belongs
  * to whichever surface acquires the stream.
  */
 export function useSegmentRecorder({

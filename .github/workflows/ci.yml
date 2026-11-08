@@ -2,7 +2,7 @@ name: CI
 
 # Reinstated 13/08/26 (TRD §19 row 12) as part of issue #13. The clinical-safety
 # acceptance suite exists so that a regression fails a build rather than
-# reaching a demo — running it only on a developer's machine defeats the point.
+# reaching production; running it only on a developer's machine defeats the point.
 
 on:
   push:
@@ -62,10 +62,59 @@ jobs:
 
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # The floor guard diffs against the merge base with origin/main, and
+          # Gitleaks scans every commit in the pull request.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Gitleaks 8.30.1
+        run: |
+          # The release tarball is checksum-verified. When release downloads
+          # fail, the binary comes from the official image, pinned by digest.
+          archive="$RUNNER_TEMP/gitleaks_8.30.1_linux_x64.tar.gz"
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          if curl --fail --location --silent --show-error --retry 3 --retry-all-errors --output "$archive" \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz; then
+            printf '%s  %s\n' '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb' "$archive" | sha256sum --check --status
+            tar -xzf "$archive" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          else
+            container=$(docker create ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f)
+            docker cp "$container:/usr/bin/gitleaks" "$RUNNER_TEMP/gitleaks/gitleaks"
+            docker rm "$container" >/dev/null
+          fi
+          echo "$RUNNER_TEMP/gitleaks" >> "$GITHUB_PATH"
+
+      - name: Scan for secrets
+        # A pull request scans only its own commits; a push to main scans the
+        # pushed range, so a secret cannot land by either lane.
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            range="$(git merge-base "$PR_BASE" "$PR_HEAD")..$PR_HEAD"
+          elif git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+            range="$PUSH_BEFORE..$PUSH_AFTER"
+          else
+            range="$PUSH_AFTER~1..$PUSH_AFTER"
+          fi
+          gitleaks git --config .gitleaks.toml --redact --no-banner --exit-code 1 --log-opts="$range"
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        id: setup-bun
+        # Bun's binary comes from GitHub releases; when those fail, the same
+        # pinned version installs from the npm registry instead.
+        continue-on-error: true
         with:
-          bun-version: latest
+          bun-version-file: package.json
+      - if: steps.setup-bun.outcome == 'failure'
+        run: |
+          npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          bun --version
 
       - run: bun install --frozen-lockfile
 
@@ -89,40 +138,14 @@ jobs:
       - name: Test, including the clinical-safety acceptance suite
         run: bun run test
 
-      - name: Confidentiality check
-        # Engagement terms must never reach a tracked file. Two tiers, because
-        # they do not carry the same risk.
-        #
-        #   Commercial terms — the fee figure and the engagement length — are
-        #   banned in every tracked file with no exception, docs/source/
-        #   included. Nothing legitimately needs them.
-        #
-        #   Client names are banned everywhere except docs/source/, which holds
-        #   verbatim meeting records where redacting the counterparty would
-        #   destroy the document being kept. Committing those was a deliberate
-        #   decision taken with the repository private, and it is recorded in
-        #   each file's header. Making this repository public again requires
-        #   revisiting that decision first, because history keeps the file
-        #   whether or not the working tree does.
-        #
-        # The submission URL is the one authorised name match outside it.
+      - run: bun run format:check
+
+      - name: Floor guard
+        # Fails a change that adds a suppression, a skipped or focused test, or
+        # a new empty catch or TODO, unless a commit carries Floor-Guard-Allow.
         run: |
-          fail=0
-          if git ls-files -z | xargs -0 grep -sInIiE "RM ?3,?000|8-week" \
-            | grep -v "\.github/workflows/ci\.yml"; then
-            echo "::error::Commercial engagement terms found in tracked files"
-            fail=1
-          fi
-          if git ls-files -z | xargs -0 grep -sInIiE "kabel" \
-            | grep -v "dxp\.kabel\.my/candidate/projects" \
-            | grep -v "kickoff-.*-session\.md" \
-            | grep -v "^docs/source/" \
-            | grep -v "\.github/workflows/ci\.yml"; then
-            echo "::error::Client name found in a tracked file outside docs/source/"
-            fail=1
-          fi
-          [ "$fail" -eq 0 ] || exit 1
-          echo "CLEAN"
+          git fetch --no-tags origin main
+          bun run floor-guard
 
   # ── Deploy ──────────────────────────────────────────────────────────────────
   # Deployment moved off Vercel's Git integration and behind this job for two
@@ -179,7 +202,7 @@ jobs:
   # Nothing applies migrations to production, deliberately: Render's
   # `preDeployCommand` is a paid-tier feature and Postgres is Supabase rather
   # than Render, so migrations are applied by hand against `DIRECT_URL`
-  # (docs/trd.md §17). That decision is sound and the gap was that **nothing
+  # (docs/TRD.md §17). That decision is sound and the gap was that **nothing
   # enforced the manual step**.
   #
   # PR #124 merged and deployed with `notificationsClearedAt` absent from
@@ -340,7 +363,7 @@ jobs:
             {
               echo "\`${name}\` merged in ${GITHUB_SHA} and is **not applied to production**."
               echo
-              echo "Production does not apply migrations on deploy, by design (\`docs/trd.md\` §17):"
+              echo "Production does not apply migrations on deploy, by design (\`docs/TRD.md\` §17):"
               echo "Render's \`preDeployCommand\` is a paid-tier feature and Postgres is Supabase, so"
               echo "there is no deploy hook to hang it on. This issue is the forcing function around"
               echo "that manual step, not the apply itself."
@@ -432,7 +455,7 @@ jobs:
       VERCEL_ORG_ID: team_CwktsdBSB9TLrdwdCV3dZRbg
       VERCEL_PROJECT_ID: prj_6QNJo1XWj70DACDO3F0ICVSJkQTF
       # The domain a reviewer actually visits, and the origin the API trusts for
-      # CORS and cookies (docs/trd.md §14). Asserting against the deployment's
+      # CORS and cookies (docs/TRD.md §14). Asserting against the deployment's
       # own URL would prove nothing: that URL always resolves to the deployment.
       PRODUCTION_DOMAIN: catatmd.vercel.app
 
@@ -440,8 +463,16 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        id: setup-bun
+        # Bun's binary comes from GitHub releases; when those fail, the same
+        # pinned version installs from the npm registry instead.
+        continue-on-error: true
         with:
-          bun-version: latest
+          bun-version-file: package.json
+      - if: steps.setup-bun.outcome == 'failure'
+        run: |
+          npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          bun --version
 
       # Pinned rather than @latest: the deploy path should not change under us
       # between one merge and the next.
@@ -729,7 +760,7 @@ jobs:
   #
   # Deterministic code (red flags, the prescription parser) runs for real in
   # the stub; anything that needs a model, a database or a recogniser key gets a
-  # placeholder or its normal "unavailable" fallback. docs/trd.md §17, Pull
+  # placeholder or its normal "unavailable" fallback. docs/TRD.md §17, Pull
   # Request Previews, has the detail and the manual Vercel setting this needs.
   #
   # Skipped for pull requests from forks, which get no secrets, and when
@@ -780,9 +811,15 @@ jobs:
           fi
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        id: setup-bun
         if: steps.filter.outputs.deployable == 'true'
+        continue-on-error: true
         with:
-          bun-version: latest
+          bun-version-file: package.json
+      - if: steps.filter.outputs.deployable == 'true' && steps.setup-bun.outcome == 'failure'
+        run: |
+          npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          bun --version
 
       - name: Install Vercel CLI
         if: steps.filter.outputs.deployable == 'true'
@@ -895,7 +932,7 @@ jobs:
           set -euo pipefail
 
           marker='<!-- vercel-preview -->'
-          body="$(printf '%s\n**Preview:** %s\n\nBuilt from %s against the in-browser stub backend: synthetic data, no production API, no model. Sign-in is automatic. See docs/trd.md §17, Pull Request Previews.' \
+          body="$(printf '%s\n**Preview:** %s\n\nBuilt from %s against the in-browser stub backend: synthetic data, no production API, no model. Sign-in is automatic. See docs/TRD.md §17, Pull Request Previews.' \
             "$marker" "$DEPLOYMENT_URL" "${HEAD_SHA:0:7}")"
           echo "Preview: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
 

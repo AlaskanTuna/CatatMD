@@ -8,10 +8,10 @@ import { type CitableDocumentId, documentRef } from '../guidelines/documents.js'
  * **Versioned clinical data, and the only place it is written down.** The
  * Modified Centor score as MOH's National Antimicrobial Guideline 2024 (§A10)
  * tabulates it, read from the guideline's own table on 08/10/26, in our own
- * words because the source is all rights reserved (docs/trd.md §10). Abdullah
+ * words because the source is all rights reserved (docs/TRD.md §10). Abdullah
  * et al. 2024 publish the same instrument as the McIsaac score, differing only
  * at its edges (38 °C itself, age 45 itself, "tender" without "swollen"), so it
- * is not offered as a second near-identical form (docs/decisions.md D-012).
+ * is not offered as a second near-identical form (docs/DECISIONS.md D-012).
  *
  * **There is no threshold here, on purpose.** The two sources read the total
  * against different cut-offs, and a cut-off is a treatment decision the

@@ -70,7 +70,7 @@ describe('wordErrorRate', () => {
   })
 
   // Golden case, computed by hand from the Python semantics. The pair is the
-  // real measured devoicing error from `docs/trd.md` section 20.3: ILMU hears
+  // real measured devoicing error from `docs/TRD.md` section 20.3: ILMU hears
   // "patut" for "batuk". One substitution across six words.
   it('scores the measured devoicing error at one word in six', () => {
     expect(

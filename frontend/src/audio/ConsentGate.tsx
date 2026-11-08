@@ -25,7 +25,7 @@ import { Checkbox } from '../ui/Checkbox.js'
  * would be true of neither.
  *
  * **Ambient passes `null` and carries no disclosure at all, from 10/09/26 on
- * the owner's instruction** (`docs/decisions.md` D-004), which is why the prop
+ * the owner's instruction** (`docs/DECISIONS.md` D-004), which is why the prop
  * is nullable rather than merely optional: omitting it would silently fall
  * through to the relay's sentence and tell the doctor the audio goes to
  * Malaysia. That surface names neither the processor nor the region anywhere
@@ -34,7 +34,7 @@ import { Checkbox } from '../ui/Checkbox.js'
  * The tick's own wording is shared, because the promise it makes is identical,
  * with one exception: a translated ambient session also machine-translates
  * what is said (#393), so its tick says so. The wording stays English only, on
- * the owner's decision (`docs/decisions.md` D-008).
+ * the owner's decision (`docs/DECISIONS.md` D-008).
  */
 export function ConsentGate({
   agreed,

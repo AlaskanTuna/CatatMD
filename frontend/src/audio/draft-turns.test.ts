@@ -14,7 +14,7 @@ import type { TranscriptSegment } from './protocol.js'
 
 /*
  * Cases mirror the measured failure modes of the segment-level v1 rules
- * (docs/trd.md §20.2): the within-segment speaker handoff, alternation
+ * (docs/TRD.md §20.2): the within-segment speaker handoff, alternation
  * flipping on same-speaker continuations, and a patient's own question being
  * handed to the doctor, which is the red-flag-suppression shape from
  * backend/src/redflags/mislabel-suppression.test.ts.

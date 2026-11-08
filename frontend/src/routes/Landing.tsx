@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
  * The only brand-register surface in the product, and the first thing an
  * evaluator sees.
  *
- * The research (`docs/superpowers/research/09-medical-web-design.md`) is
+ * The research (`docs/research/09-medical-web-design.md`) is
  * specific about what belongs here: Malaysian clinical audiences expect
  * explicit credentials, Western clinician products express them with
  * restraint, and CatatMD's audience is Malaysian doctors. So the hero states
@@ -36,7 +36,7 @@ const CLAIMS = [
 const LIMITS = [
   {
     term: 'Not a Registered Medical Device',
-    body: 'It is a prototype built for evaluation, and no clinician has reviewed its output in a validation study.',
+    body: 'It is a research prototype, not a medical device, and no clinician has reviewed its output in a validation study.',
   },
   {
     term: 'Not Real Patient Data',
