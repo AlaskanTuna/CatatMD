@@ -102,3 +102,6 @@ take-*/
 *.wav
 *.srt
 narration-segments/
+
+# Local agent tooling state
+.dkm/

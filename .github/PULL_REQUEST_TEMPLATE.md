@@ -18,9 +18,7 @@ Closes #
 
 <!-- How you know it works. Delete rows that do not apply. -->
 
-- [ ] `bun run lint`
-- [ ] `bun run typecheck`
-- [ ] `bun run test`
+- [ ] `bun run verify` (lint, format check, typecheck, tests, floor guard)
 - [ ] Manually exercised the affected flow
 
 <!-- Name the specific tests added or the manual steps taken: -->
@@ -39,7 +37,7 @@ Production does not apply migrations on deploy, by design (`docs/trd.md` §17). 
 <!-- Delete this whole section only if the diff touches none of these paths. -->
 
 - [ ] No new path sends un-de-identified text to a provider — egress still goes through `deid/` then `LLMClient`
-- [ ] No provider SDK imported outside `backend/src/lib/llm/`
+- [ ] No provider SDK imported outside `backend/src/lib/llm/`, and any new speech egress is under `backend/src/lib/asr/`
 - [ ] Deterministic red-flag hits remain unsuppressable by the model
 - [ ] Citations remain ID-constrained; no free-text references accepted
 - [ ] No transcript bodies, note contents, or vault entries written to logs

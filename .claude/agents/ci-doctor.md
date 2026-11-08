@@ -23,9 +23,9 @@ Read the failing step's output, then read the workflow around it and the source 
 
 ## The Pipeline
 
-One workflow, `.github/workflows/ci.yml`, two jobs.
+One workflow, `.github/workflows/ci.yml`. The jobs that fail most are `verify` and `deploy`; `migrations`, `migration-reminder`, `changes` and `preview` gate and annotate around them.
 
-**`verify`** runs on push and pull_request. It brings up a throwaway Postgres 16 service, generates the Prisma client and applies migrations to it, then runs lint, typecheck, and test (including the clinical-safety acceptance suite), then a "Confidentiality check" step. It runs with no LLM key, so anything requiring a live provider must be mocked or skipped.
+**`verify`** runs on push and pull_request. It brings up a throwaway Postgres 16 service, generates the Prisma client and applies migrations to it, scans the pushed or pull-request commits with Gitleaks, audits dependencies, then runs lint, typecheck, test (including the clinical-safety acceptance suite), the format check and the floor guard. It runs with no LLM key, so anything requiring a live provider must be mocked or skipped.
 
 **`deploy`** runs only on a push to `main`. It installs the Vercel CLI, pulls production project settings, builds, asserts the bundle points at the API rather than the static origin, deploys the prebuilt output, waits for readiness, asserts the production domain serves that deployment, and confirms the served bundle matches the build.
 
@@ -38,7 +38,9 @@ Concurrency cancels in-progress runs on every ref except `main`, because a run o
 | Typecheck fails on `@shared/types` | `shared` was not rebuilt. It resolves to `shared/dist`, not source. |
 | Prisma client type errors | Schema changed without `prisma generate`, or a migration is missing from the commit. |
 | Test fails only in CI | Something depends on a live database, a real LLM key, or wall-clock time. CI has none of them. |
-| Confidentiality check fails | An engagement term, fee, date, or client name reached a tracked file. The one permitted exception is the submission URL in `docs/prd.md`. |
+| Secret scan fails | Gitleaks matched a credential pattern in the commit range. Never print the match; name the file and commit, and say the secret must be rotated, not just removed. |
+| Floor guard fails | The diff adds a suppression, a skipped or focused test, or an empty `catch` or `TODO`. Fix the code; only a maintainer adds `Floor-Guard-Allow`. |
+| Format check fails | Run `bun run format`; Biome formats code and Prettier formats Markdown and YAML. |
 | Lint fails | `noExplicitAny` and `noNonNullAssertion` are `error` in `biome.json`, not warnings. |
 | Deploy alias assertion fails | The production domain is serving a different deployment. Read the assertion step's own comments before touching anything; the repo has several commits' worth of history on exactly this. |
 | Deploy triggered unexpectedly | Vercel Git-integration deploys are disabled on all branches deliberately. Only this workflow deploys. |
@@ -48,9 +50,9 @@ Render hosts the API in Singapore on the free plan with a `/api/health` check. F
 ## Supply Chain Rules
 
 - CI installs with `bun install --frozen-lockfile`. Never loosen it, and never propose deleting `bun.lock` to fix an install. A dependency change commits the lockfile with it.
-- Actions currently use floating major tags (`actions/checkout@v4`, `oven-sh/setup-bun@v2`). Pin them to commit SHAs when the workflow is next touched, and add any new action SHA-pinned from the start.
+- Every action is pinned to a full commit SHA with a version comment. Add any new action the same way, and let Dependabot propose the bumps.
 - The CI secret surface stays at one entry, `secrets.VERCEL_TOKEN`. Project and org IDs are identifiers, not credentials, and stay inline. Flag any change that adds a second secret.
-- Known gaps, state them as gaps rather than implying coverage: no `bun audit`, no Dependabot or Renovate, no secret scanning, no SAST. The confidentiality check greps engagement terms, not credentials.
+- In place: `bun audit` at `high`, Gitleaks on every commit range, monthly grouped Dependabot, and a three-day install cooldown (`bunfig.toml`). Known gap, state it as a gap: no SAST.
 
 ## Hard Stops
 
