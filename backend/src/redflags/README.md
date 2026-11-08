@@ -1,4 +1,4 @@
-# Red-flag rules engine
+# Red-Flag Rules Engine
 
 Deterministic escalation triggers for adult acute cough / sore throat / URTI.
 Rules run **before** the model and their hits are authoritative — the LLM may

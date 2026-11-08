@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# routes
+# Routes
 
 Defines the Express HTTP surface and coordinates request validation, domain modules, persistence and response schemas.
 

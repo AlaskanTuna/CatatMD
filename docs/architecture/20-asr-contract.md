@@ -46,18 +46,18 @@ The resolution is not "audio never leaves the device" as an absolute, because §
 
 Failure degrades away from the cloud on both, but their floors differ and the difference is the part worth reading.
 
-| Surface                | Its floor when the streaming path cannot run                                                                                                                                                |
+| Surface                | Its Floor When The Streaming Path Cannot Run                                                                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Prescription dictation | On-device recognition, or typing                                                                                                                                                            |
-| Ambient capture        | **No on-device path of its own.** It falls back to press-to-record, which has one. With `SONIOX_API_KEY` unset the Record tab shows that recorder instead of the ambient panel, and says so |
+| Ambient capture        | **No On-Device Path Of Its Own.** It falls back to press-to-record, which has one. With `SONIOX_API_KEY` unset the Record tab shows that recorder instead of the ambient panel, and says so |
 
 Ambient still sends nothing without its per-consultation tick. This rule governs the press-to-record relay below unchanged.
 
 This is the direct analogue of `DEID_FAIL_CLOSED` (§7), and it is stated here in the same terms because a reviewer will, correctly, ask what happens when the on-device path cannot cope:
 
-| Behaviour on a device that cannot transcribe locally     | Verdict                                                                                                                     |
+| Behaviour On A Device That Cannot Transcribe Locally     | Verdict                                                                                                                     |
 | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Fall back to paste, tell the doctor why                  | **The specified behaviour.** The privacy control fails **closed**, the cheap path out is the private one                    |
+| Fall back to paste, tell the doctor why                  | **The Specified Behaviour.** The privacy control fails **closed**, the cheap path out is the private one                    |
 | Silently switch to hosted ASR because the device is slow | **Rejected.** A privacy control that fails **open** under load, degrading precisely when the doctor is least able to notice |
 
 The second option is the one a performance-minded implementation reaches for by default, which is why it is written down as rejected rather than left to judgement. Convenience may never be the trigger that moves patient audio off the device; only the doctor, per consultation, may be.
@@ -66,20 +66,20 @@ The second option is the one a performance-minded implementation reaches for by 
 
 Capture Mode belongs to the consultation, not the browser. The hero's **Consultation Settings** dialog owns the Ambient / Press To Record choice alongside the clinical-note layout; the device-scoped Audio dialog retains only microphone, noise handling, gain, and manual transcription-engine preferences. A legacy `mode` key in local storage is ignored.
 
-**A new consultation opens in Ambient** (`docs/decisions/` D-007). Three things follow, and the second is the one that is easy to get wrong.
+**A New Consultation Opens In Ambient** (`docs/decisions/` D-007). Three things follow, and the second is the one that is easy to get wrong.
 
-- **The value is written, not merely defaulted.** The column defaults to `ambient` and `POST /api/consultations` writes it too, because the migration is applied by hand while the API deploys on a merge (§17), so neither ordering may decide where a doctor lands.
-- **Only where nothing contradicts it.** A create carrying a transcript takes the mode that transcript's `source` implies: `asr_live` did stream and stays `ambient`, everything else is written `manual`. An unconditional `ambient` would stamp every pasted, uploaded and fixture-seeded consultation with a claim that audio reached the provider, and the mode locks the moment a transcript exists, so it could never be corrected.
-- **The mode is reconciled again when the transcript lands.** `PATCH` writes `manual` alongside any transcript whose `source` is not `asr_live`, in the same statement that closes the lock. That is what makes the rule hold rather than merely be intended: the browser also moves the mode when ambient turns out to be unavailable, and that write can fail silently while the doctor carries on recording.
-- **Existing consultations are untouched.** The migration sets the default and updates no row, so anything created before 21/09/26 keeps `manual`.
+- **The Value Is Written, Not Merely Defaulted.** The column defaults to `ambient` and `POST /api/consultations` writes it too, because the migration is applied by hand while the API deploys on a merge (§17), so neither ordering may decide where a doctor lands.
+- **Only Where Nothing Contradicts It.** A create carrying a transcript takes the mode that transcript's `source` implies: `asr_live` did stream and stays `ambient`, everything else is written `manual`. An unconditional `ambient` would stamp every pasted, uploaded and fixture-seeded consultation with a claim that audio reached the provider, and the mode locks the moment a transcript exists, so it could never be corrected.
+- **The Mode Is Reconciled Again When The Transcript Lands.** `PATCH` writes `manual` alongside any transcript whose `source` is not `asr_live`, in the same statement that closes the lock. That is what makes the rule hold rather than merely be intended: the browser also moves the mode when ambient turns out to be unavailable, and that write can fail silently while the doctor carries on recording.
+- **Existing Consultations Are Untouched.** The migration sets the default and updates no row, so anything created before 21/09/26 keeps `manual`.
 
 Capture Mode is also one half of the ambient consent pair, so moving it pre-arms that half and leaves the per-consultation tick as the only control the doctor still exercises.
 
 **Where ambient cannot run, the Record tab moves the consultation to press-to-record and says so.** `SONIOX_API_KEY` unset answers the config probe `503 asr_unavailable`, and since every new consultation now opens in ambient, without this the tab would greet each one with an alert rather than a working recorder.
 
-- **The stored mode moves too**, through the same `onCaptureModeChange` the panel's own Use Press To Record button always called. Showing one path while the record claims the other is how a consultation ends up locked at `ambient` with nothing having streamed.
-- **The trigger is the error code, not the status.** A Render cold start through the `/api` rewrite also answers `503`, and treating that as "no provider" would flip a doctor's deliberate choice on a transient outage. Any other failure keeps the ambient panel and its Check Again button, because there is something to retry.
-- **The substitution is stated on screen** rather than made quietly, in a `role="status"` line, for the reason `.claude/rules/security.md` gives on the sibling surface.
+- **The Stored Mode Moves Too**, through the same `onCaptureModeChange` the panel's own Use Press To Record button always called. Showing one path while the record claims the other is how a consultation ends up locked at `ambient` with nothing having streamed.
+- **The Trigger Is The Error Code, Not The Status.** A Render cold start through the `/api` rewrite also answers `503`, and treating that as "no provider" would flip a doctor's deliberate choice on a transient outage. Any other failure keeps the ambient panel and its Check Again button, because there is something to retry.
+- **The Substitution Is Stated On Screen** rather than made quietly, in a `role="status"` line, for the reason `.claude/rules/security.md` gives on the sibling surface.
 
 The persisted choice is mutable only before a transcript exists. Once `Consultation.transcript` is non-null, both Capture Mode controls are disabled with a visible explanation and the API independently rejects any `captureMode` write with `409 invalid_state`. While a recorder, transcription worker, upload, or live stream owns unsent audio, the hero gear is temporarily disabled so a mode change cannot unmount that work.
 
@@ -95,7 +95,7 @@ Pause and Resume retain the same `MediaRecorder`, microphone stream, accumulated
 
 Transcription is specified as a **port with two adapters**, deliberately mirroring `LLMClient` (§6) rather than inventing a second pattern:
 
-| Adapter      | Implementation                                                                                              | Status                                                                                                                         | Where audio goes                                                                                  |
+| Adapter      | Implementation                                                                                              | Status                                                                                                                         | Where Audio Goes                                                                                  |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
 | `asr_local`  | `whisper-small` via `@huggingface/transformers` v4, chunked in a **Web Worker**                             | **`Built`** (issue #2)                                                                                                         | Nowhere, browser memory only                                                                      |
 | `asr_hosted` | `ilmu-asr-v4.2` via the authenticated relay `POST /api/asr/transcriptions` (#154)                           | **`Built`** server-side; the consent UI that invokes it is #155                                                                | ILMU, processed in Malaysia, transiting our API on Render Singapore in request-scoped memory only |
@@ -109,7 +109,7 @@ The rationale for shaping it as a port rather than a branch is the same one that
 
 - On the default path, audio capture and transcription happen entirely client-side, inside `frontend/`, using Whisper via **`@huggingface/transformers` v4 directly**, not `xenova/whisper-web`, which was last pushed 2024-10-01, carries WebGPU only on a branch, and has 49 open issues.
 - The audio buffer (microphone input, or an uploaded audio file if that path is ever added) exists only in the browser's memory for the duration of transcription. It is never sent to `backend/`, never written to a request body, and never persisted anywhere server-side.
-- **There is no self-hosted transcription path, and none is planned.** Render's free-tier instance (§17) has 512 MB of memory and no GPU, and cannot host a Whisper model at all, but the tier is not the real argument. Self-hosted server-side ASR is **strictly dominated**: the audio crosses the network either way, so it pays the full privacy cost _and_ the compute cost, for worse accuracy than a hosted provider (`docs/PRD.md` §12). Where audio must leave the device, a hosted provider is the honest choice; running our own would only obscure that it left.
+- **There Is No Self-Hosted Transcription Path, And None Is Planned.** Render's free-tier instance (§17) has 512 MB of memory and no GPU, and cannot host a Whisper model at all, but the tier is not the real argument. Self-hosted server-side ASR is **strictly dominated**: the audio crosses the network either way, so it pays the full privacy cost _and_ the compute cost, for worse accuracy than a hosted provider (`docs/PRD.md` §12). Where audio must leave the device, a hosted provider is the honest choice; running our own would only obscure that it left.
 - The hosted adapter is therefore an egress path to a **third party**, not a fallback to our own backend, and it is governed by the rule above. With ILMU that third party processes and stores in Malaysia (a provider claim from docs.ilmu.ai, read 15/08/26; contractual verification is tracked in `docs/DPIA.md`), which makes the hosted path an in-country answer for the audio itself, with one honestly disclosed caveat: the recording transits our API on Render Singapore, in request-scoped memory only, because the browser cannot hold the provider key.
 
 ## What Crosses The Network
@@ -131,9 +131,9 @@ In both cases the resulting `Transcript` is submitted through the existing `POST
 
 The claim above is about **patient data**, and stated without this it reads as broader than it is. On the `asr_local` path one request does leave the browser, and a reviewer watching the network tab will see it: the model weights are fetched from the Hugging Face CDN on first use (see Delivery, below). Naming it here rather than only in a delivery table is deliberate, because the section a reviewer checks for egress claims should be the section that discloses the egress.
 
-**The direction is what makes it safe, not a policy.** It is a download of public model weights, not an upload. No audio, no transcript, no identifier, and no consultation content is part of that request, because it happens before any of them exist.
+**The Direction Is What Makes It Safe, Not A Policy.** It is a download of public model weights, not an upload. No audio, no transcript, no identifier, and no consultation content is part of that request, because it happens before any of them exist.
 
-| Party            | What it observes                                                       |
+| Party            | What It Observes                                                       |
 | ---------------- | ---------------------------------------------------------------------- |
 | Hugging Face CDN | The clinician device's IP address, which model was requested, and when |
 | Hugging Face CDN | **No** patient data of any kind, and no transcript                     |
@@ -141,13 +141,13 @@ The claim above is about **patient data**, and stated without this it reads as b
 Two things follow that are worth stating plainly rather than leaving a reviewer to infer:
 
 - **Nothing that PDPA cross-border transfer rules attach to leaves the country on this path**, because no personal data of a patient is in the request. The clinician's IP is visible to a non-Malaysian CDN, which is a fact about the clinic's own network rather than a patient data transfer, and it is the same exposure as loading any third-party asset.
-- **It is removable, and the removal is shipped rather than described.** `VITE_ASR_MODEL_HOST` (§7) points the weight download at any origin, and the path layout under it matches HuggingFace's own (`{model}/resolve/{revision}/…`), so mirroring is a plain file copy rather than a rewrite. A clinic whose network policy forbids the fetch mirrors the files, serves them from the same origin as the app, and the on-device claim becomes an on-premises one with no third-party call at all. Left unset it defaults to the CDN, which is the disclosed behaviour above.
+- **It Is Removable, And The Removal Is Shipped Rather Than Described.** `VITE_ASR_MODEL_HOST` (§7) points the weight download at any origin, and the path layout under it matches HuggingFace's own (`{model}/resolve/{revision}/…`), so mirroring is a plain file copy rather than a rewrite. A clinic whose network policy forbids the fetch mirrors the files, serves them from the same origin as the app, and the on-device claim becomes an on-premises one with no third-party call at all. Left unset it defaults to the CDN, which is the disclosed behaviour above.
 
 #### Two Assets, Two Decisions
 
 The ONNX Runtime WASM (~23 MB) is served from the application's own origin; the model weights (~240 MB per model) are not. That is **two decisions with different inputs, not one mitigation half-applied**, and a reviewer who sees `ort-wasm` on our origin and the model on HuggingFace should be able to tell them apart:
 
-| Asset             | Served from                            | Why                                                                                                                                                |
+| Asset             | Served From                            | Why                                                                                                                                                |
 | ----------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ONNX Runtime WASM | Our origin, always                     | Bounded and fixed. Emitted into the build, so there is no reason to introduce a second third-party origin for it                                   |
 | Model weights     | HuggingFace CDN by default, mirrorable | ~240 MB per model whose bandwidth we would carry on every cache miss. Made configurable instead, so the cost falls to the deployment that needs it |
@@ -169,9 +169,9 @@ Shipping behaviour as of issues #138 and #139. The contract in one line: **the w
 
 Three properties are load-bearing and worth defending against future edits:
 
-- **The budget is on silence, not duration.** §20.1 measures an RTF of 1.5 to 3.0, so a consultation-length recording legitimately transcribes for many minutes; a deadline on the whole job would abort exactly the recordings most expensive to lose. 180 s is floored by ONNX session creation, which blocks the worker thread on a ~240 MB decoder and is legitimately silent throughout.
-- **The heartbeat rides on tokens, not Whisper timestamps.** Timestamps go silent over stride overlaps, quiet audio and repetition loops, any of which would let the budget kill a healthy run; tokens fire per decoding step whatever the audio contains (`HEARTBEAT_TOKENS`, one `alive` per eight).
-- **`finishing` clears the budget rather than rearming it.** After the last chunk the tokenizer merge blocks the worker thread, so no heartbeat is physically possible until the result. The phase is named on screen, the spinner carries liveness, and Cancel remains the doctor's bound. A cap here would have to be sized for the slowest legitimate merge, at which point it protects nothing Cancel does not, while a wrong one destroys a finished transcription, the worst outcome this feature has.
+- **The Budget Is On Silence, Not Duration.** §20.1 measures an RTF of 1.5 to 3.0, so a consultation-length recording legitimately transcribes for many minutes; a deadline on the whole job would abort exactly the recordings most expensive to lose. 180 s is floored by ONNX session creation, which blocks the worker thread on a ~240 MB decoder and is legitimately silent throughout.
+- **The Heartbeat Rides On Tokens, Not Whisper Timestamps.** Timestamps go silent over stride overlaps, quiet audio and repetition loops, any of which would let the budget kill a healthy run; tokens fire per decoding step whatever the audio contains (`HEARTBEAT_TOKENS`, one `alive` per eight).
+- **`finishing` Clears The Budget Rather Than Rearming It.** After the last chunk the tokenizer merge blocks the worker thread, so no heartbeat is physically possible until the result. The phase is named on screen, the spinner carries liveness, and Cancel remains the doctor's bound. A cap here would have to be sized for the slowest legitimate merge, at which point it protects nothing Cancel does not, while a wrong one destroys a finished transcription, the worst outcome this feature has.
 
 Cancel is a `terminate()`, never a message: a worker wedged inside a fetch that never settles will not read one. Every exit, whether expiry, cancel, worker death or unmount, leaves no worker running and no timer armed. The bar also stopped claiming a finished download: at 100% the copy reads "Opening the speech model", because the ORT backend import and the session open both happen after the last byte, which is the same stretch where a blocked backend used to surface only after a finished-looking download.
 
@@ -179,16 +179,16 @@ Cancel is a `terminate()`, never a message: a worker wedged inside a fetch that 
 
 The probe's job is to decide **whether to offer audio on this device at all**, not to silently pick a mode. Mode selection is the doctor's (see the governing rule); capability is a fact about the machine.
 
-**Design constraint that shapes the whole thing:** a probe that downloads 240 MB before reporting "your device is too slow" punishes exactly the user it exists to protect. The free stage exists to gate the expensive one.
+**Design Constraint That Shapes The Whole Thing:** a probe that downloads 240 MB before reporting "your device is too slow" punishes exactly the user it exists to protect. The free stage exists to gate the expensive one.
 
-| Stage                                          | What it measures                                                                                       | Cost                 | What it decides                                              |
+| Stage                                          | What It Measures                                                                                       | Cost                 | What It Decides                                              |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------- | ------------------------------------------------------------ |
 | **1, Triage**, on opening "New consultation"   | `navigator.hardwareConcurrency`, `navigator.deviceMemory`, and a ~200 ms synthetic WASM microbenchmark | Zero network, ~0.5 s | Three bands: clearly capable / clearly incapable / uncertain |
 | **2, Verdict**, on the first transcribed chunk | Real-time factor (RTF) measured on work actually done                                                  | The chunk itself     | Can **overturn** Stage 1 in either direction                 |
 
 A synthetic benchmark is triage, not a verdict, which is why Stage 2 exists and is allowed to overrule Stage 1. The "uncertain" band is a genuine outcome and must be designed for, not collapsed into one of the confident ones.
 
-**Caching, stated honestly.** The model is cached to OPFS, with the measured RTF stored alongside it so the probe does not start from zero on every visit. "One-time download" is nevertheless a claim that fails in ordinary clinic conditions, and is not made here: cache eviction, a shared clinic PC where each staff member has their own browser profile, and incognito sessions each defeat it independently.
+**Caching, Stated Honestly.** The model is cached to OPFS, with the measured RTF stored alongside it so the probe does not start from zero on every visit. "One-time download" is nevertheless a claim that fails in ordinary clinic conditions, and is not made here: cache eviction, a shared clinic PC where each staff member has their own browser profile, and incognito sessions each defeat it independently.
 
 ## The Memory Failure Mode
 
@@ -198,21 +198,21 @@ Slowness is the visible risk. Memory exhaustion is the one that actually loses a
 
 Consequently: **Core-i3-class hardware gets audio _not offered_ by default**, with an explicit override for a doctor who wants to try it anyway. This is deliberately stronger than "discouraged", a warning the doctor can click past is the wrong control for a failure whose cost is losing the consultation rather than waiting longer for it.
 
-**The same budget argument constrains the rest of the page.** These estimates assume transcription is not competing with a continuous render loop for the same cores: at an estimated RTF of 1.5–3.0 in-browser on a 4-core clinic PC (§20.1), there is no headroom to share. Any always-animating WebGL or `requestAnimationFrame` surface on the consultation screen would be spending exactly the CPU the ASR path needs, so the frontend does not carry one, a constraint on the UI, recorded here because it originates in this section's measurements rather than in a design preference.
+**The Same Budget Argument Constrains The Rest Of The Page.** These estimates assume transcription is not competing with a continuous render loop for the same cores: at an estimated RTF of 1.5–3.0 in-browser on a 4-core clinic PC (§20.1), there is no headroom to share. Any always-animating WebGL or `requestAnimationFrame` surface on the consultation screen would be spending exactly the CPU the ASR path needs, so the frontend does not carry one, a constraint on the UI, recorded here because it originates in this section's measurements rather than in a design preference.
 
 ## Consent UX: A Live Tension, Not A Solved Problem
 
 Recorded as an unresolved tension because presenting it as solved would be the more comfortable and less honest option.
 
-**The tension:** the doctor on weak hardware is exactly the doctor who wants hosted mode, and surfacing the hosted option at the moment of maximum frustration is precisely how meaningful consent quietly degrades into clicking whatever ends the friction. The mechanism is sound (explicit, per-consultation, recorded); the risk is that the moment it fires is the moment the doctor is least able to weigh it.
+**The Tension:** the doctor on weak hardware is exactly the doctor who wants hosted mode, and surfacing the hosted option at the moment of maximum frustration is precisely how meaningful consent quietly degrades into clicking whatever ends the friction. The mechanism is sound (explicit, per-consultation, recorded); the risk is that the moment it fires is the moment the doctor is least able to weigh it.
 
-**The handling:** hosted must be **findable but not funnelled**. It is mentioned neutrally, with its tradeoff stated in the same breath rather than behind a link, and it is never the highlighted button on a screen the doctor reached by failing. The exact wording and affordance are unresolved, see the Open Decisions Register, §19, row 18.
+**The Handling:** hosted must be **findable but not funnelled**. It is mentioned neutrally, with its tradeoff stated in the same breath rather than behind a link, and it is never the highlighted button on a screen the doctor reached by failing. The exact wording and affordance are unresolved, see the Open Decisions Register, §19, row 18.
 
 Two properties are settled regardless of how that resolves: consent is **per consultation and never sticky** (consent is not transferable between patients), and choosing hosted is recorded in both the transcript (§3) and the audit trail (§15).
 
 ## Batch, Not Streaming, For V1
 
-**Superseded 05/09/26 by §20.7.** Reason 1 below is overturned: the client has now asked, by name, for exactly the margin it recorded nobody wanting. Reasons 2 and 3 still hold, and are what make §20.7 segmented HTTP rather than a socket. This section is kept rather than rewritten, because the reasoning it records is what shaped the replacement.
+**Superseded 05/09/26 By §20.7.** Reason 1 below is overturned: the client has now asked, by name, for exactly the margin it recorded nobody wanting. Reasons 2 and 3 still hold, and are what make §20.7 segmented HTTP rather than a socket. This section is kept rather than rewritten, because the reasoning it records is what shaped the replacement.
 
 The hosted adapter posts one finished recording per request. ILMU's transcription API is batch-only today, and that fits the design rather than constraining it: a streaming session was already rejected on its own terms when the pencilled-in provider offered one.
 
@@ -235,14 +235,14 @@ True streaming is an optimisation available later, not the starting point. State
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Model              | **`whisper-small`** (~240 MB), revised upward from `whisper-base` on 13/08/26 by measurement, see §20.1. `base` is **not** fit for Malaysian code-switched speech. **Not** `large-v3-turbo`, ≈560 MB+ on first load                                                                                                                                                                     |
 | Delivery           | Fetched from the Hugging Face CDN on first use, then cached in the browser. Never bundled into the frontend build                                                                                                                                                                                                                                                                       |
-| Execution provider | **WASM is first-class, not a fallback.** Through transformers.js v3.0.2, WASM beat WebGPU on `whisper-base` on an M2 (4.9–5.9 s vs 9.5–9.6 s for 60 s audio). v4's runtime may have flipped this; measure, do not assume                                                                                                                                                                |
-| Platform           | **Desktop Chromium only**, stated explicitly. Documented crashes exist on Android Chrome and iOS                                                                                                                                                                                                                                                                                        |
-| `language`         | **Always hard-coded to `'en'`.** Never auto-detected, and never set from a locale picker or a patient's recorded language, §20.1 finding 2. The risk is not that auto-detect translates (that claim was measured and withdrawn, finding 3); it is that auto-detect could _select_ a non-English language on code-switched audio, which is the regime finding 2 measured as catastrophic |
+| Execution provider | **WASM Is First-Class, Not A Fallback.** Through transformers.js v3.0.2, WASM beat WebGPU on `whisper-base` on an M2 (4.9–5.9 s vs 9.5–9.6 s for 60 s audio). v4's runtime may have flipped this; measure, do not assume                                                                                                                                                                |
+| Platform           | **Desktop Chromium Only**, stated explicitly. Documented crashes exist on Android Chrome and iOS                                                                                                                                                                                                                                                                                        |
+| `language`         | **Always Hard-Coded To `'en'`.** Never auto-detected, and never set from a locale picker or a patient's recorded language, §20.1 finding 2. The risk is not that auto-detect translates (that claim was measured and withdrawn, finding 3); it is that auto-detect could _select_ a non-English language on code-switched audio, which is the regime finding 2 measured as catastrophic |
 | Version pinning    | Pin the exact model × dtype × device combination and test it before shipping; a known open issue collapses all segments into one under v4 + WebGPU + fp16 + timestamped turbo                                                                                                                                                                                                           |
 
-**Never promise real-time.** Measured figures and their hardware caveats are in §20.1; the short version is that `whisper-small` ranges from comfortably faster than real time on a modern multi-core machine to **several times slower than real time** on a modest clinic PC, and the clinic's hardware is not ours to choose. Design consequences: transcribe in chunks in a Web Worker during the consultation, probe real-time factor on the first chunk and warn early if the device cannot keep up, show real progress, and keep the paste-a-transcript path as the primary route (`docs/PRD.md` §14).
+**Never Promise Real-Time.** Measured figures and their hardware caveats are in §20.1; the short version is that `whisper-small` ranges from comfortably faster than real time on a modern multi-core machine to **several times slower than real time** on a modest clinic PC, and the clinic's hardware is not ours to choose. Design consequences: transcribe in chunks in a Web Worker during the consultation, probe real-time factor on the first chunk and warn early if the device cannot keep up, show real progress, and keep the paste-a-transcript path as the primary route (`docs/PRD.md` §14).
 
-**Check cross-origin isolation before counting on multi-threaded WASM.** COOP/COEP headers are required for `SharedArrayBuffer`, and enabling them on Vercel constrains cross-origin model fetches from the HF CDN, the two requirements pull against each other and must be resolved together, not sequentially.
+**Check Cross-Origin Isolation Before Counting On Multi-Threaded WASM.** COOP/COEP headers are required for `SharedArrayBuffer`, and enabling them on Vercel constrains cross-origin model fetches from the HF CDN, the two requirements pull against each other and must be resolved together, not sequentially.
 
 ### The Quantised Decoder Needs Graph Optimisation Disabled
 
@@ -257,7 +257,7 @@ Missing required scale: model.decoder.embed_tokens.weight_merged_0_scale
 
 Three plausible causes, each eliminated by measurement rather than reasoning:
 
-| Hypothesis                  | Why it is wrong                                                                                                                  |
+| Hypothesis                  | Why It Is Wrong                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | A bad mirror                | The failure is identical on `Xenova/whisper-small` and `onnx-community/whisper-small`                                            |
 | The wrong dtype             | `decoder_model_merged_int8.onnx` is **byte-identical** (md5) to the `_quantized` file, so switching between them changes nothing |
@@ -272,7 +272,7 @@ That distinction matters for anyone reviewing it later: this disables a graph re
 The WebGPU branch originally set no `dtype`, so the library default applied and everything came down at fp32. It now pins a full-precision encoder with a `q4` decoder, the pairing the official transformers.js WebGPU Whisper demos ship for models of this size. Two nearby options were rejected on evidence, not preference:
 
 - **Scalar `q8`** is pathologically slow on WebGPU (transformers.js issue #894 measures 27 s against 5.2 s WASM on the same file), and the q8 decoder independently fails to open on this runtime (the qdq diagnosis above).
-- **An fp16 encoder** would save a further 176 MB, but the demos reserve fp16 encoders for `large-v3-turbo`, and the pinning row above records an open v4 + WebGPU + fp16 timestamp issue. Timestamps carry §20.2, so full precision won.
+- **An fp16 Encoder** would save a further 176 MB, but the demos reserve fp16 encoders for `large-v3-turbo`, and the pinning row above records an open v4 + WebGPU + fp16 timestamp issue. Timestamps carry §20.2, so full precision won.
 
 #### Download Size, Measured 15/08/26
 
@@ -296,7 +296,7 @@ The §20.1 sample was no longer present on the measurement machine, so the A/B r
 
 | Token (Ground Truth)         | WASM q8 (14/08 Baseline) | WebGPU fp32 + q4      | WebGPU fp32 Decoder          |
 | ---------------------------- | ------------------------ | --------------------- | ---------------------------- |
-| "Any phlegm when you cough?" | phlegm                   | **flam**              | phlegm                       |
+| "Any phlegm when you cough?" | phlegm                   | **Flam**              | phlegm                       |
 | "Batuk sudah 3 hari lah"     | Batuxidha 3 Harry Law    | Batuxedot 3 harry law | Batuxidothri harila (no "3") |
 | "MC", both mentions          | MC                       | MC                    | mc                           |
 | "sakit"                      | socket                   | socket                | socket                       |
@@ -314,9 +314,9 @@ This is a genuine architectural gap, stated as one. Every control in this system
 
 | Failure                        | Mechanism                                                                                                                                               | Why No Downstream Control Catches It                                                                                                    |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **Whisper hallucination**      | ~1% of transcriptions contain entire fabricated phrases, correlated with long non-vocal spans; ~40% judged capable of harm (Koenecke et al., FAccT '24) | A hallucinated span **passes** the §21.4 evidence check, the evidence genuinely is in the transcript. The transcript is what is wrong   |
-| **Wrong-language declaration** | **Measured, §20.1.** Declaring a language the audio is not in produces a fluent repetition loop, not an error, on both `base` and `small`               | Grammatical, plausible output in the declared language, bearing no relation to what was said. Indistinguishable downstream              |
-| **Semantic substitution**      | **Measured, §20.1.** `whisper-base` rendered "auntie" as "until" and dropped "pasar malam" entirely                                                     | The transcript is well-formed English. A substituted content word is a fact the doctor never said, and it carries a valid evidence span |
+| **Whisper Hallucination**      | ~1% of transcriptions contain entire fabricated phrases, correlated with long non-vocal spans; ~40% judged capable of harm (Koenecke et al., FAccT '24) | A hallucinated span **passes** the §21.4 evidence check, the evidence genuinely is in the transcript. The transcript is what is wrong   |
+| **Wrong-Language Declaration** | **Measured, §20.1.** Declaring a language the audio is not in produces a fluent repetition loop, not an error, on both `base` and `small`               | Grammatical, plausible output in the declared language, bearing no relation to what was said. Indistinguishable downstream              |
+| **Semantic Substitution**      | **Measured, §20.1.** `whisper-base` rendered "auntie" as "until" and dropped "pasar malam" entirely                                                     | The transcript is well-formed English. A substituted content word is a fact the doctor never said, and it carries a valid evidence span |
 
 Mitigations available in this window: pass `language` and **never pass one the audio is not in**; VAD-trim long silences before transcription; surface a low-confidence indicator on ASR output so the doctor is cued to check the **transcript**, not only the note; and keep pasted text as the primary demo path. None of these closes the gap, they bound it. The same law fires at both layers: **silence → fabrication at the ASR layer, sparse text → fabrication at the LLM layer** (§21.1).
 
@@ -324,37 +324,37 @@ Mitigations available in this window: pass `language` and **never pass one the a
 
 Measured **13/08/26** on a 49.7 s Manglish sample (casual conversation, Malay and Cantonese loanwords, single speaker, not clinical register), decoded to 16 kHz mono. Whisper runs via `@huggingface/transformers` **4.2.0**, the exact production dependency, at `dtype: 'q8', device: 'cpu'` on a 16-core machine. Qwen via `qwen3-asr-flash` on the Singapore endpoint.
 
-**Sample provenance:** a publicly downloaded speech sample. No patient data, real or simulated, was sent to any provider. The file is **not committed** to this repository.
+**Sample Provenance:** a publicly downloaded speech sample. No patient data, real or simulated, was sent to any provider. The file is **not committed** to this repository.
 
-| Token in audio      | `whisper-base`        | `whisper-small`    | `qwen3-asr-flash` |
+| Token In Audio      | `whisper-base`        | `whisper-small`    | `qwen3-asr-flash` |
 | ------------------- | --------------------- | ------------------ | ----------------- |
-| "pasar malam"       | **dropped entirely**  | "Paso Malams"      | "pasar malams"    |
-| "auntie"            | **"until"**           | "Auntie"           | "Auntie"          |
-| "lang loi"          | **"language"** (7×)   | "Lang Loi"         | "lang loi"        |
-| "lang chai"         | **"language"**        | "Lang Jai"         | "lang chai"       |
+| "pasar malam"       | **Dropped Entirely**  | "Paso Malams"      | "pasar malams"    |
+| "auntie"            | **"Until"**           | "Auntie"           | "Auntie"          |
+| "lang loi"          | **"Language"** (7×)   | "Lang Loi"         | "lang loi"        |
+| "lang chai"         | **"Language"**        | "Lang Jai"         | "lang chai"       |
 | `lah` / `ah` / `eh` | mostly lost           | preserved          | preserved         |
 | Wall clock          | 7.2 s (**RTF 0.146**) | 13.9 s (RTF 0.279) | **2.8 s**         |
 | Determinism         | ,                     | ,                  | byte-identical ×3 |
 
-**Three findings, in order of consequence.**
+**Three Findings, In Order Of Consequence.**
 
-1. **`whisper-base` is not fit for the measured Malaysian code-switched speech.** It rendered _"You call me auntie ah, how old am I"_ as _"You call me until you're old and you know?"_, not degradation but a **meaning change**, in well-formed English that no downstream control can flag. `whisper-small` recovers essentially all of it. The §20 default is therefore revised `base` → `small`, at the cost of ~104 MB more download and roughly 2× the compute.
+1. **`whisper-base` Is Not Fit For The Measured Malaysian Code-Switched Speech.** It rendered _"You call me auntie ah, how old am I"_ as _"You call me until you're old and you know?"_, not degradation but a **meaning change**, in well-formed English that no downstream control can flag. `whisper-small` recovers essentially all of it. The §20 default is therefore revised `base` → `small`, at the cost of ~104 MB more download and roughly 2× the compute.
 
 2. **Declaring the wrong language causes a fluent hallucination loop, on both model sizes.** With `language: 'ms'`, `base` emitted _"Dia berlalu di sini"_ ×20 then _"Saya takkan berguna"_ ×30, **238 words for 50 s of audio**, RTF rising 4× to 0.583. `small` emitted _"Teruklah"_ ×10 at **RTF 1.365, slower than real time.** This is the §21.1 failure mode reproduced one layer down: grammatical, confident, entirely fabricated. It is why `language` must be `'en'` and must never be set from a locale picker or auto-detected patient language.
 
-3. **The silent-translation threat did not reproduce, and the claim is withdrawn.** Earlier drafts of this section asserted, from secondary research, that Whisper translates rather than transcribes on code-switched audio when `language` is unset. Measured here, `auto` and `language: 'en'` produced **byte-identical output** on both model sizes. The underlying source benchmarked European language pairs; it does not transfer to Malaysian audio. `language` stays explicit because finding 2 makes it load-bearing anyway, but for a different and better-evidenced reason.
+3. **The Silent-Translation Threat Did Not Reproduce, And The Claim Is Withdrawn.** Earlier drafts of this section asserted, from secondary research, that Whisper translates rather than transcribes on code-switched audio when `language` is unset. Measured here, `auto` and `language: 'en'` produced **byte-identical output** on both model sizes. The underlying source benchmarked European language pairs; it does not transfer to Malaysian audio. `language` stays explicit because finding 2 makes it load-bearing anyway, but for a different and better-evidenced reason.
 
-**Limits of this measurement, stated plainly.** n=1, one 50-second sample, casual register rather than clinical, with heavier Cantonese loanword density than a typical consultation. Clinical Manglish is plausibly easier, medical vocabulary is English. No WER is reported because the sample carries no ground-truth transcript; the table compares specific tokens whose correct value is agreed between the two stronger models. This is a **smoke test that settled a model choice**, not a benchmark, and it is described as such wherever it is cited.
+**Limits Of This Measurement, Stated Plainly.** n=1, one 50-second sample, casual register rather than clinical, with heavier Cantonese loanword density than a typical consultation. Clinical Manglish is plausibly easier, medical vocabulary is English. No WER is reported because the sample carries no ground-truth transcript; the table compares specific tokens whose correct value is agreed between the two stronger models. This is a **smoke test that settled a model choice**, not a benchmark, and it is described as such wherever it is cited.
 
-**The hardware consequence is now the binding constraint, not accuracy.** The 16-core figures above run native ONNX Runtime in Node; **browser WASM is typically 1.5–3× slower**, so treat RTF 0.279 as a floor. On a 4-core clinic PC, `whisper-small` in-browser plausibly lands at **RTF 1.5–3.0, slower than real time**, meaning a 10-minute consultation could take 15–30 minutes to transcribe. Design consequence: probe real-time factor on the first completed chunk and tell the doctor up front, rather than discovering the backlog at the end.
+**The Hardware Consequence Is Now The Binding Constraint, Not Accuracy.** The 16-core figures above run native ONNX Runtime in Node; **browser WASM is typically 1.5–3× slower**, so treat RTF 0.279 as a floor. On a 4-core clinic PC, `whisper-small` in-browser plausibly lands at **RTF 1.5–3.0, slower than real time**, meaning a 10-minute consultation could take 15–30 minutes to transcribe. Design consequence: probe real-time factor on the first completed chunk and tell the doctor up front, rather than discovering the backlog at the end.
 
 **Open**, `language` is settled above and is not negotiable. Whether the low-confidence indicator and VAD silence-trimming are built in this window, or named as unmitigated, is a scope call against the remaining runway. See the Open Decisions Register, §19, row 15.
 
-**Malay-accuracy roadmap, not a build item.** `mesolitica/malaysian-whisper-*` is fine-tuned on Malaysian audio (IMDA STT, the Malay Conversational Speech Corpus, pseudolabelled Malaysian YouTube) with v3 described as handling Malay, Manglish, Mandarin and Tamil. **No ONNX build is published and no public WER exists.** Cite it as the improvement path; do not attempt the conversion now.
+**Malay-Accuracy Roadmap, Not A Build Item.** `mesolitica/malaysian-whisper-*` is fine-tuned on Malaysian audio (IMDA STT, the Malay Conversational Speech Corpus, pseudolabelled Malaysian YouTube) with v3 described as handling Malay, Manglish, Mandarin and Tamil. **No ONNX build is published and no public WER exists.** Cite it as the improvement path; do not attempt the conversion now.
 
 ## 20.2 Draft Speaker Labels: Measured, Gated, Not Diarisation
 
-**Built, issue #118.**
+**Built, Issue #118.**
 
 ### What This Is, And Is Not
 
@@ -374,7 +374,7 @@ This is **turn segmentation from timing and sentence content**, not diarisation.
 
 83.4 s synthetic two-voice consultation (Windows SAPI, David as doctor, Zira as patient), fixture 1's turns plus four scripted closing turns, run through the exact production pipeline (`onnx-community/whisper-small`, WASM, `q8`, `graphOptimizationLevel: 'disabled'`, `language: 'en'`) and through the production worker file end to end.
 
-**Stated honestly, as §20.1 does for its own sample:** synthetic TTS audio is a timing and boundary test, not a speech-register test (clean voices, anglicised Malay pronunciation). n=1, not a benchmark.
+**Stated Honestly, As §20.1 Does For Its Own Sample:** synthetic TTS audio is a timing and boundary test, not a speech-register test (clean voices, anglicised Malay pronunciation). n=1, not a benchmark.
 
 | Finding                         | Result                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -391,7 +391,7 @@ The v1 rules (open with the doctor, answer after a question, any question to the
 
 - **Split.** Each segment splits at sentence boundaries (`[.!?]` runs followed by a capital or digit), guarded twice: a title Whisper writes ("Dr.") is not a boundary, and a split whose pieces do not reconstruct the segment text exactly is discarded whole. The same text-is-authoritative stance as `usable()`.
 - **Score.** Each sentence is checked against two small pattern tables. Doctor patterns are speech directed at the patient: question openers ("what brings you", "any fever"), instructions ("take these", "let me"), examination ("your throat"). Patient patterns are first-person experience ("I have", "my chest", "I ate") and vocative "doctor". More matches wins.
-- **Context on a tie, keeping v1's ordering rationale.** The answer to a question outranks the sentence's own trailing question mark ("Yes, since this morning?" stays the patient's); a content-free question falls to the doctor as the last resort; a sentence with no signal at all continues the previous speaker. Continuation replaces alternation, whose flips on same-speaker continuations were the largest measured failure mode above.
+- **Context On A Tie, Keeping v1's Ordering Rationale.** The answer to a question outranks the sentence's own trailing question mark ("Yes, since this morning?" stays the patient's); a content-free question falls to the doctor as the last resort; a sentence with no signal at all continues the previous speaker. Continuation replaces alternation, whose flips on same-speaker continuations were the largest measured failure mode above.
 - **Merge.** Consecutive same-speaker sentences within one segment fold back into one line, so splitting costs a review line only where the guessed speaker changes.
 - **Offsets.** Only the line that opens a segment carries its start time. A split line's true offset inside the segment is unknown, and a fabricated one would assert a wrong time in the evidence trace.
 
@@ -403,23 +403,23 @@ What this fixes, each pinned by `frontend/src/audio/draft-turns.test.ts`: the wi
 
 Whisper returned **15 segments** spanning **38 sentences**, having merged a speaker handoff into a segment at eleven of the twenty-one turn boundaries, a heavier merge rate than the 14/08/26 sample. v1 was replayed over the identical segments for a like-for-like comparison.
 
-| Metric, per sentence         | v1             | v2                 |
+| Metric, Per Sentence         | v1             | v2                 |
 | ---------------------------- | -------------- | ------------------ |
-| Sentences labelled correctly | 20 of 38 (53%) | **36 of 38 (95%)** |
+| Sentences labelled correctly | 20 of 38 (53%) | **36 Of 38 (95%)** |
 | Lines holding two speakers   | 10 of 15       | 2 of 28            |
 | Lines carrying a wrong label | 4 of 15        | 0 of 28            |
 
 v1 scoring 53% here, on different audio and a different metric from the 14/08/26 run that also produced 53%, is corroboration rather than coincidence.
 
-**The red-flag case, on real speech:** v1 labelled "Is it bad that I'm coughing out blood?" **Doctor**, which is the suppression shape `mislabel-suppression.test.ts` pins. v2 labelled it **Patient**.
+**The Red-Flag Case, On Real Speech:** v1 labelled "Is it bad that I'm coughing out blood?" **Doctor**, which is the suppression shape `mislabel-suppression.test.ts` pins. v2 labelled it **Patient**.
 
-**Two pattern gaps this run exposed, both fixed and pinned by tests:** a first-person question about one's own care ("Do I need antibiotics?", "anything I should watch out for?") had no content signal, fell to the doctor as a last-resort question, and then cascaded one line through the answer-after-question rule; and the first-person symptom pattern fired on a bare negation, handing "You can see Dr. Tan if I'm not around" to the patient. Together they accounted for 6 of the 9 errors in the first pass, which scored 29 of 38.
+**Two Pattern Gaps This Run Exposed, Both Fixed And Pinned By Tests:** a first-person question about one's own care ("Do I need antibiotics?", "anything I should watch out for?") had no content signal, fell to the doctor as a last-resort question, and then cascaded one line through the answer-after-question rule; and the first-person symptom pattern fired on a bare negation, handing "You can see Dr. Tan if I'm not around" to the patient. Together they accounted for 6 of the 9 errors in the first pass, which scored 29 of 38.
 
-**The two remaining errors are structural, not tuning:** Whisper split "Any chest pain or / breathlessness?" across two segments mid-sentence, which no sentence-level labeller can repair, and "Like this." carries no signal in either direction.
+**The Two Remaining Errors Are Structural, Not Tuning:** Whisper split "Any chest pain or / breathlessness?" across two segments mid-sentence, which no sentence-level labeller can repair, and "Like this." carries no signal in either direction.
 
-**Confirmation run, same day, fixed code, fresh recording.** The table above scores the corrected patterns replayed over the first recording's segments, so a second reading was recorded end to end to check the result was not fitted to one sample. 31 lines over 39 sentences: **38 of 39 correct (97%), 30 of 31 lines clean, zero wrong labels.** Every fix held in live conditions, including the two that the first run motivated, and the red-flag line landed on the patient again. The single error is the same "Like this.", which is now the only known content-free failure in either recording.
+**Confirmation Run, Same Day, Fixed Code, Fresh Recording.** The table above scores the corrected patterns replayed over the first recording's segments, so a second reading was recorded end to end to check the result was not fitted to one sample. 31 lines over 39 sentences: **38 of 39 correct (97%), 30 of 31 lines clean, zero wrong labels.** Every fix held in live conditions, including the two that the first run motivated, and the red-flag line landed on the patient again. The single error is the same "Like this.", which is now the only known content-free failure in either recording.
 
-**Limits, stated as §20.1 does:** n=1, one voice, scripted rather than spontaneous, and read by a non-clinician. Real ASR errors were present and left in ("phlegm" became "flame", "doctor" became "daughter"), so this measures labelling over imperfect text, which is the honest condition. The pattern tables are English-only, so heavily code-switched sentences fall through to the context rules.
+**Limits, Stated As §20.1 Does:** n=1, one voice, scripted rather than spontaneous, and read by a non-clinician. Real ASR errors were present and left in ("phlegm" became "flame", "doctor" became "daughter"), so this measures labelling over imperfect text, which is the honest condition. The pattern tables are English-only, so heavily code-switched sentences fall through to the context rules.
 
 ### The Apply Gate Is The Safety Control
 
@@ -447,25 +447,25 @@ Segments are advisory, text is authoritative. `usable()` in `draft-turns.ts` che
 
 Recorded so the option is scoped, not attempted, in this window.
 
-**What is available for free.** transformers.js v4 natively ships both models a diarisation pass would need, with zero new dependencies and mirrorable through the existing `VITE_ASR_MODEL_HOST` layout with no code change:
+**What Is Available For Free.** transformers.js v4 natively ships both models a diarisation pass would need, with zero new dependencies and mirrorable through the existing `VITE_ASR_MODEL_HOST` layout with no code change:
 
 | Model                                           | Size         | Role                                                             |
 | ----------------------------------------------- | ------------ | ---------------------------------------------------------------- |
 | `onnx-community/pyannote-segmentation-3.0`      | 6.0 MB fp32  | `AutoModelForAudioFrameClassification`, speech/overlap detection |
 | `onnx-community/wespeaker-voxceleb-resnet34-LM` | 26.5 MB fp32 | 256-d speaker embeddings                                         |
 
-**Two verified library traps, so they are not re-discovered the hard way:**
+**Two Verified Library Traps, So They Are Not Re-Discovered The Hard Way:**
 
 - `PyAnnoteFeatureExtractor` does not window: it tensors the whole recording, but the model is trained on 10 s chunks, so a sliding window has to be hand-built.
 - `post_process_speaker_diarization` is not a diarizer. It returns per-window powerset class ids (0 is silence) whose identities do not persist across windows.
 
-**Design sketch.** 10 s windows at a 5 s hop; permutation-invariant `P(speech)` and `P(overlap)` stitching across windows; embeddings taken on clean (non-overlapping) segments under a CPU budget; deterministic average-linkage agglomerative clustering read at k=1/2/3; **refusal as a first-class output**, where a one-speaker or third-voice verdict falls back to unlabelled prose rather than forcing a guess. That refusal path is why `SpeakerSchema` needs no third value even if this ships.
+**Design Sketch.** 10 s windows at a 5 s hop; permutation-invariant `P(speech)` and `P(overlap)` stitching across windows; embeddings taken on clean (non-overlapping) segments under a CPU budget; deterministic average-linkage agglomerative clustering read at k=1/2/3; **refusal as a first-class output**, where a one-speaker or third-voice verdict falls back to unlabelled prose rather than forcing a guess. That refusal path is why `SpeakerSchema` needs no third value even if this ships.
 
-**A possible second payoff.** The segmentation pass doubles as a VAD. Its silence-trimming may pay for more of its own cost than the diarisation half costs, and would close the VAD half of §19 row 15 (currently open) if it does.
+**A Possible Second Payoff.** The segmentation pass doubles as a VAD. Its silence-trimming may pay for more of its own cost than the diarisation half costs, and would close the VAD half of §19 row 15 (currently open) if it does.
 
-**Estimated cost.** 2 to 4 minutes added to a 10-minute consultation.
+**Estimated Cost.** 2 to 4 minutes added to a 10-minute consultation.
 
-**Ship thresholds**, against measured EER on one-desk-microphone clinic-like audio:
+**Ship Thresholds**, against measured EER on one-desk-microphone clinic-like audio:
 
 | EER             | Verdict                                                                           |
 | --------------- | --------------------------------------------------------------------------------- |
@@ -473,14 +473,14 @@ Recorded so the option is scoped, not attempted, in this window.
 | 10 to 20%       | Demoted to a labour-saver with per-line uncertainty shown, not a default          |
 | Over 20%        | Worse than nothing: converts the doctor's authoring task into a proofreading task |
 
-**Rejected implementations, recorded so they are not retried:**
+**Rejected Implementations, Recorded So They Are Not Retried:**
 
-- **sherpa-onnx WASM.** Statically links a second ONNX Runtime, bypassing the `VITE_ASR_MODEL_HOST` mirror.
-- **A direct `onnxruntime-web` dependency.** The lockfile resolves a transformers.js-pinned nightly dev build; a caret range on top would install a second ORT beside it.
+- **Sherpa-onnx WASM.** Statically links a second ONNX Runtime, bypassing the `VITE_ASR_MODEL_HOST` mirror.
+- **A Direct `onnxruntime-web` Dependency.** The lockfile resolves a transformers.js-pinned nightly dev build; a caret range on top would install a second ORT beside it.
 
-**Role-mapping floor.** A one-tap swap control, same as today's Swap All. Stored clinician voiceprints are rejected outright: biometric data, on shared clinic PCs, and this section's own upload claims already forbid it.
+**Role-Mapping Floor.** A one-tap swap control, same as today's Swap All. Stored clinician voiceprints are rejected outright: biometric data, on shared clinic PCs, and this section's own upload claims already forbid it.
 
-**Verified 15/08/26, while revising the draft labels:**
+**Verified 15/08/26, While Revising The Draft Labels:**
 
 - `onnx-community/whisper-small_timestamped` exists on the hub, so the word-timestamp alignment path is real. Swapping `MODEL` to it invalidates the cached weights and re-downloads them in full; schedule that migration deliberately, not as a side effect.
 - `vercel.json` `connect-src` already covers the hosts the two models above download from; no CSP change is needed.
@@ -492,41 +492,41 @@ Recorded so the option is scoped, not attempted, in this window.
 
 Measured **15/08/26**, gating issue #151 (the hosted-ASR build, issues #154 and #155, does not start unless this section records a ship decision). Harness: `evals/asr-ab.ts`, three default runs per sample plus one `language='ms'` probe, response-shape probes, and a report per run under the gitignored `evals/reports/`.
 
-**Samples, provenance stated per the 20.1 convention.** Two samples, neither committed:
+**Samples, Provenance Stated Per The 20.1 Convention.** Two samples, neither committed:
 
 1. The 20.2 reference recording: 83.4 s synthetic two-voice consultation, Windows SAPI voices, anglicised Malay pronunciation.
 2. A new 99.2 s scripted rojak consultation: single human reader voicing both roles, phone recording (AAC 48 kHz stereo, decoded to 16 kHz mono), Malay-dominant with mid-sentence English switches, scripted ground truth. Synthetic content; no patient data of any kind was sent to any provider.
 
-**Local arm:** `@huggingface/transformers` 4.2.0, the exact production dependency, Node CPU, `dtype: 'q8'`, `graphOptimizationLevel: 'disabled'`, production generation options, run per the 20.1 method with the same caveat (browser WASM is slower than these Node figures).
+**Local Arm:** `@huggingface/transformers` 4.2.0, the exact production dependency, Node CPU, `dtype: 'q8'`, `graphOptimizationLevel: 'disabled'`, production generation options, run per the 20.1 method with the same caveat (browser WASM is slower than these Node figures).
 
 ### Token Table, Rojak Sample
 
-| Token (Ground Truth)                    | `ilmu-asr-v4.2`                         | `whisper-small` `language:'en'` (shipped)                         | `whisper-small` `language:'ms'`                  |
+| Token (Ground Truth)                    | `ilmu-asr-v4.2`                         | `whisper-small` `language:'en'` (Shipped)                         | `whisper-small` `language:'ms'`                  |
 | --------------------------------------- | --------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------ |
-| "batuk sudah empat hari lah"            | "patut sudah empat hari lah"            | **"it's been four days"** (translated)                            | "patuk sudah empah hari lah"                     |
-| "Ada demam tak?"                        | "ada teman tak"                         | **"Do you have a fever?"** (translated)                           | "Ada teman tak?"                                 |
+| "batuk sudah empat hari lah"            | "patut sudah empat hari lah"            | **"It's Been Four Days"** (translated)                            | "patuk sudah empah hari lah"                     |
+| "Ada demam tak?"                        | "ada teman tak"                         | **"Do You Have A Fever?"** (translated)                           | "Ada teman tak?"                                 |
 | "tiga puluh lapan point dua"            | correct ("poin"/"point" varies by run)  | "38.2" (translated to digits)                                     | "38.2"                                           |
 | "Any phlegm when you cough? Kahak ada?" | "any 你 fling when you cough kahak ada" | "Any flanks when you cough, or cough, or white"                   | "Any fling when your cough kakak ada"            |
-| "dada rasa sakit sikit"                 | **correct**                             | **"your feet are strong, you will feel a little pain"**           | "dah dah rasa sakit sikit"                       |
+| "dada rasa sakit sikit"                 | **Correct**                             | **"Your Feet Are Strong, You Will Feel A Little Pain"**           | "dah dah rasa sakit sikit"                       |
 | "Tekak merah sikit, tonsil tak bengkak" | "kekak merah sikit tongso tak pengkat"  | "Tekak Merah sikit Tongsil, Dap penkak" (after an English detour) | "Tekak. Merah sikit. Tongsel. Tak penkak."       |
 | "denggi", both mentions                 | "tenggi"                                | "tanggi"                                                          | "tanggi"                                         |
-| "Boleh dapat MC tak"                    | "boleh tapak MC tak" (MC survives)      | **"Can I get a doctor's leave?"** (translated, MC gone)           | "boleh tapak emci tak"                           |
+| "Boleh dapat MC tak"                    | "boleh tapak MC tak" (MC survives)      | **"Can I Get A Doctor's Leave?"** (translated, MC gone)           | "boleh tapak emci tak"                           |
 | "semput"                                | "sempuk"                                | "if you feel sick" (gone)                                         | "sempuk"                                         |
 | Duplicated or invented content          | one stutter ("air air")                 | repeated blocks plus invented clauses                             | repeated blocks plus one fabricated Malay clause |
-| Punctuation and casing                  | **none**: flat lowercase stream         | yes                                                               | partial                                          |
+| Punctuation and casing                  | **None**: flat lowercase stream         | yes                                                               | partial                                          |
 | Wall clock (99.2 s audio)               | 2.3 to 2.5 s (**RTF 0.024**)            | 66.2 s (RTF 0.67, Node CPU floor)                                 | 157.5 s (**RTF 1.59**, slower than real time)    |
 
 ### Findings, In Order Of Consequence
 
-1. **The shipped local configuration fails dangerously, not gracefully, on Malay-dominant audio.** `language: 'en'` on this recording produced fluent English translation-fabrication: "bila batuk kuat, dada rasa sakit sikit" became "when your feet are strong, you will feel a little pain", erasing the exact phrase the chest-pain red flag matches on. This is 20.1 finding 2 and the section 21 threat table reproduced on the production settings, and it is the measured justification for the consent-gated hosted path: the on-device default has no safe answer for a Malay consultation today.
-2. **`auto` is not detection.** With `language` unset, transformers.js logs "No language specified - defaulting to English" per chunk; output was byte-identical to `'en'`. 20.1 finding 3 withdrew the silent-translation claim from secondary research; this run supplies the mechanism: there is no detection to mistrust, only a default.
-3. **A doctor-declared `'ms'` toggle would not be a fix.** It transcribes rather than translates, but with stride-duplication blocks, one fabricated clause, "emci" for MC, and RTF 1.59 on a 16-core machine, which clinic hardware multiplies. The on-device toggle idea stays rejected; the section 20 language row stands unchanged.
-4. **`ilmu-asr-v4.2` wins the rojak arm decisively on structure and speed.** Correct matrix language, mid-sentence code-switching preserved, clinical content largely intact (including "dada rasa sakit sikit" and "kahak"), roughly 40x faster than the local WASM path, at about RM 0.012 per consultation-minute. Its error family on this recording is consonant devoicing ("patut" for "batuk", "teman" for "demam", "tenggi" for "denggi", "pengkat" for "bengkak"), shared with `whisper-small` `'ms'` at the same spots, which points at the phone-mic audio profile as a contributor; plus one Chinese-character intrusion on "phlegm" and no punctuation.
+1. **The Shipped Local Configuration Fails Dangerously, Not Gracefully, On Malay-Dominant Audio.** `language: 'en'` on this recording produced fluent English translation-fabrication: "bila batuk kuat, dada rasa sakit sikit" became "when your feet are strong, you will feel a little pain", erasing the exact phrase the chest-pain red flag matches on. This is 20.1 finding 2 and the section 21 threat table reproduced on the production settings, and it is the measured justification for the consent-gated hosted path: the on-device default has no safe answer for a Malay consultation today.
+2. **`auto` Is Not Detection.** With `language` unset, transformers.js logs "No language specified - defaulting to English" per chunk; output was byte-identical to `'en'`. 20.1 finding 3 withdrew the silent-translation claim from secondary research; this run supplies the mechanism: there is no detection to mistrust, only a default.
+3. **A Doctor-Declared `'ms'` Toggle Would Not Be A Fix.** It transcribes rather than translates, but with stride-duplication blocks, one fabricated clause, "emci" for MC, and RTF 1.59 on a 16-core machine, which clinic hardware multiplies. The on-device toggle idea stays rejected; the section 20 language row stands unchanged.
+4. **`ilmu-asr-v4.2` Wins The Rojak Arm Decisively On Structure And Speed.** Correct matrix language, mid-sentence code-switching preserved, clinical content largely intact (including "dada rasa sakit sikit" and "kahak"), roughly 40x faster than the local WASM path, at about RM 0.012 per consultation-minute. Its error family on this recording is consonant devoicing ("patut" for "batuk", "teman" for "demam", "tenggi" for "denggi", "pengkat" for "bengkak"), shared with `whisper-small` `'ms'` at the same spots, which points at the phone-mic audio profile as a contributor; plus one Chinese-character intrusion on "phlegm" and no punctuation.
 5. **The early-access API diverges from its documentation, in ways the relay must absorb.** `verbose_json` is not honoured (the response is `{text, usage: {type: "duration", seconds}}` with `timestamp_granularities[]` a no-op), `srt` returns a single cue spanning the whole file, the `prompt` biasing field is a no-op (identical output with punctuation-style and jargon prompts), and `temperature=0` is not byte-deterministic on the rojak sample (three runs differed in minor tokens; the TTS sample was deterministic). Consequences: no per-turn offsets exist, draft speaker labels cannot engage (the flat unpunctuated prose also defeats sentence splitting), and the relay's audited `durationSeconds` comes from `usage.seconds`, the one duration the API actually returns.
 
    **Revised 16/08/26:** superseded in part by §20.5. The §20.2 sentence-scoring pass still cannot engage on hosted prose for the reason stated above, but a server-side LLM pass now drafts labels for the hosted path from text alone, no segments or punctuation required. Offsets remain unavailable on the hosted path; only the labelling half of this finding is closed.
 
-6. **Reference-recording arm, for continuity with 20.2:** rough parity with the local WASM baseline on anglicised TTS (both garble the TTS-Malay tokens; ILMU uniquely recovered "Okay can", uniquely stuttered once, and spells numerals out), deterministic there, 2.0 to 2.4 s. The TTS register cannot carry the Malay verdict, which is why the human-read sample exists.
+6. **Reference-Recording Arm, For Continuity With 20.2:** rough parity with the local WASM baseline on anglicised TTS (both garble the TTS-Malay tokens; ILMU uniquely recovered "Okay can", uniquely stuttered once, and spells numerals out), deterministic there, 2.0 to 2.4 s. The TTS register cannot carry the Malay verdict, which is why the human-read sample exists.
 
 ### Decision, Applying The Rule Written In #151 Before Measurement
 
@@ -534,11 +534,11 @@ Tokens: ILMU beats local. Segments: fail (none delivered). **Ship the hosted pat
 
 **Revised 16/08/26:** the "no draft speaker labels" half of this decision is superseded by §20.5, which drafts labels server-side from text rather than from segments. The consent UI now discloses that step (§20.4); the rest of this decision, including no per-turn offsets on the hosted path, stands unchanged.
 
-**Limits, stated plainly.** n=1 reader, one phone microphone, a non-clinical room; one sample per register; token comparison rather than WER, per the 20.1 convention; the local arm ran in Node CPU rather than browser WASM. The devoicing overlap between both models suggests re-measurement with a clinic-grade microphone before treating it as a provider property. If the provider ships working `verbose_json` segments or punctuation later, the draft-labels verdict in finding 5 is the one to re-measure.
+**Limits, Stated Plainly.** n=1 reader, one phone microphone, a non-clinical room; one sample per register; token comparison rather than WER, per the 20.1 convention; the local arm ran in Node CPU rather than browser WASM. The devoicing overlap between both models suggests re-measurement with a clinic-grade microphone before treating it as a provider property. If the provider ships working `verbose_json` segments or punctuation later, the draft-labels verdict in finding 5 is the one to re-measure.
 
 **Revised 16/08/26:** the capture-profile suspicion now has a shipped response: §20.6 turns off the browser's voice-call DSP at the microphone. Every figure in this section was captured with that DSP on; §20.6 holds the re-measurement protocol, and this section's verdicts stand until it runs.
 
-**Cost of the whole gate:** about RM 0.20 of the RM 20 early-access credit.
+**Cost Of The Whole Gate:** about RM 0.20 of the RM 20 early-access credit.
 
 ## 20.4 The Consent Gate (Resolves §19 Row 18)
 
@@ -550,8 +550,8 @@ Tokens: ILMU beats local. Segments: fail (none delivered). **Ship the hosted pat
 
 | Control                          | Question                          | Scope                                    | Where                       |
 | -------------------------------- | --------------------------------- | ---------------------------------------- | --------------------------- |
-| **Engine preference** (#228)     | Where does audio go?              | This device, standing, in `localStorage` | `audio/AudioSettingsDialog` |
-| **Consent gesture** (#155, #254) | May this patient's audio be sent? | One consultation, remembered by nothing  | `audio/ConsentGate`         |
+| **Engine Preference** (#228)     | Where does audio go?              | This device, standing, in `localStorage` | `audio/AudioSettingsDialog` |
+| **Consent Gesture** (#155, #254) | May this patient's audio be sent? | One consultation, remembered by nothing  | `audio/ConsentGate`         |
 
 Neither reaches ILMU alone. Between 02/09/26 and 06/09/26 only the first existed, while the Audio dialog went on stating that each patient was asked. Nothing asked, and no test covered the claim, which is why it survived three weeks (#254).
 
@@ -565,7 +565,7 @@ Neither reaches ILMU alone. Between 02/09/26 and 06/09/26 only the first existed
 | **Emphasis**           | Muted body text and a plain checkbox. Never a button, never accented, never a highlighted card            |
 | **Default**            | Unticked. Plain `useState`, so it resets on every mount and writes nothing to any storage                 |
 | **Availability**       | Disabled unless the component is idle                                                                     |
-| **Supplementary note** | A keyboard-reachable, touch-usable disclosure beside the `ilmu-asr-v4.2` model name, carrying detail only |
+| **Supplementary Note** | A keyboard-reachable, touch-usable disclosure beside the `ilmu-asr-v4.2` model name, carrying detail only |
 
 **Placement moved from the foot of the tab to above the controls (#254).** A disabled button leaves the tab order, so at the foot a keyboard user reached Start and the file picker only to have both skipped, and arrived last at the one control that unlocks them. The invariance argument below was about the engine picker not reading as a rescue after a failure; that picker is gone, and what remains is a precondition rather than an offer.
 
@@ -573,10 +573,10 @@ Neither reaches ILMU alone. Between 02/09/26 and 06/09/26 only the first existed
 
 The §19 row 18 tension was that the doctor on weak hardware is exactly the one offered the hosted path, at the moment of most frustration. Wording cannot fix that; placement and invariance can:
 
-- **The block never changes.** Identical presence, position and styling whether the doctor arrived fresh or after a stall, a dead worker or a refused microphone. Nothing about it is introduced by failure, so nothing about it reads as a rescue.
-- **The on-device failure copy never mentions hosted.** Pinned by a negative test asserting the stall and worker-death messages match no `/hosted|ilmu|upload/i`. This is the regression most likely to be introduced by someone editing nearby copy in good faith.
-- **Failure degrades toward privacy in both directions.** A hosted failure offers on-device or paste and never silently runs the local worker, exactly as a local failure never silently uploads. No automatic switching exists in either direction.
-- **Consent is not transferable.** It dies with the component, so it cannot carry from one patient to the next. This is the property #228 lost and #254 restored, and it is the reason the gesture may never be folded back into the remembered preference however convenient that is.
+- **The Block Never Changes.** Identical presence, position and styling whether the doctor arrived fresh or after a stall, a dead worker or a refused microphone. Nothing about it is introduced by failure, so nothing about it reads as a rescue.
+- **The On-Device Failure Copy Never Mentions Hosted.** Pinned by a negative test asserting the stall and worker-death messages match no `/hosted|ilmu|upload/i`. This is the regression most likely to be introduced by someone editing nearby copy in good faith.
+- **Failure Degrades Toward Privacy In Both Directions.** A hosted failure offers on-device or paste and never silently runs the local worker, exactly as a local failure never silently uploads. No automatic switching exists in either direction.
+- **Consent Is Not Transferable.** It dies with the component, so it cannot carry from one patient to the next. This is the property #228 lost and #254 restored, and it is the reason the gesture may never be folded back into the remembered preference however convenient that is.
 
 ### What The Copy Claims, And Why It Claims No More
 
@@ -594,22 +594,22 @@ The disclosure cites the **PDPA as amended in 2024**, under which voice is biome
 
 | Concern            | Behaviour                                                                                                                                                                                                                                                                                            |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Fork point**     | `media.onstop`, the audio-file picker and Try Again all route through one dispatcher reading both keys                                                                                                                                                                                               |
-| **Mid-run switch** | Saving the Audio dialog to hosted during a recording is refused at that dispatcher, not by the controls, which were legitimately enabled when the run started. The blob is kept and Try Again sends it once agreed. It never falls back to the local worker: no silent switching in either direction |
+| **Fork Point**     | `media.onstop`, the audio-file picker and Try Again all route through one dispatcher reading both keys                                                                                                                                                                                               |
+| **Mid-Run Switch** | Saving the Audio dialog to hosted during a recording is refused at that dispatcher, not by the controls, which were legitimately enabled when the run started. The blob is kept and Try Again sends it once agreed. It never falls back to the local worker: no silent switching in either direction |
 | **Prewarm**        | A hosted recording skips the local prewarm and terminates any worker left warm by an earlier on-device run                                                                                                                                                                                           |
-| **Upload phase**   | A distinct `uploading` phase with no invented progress bar; the relay is one request with no midpoint to report                                                                                                                                                                                      |
+| **Upload Phase**   | A distinct `uploading` phase with no invented progress bar; the relay is one request with no midpoint to report                                                                                                                                                                                      |
 | **Bound**          | 180 s via `AbortController`, plus Cancel and unmount. Expiry is reported; a cancel is not an error                                                                                                                                                                                                   |
-| **Hardware floor** | Does not apply to hosted, which loads no local weights. Choosing hosted reveals the controls without setting the local-path override                                                                                                                                                                 |
-| **Failure copy**   | One message for every upstream reason, so the provider's operational state never reaches a consulting-room screen                                                                                                                                                                                    |
+| **Hardware Floor** | Does not apply to hosted, which loads no local weights. Choosing hosted reveals the controls without setting the local-path override                                                                                                                                                                 |
+| **Failure Copy**   | One message for every upstream reason, so the provider's operational state never reaches a consulting-room screen                                                                                                                                                                                    |
 | **Provenance**     | `asr_hosted` is sticky for the consultation once any hosted recording contributed, and never downgrades on a later local pass                                                                                                                                                                        |
 
-**Follow-up, closed 16/08/26:** `docs/assets/tech-stack.drawio.png` and the doctor-journey diagram now draw the hosted adapter as `ilmu-asr-v4.2`, built, with the audio relayed through the API. The dashed outline remains because the provider sits outside the trust boundary.
+**Follow-Up, Closed 16/08/26:** `docs/assets/tech-stack.drawio.png` and the doctor-journey diagram now draw the hosted adapter as `ilmu-asr-v4.2`, built, with the audio relayed through the API. The dashed outline remains because the provider sits outside the trust boundary.
 
 ### What Pins This, Added 06/09/26 (#254)
 
 The claim outlived its control for three weeks because nothing connected the two. Three guards now do:
 
-| Guard                                             | What it prevents                                                                                                                        |
+| Guard                                             | What It Prevents                                                                                                                        |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `AudioSettingsDialog.test.tsx`, the coupling test | The dialog claiming per-patient asking while no per-patient control renders. Both halves asserted in one test, so deleting either fails |
 | `AudioCapture.test.tsx`, the consent describe     | The relay being reachable without the gesture, including the mid-run engine switch no disabled control can catch                        |
@@ -632,9 +632,9 @@ The §20.2 sentence-scoring heuristic reads segment boundaries and punctuation, 
 `POST /api/asr/draft-turns` (§13), session-guarded, own limiter (`draftTurnsRateLimit`, 5/min per client key), body `{ text }` trimmed to 1..30,000 chars (`MAX_DRAFT_TEXT_CHARACTERS`, reconciled with the 16,384-token output ceiling: the response echoes the input verbatim, and at a conservative 2.5 chars/token for code-switched Malay the echo is now per chunk rather than per request, so the ceiling has ample headroom; the cap remains the bound on how much text one request may submit, and therefore on the fan-out below):
 
 1. `deidentify(text)` mints the branded content plus a request-scoped vault before anything leaves the API, the same PHI-boundary gate every other egress uses. `detected` labels are kept for the audit row.
-2. **`sliceDeidentified` cuts the gated value into 600-character, whitespace-bounded chunks**, at most four in flight at once. Detail and rationale in §20.6 below.
+2. **`sliceDeidentified` Cuts The Gated Value Into 600-Character, Whitespace-Bounded Chunks**, at most four in flight at once. Detail and rationale in §20.6 below.
 3. `LLMClient.generate` **per chunk**, operation `draft_turns`, `temperature: 0`, `maxTokens: 16_384`, output constrained to `DraftTurnsResponseSchema` (`{ turns: [{ speaker: 'doctor' | 'patient', text }] }`, 1 to 600 turns, each turn's text 1 to 4,000 chars), system prompt in `backend/src/draft-turns/prompt.ts`.
-4. **Reconstruction guard** (`backend/src/draft-turns/reconstruction.ts`). The model's turns are trusted only for boundaries and speaker labels, never for their text. Each turn is canon-aligned word-for-word against the input (lowercased; letters, digits, `[]`, `_` kept, so a pseudonym token compares as one word), then the shipped turn text is re-sliced from the input's own characters, not from the model's. Punctuation and casing changes are forgiven during comparison but excluded from the output; a paraphrase, drop, reorder, translation, or split token discards the whole draft. This is stronger than a string diff: the guarantee is that shipped text is provably the input's own characters, not merely similar to it.
+4. **Reconstruction Guard** (`backend/src/draft-turns/reconstruction.ts`). The model's turns are trusted only for boundaries and speaker labels, never for their text. Each turn is canon-aligned word-for-word against the input (lowercased; letters, digits, `[]`, `_` kept, so a pseudonym token compares as one word), then the shipped turn text is re-sliced from the input's own characters, not from the model's. Punctuation and casing changes are forgiven during comparison but excluded from the output; a paraphrase, drop, reorder, translation, or split token discards the whole draft. This is stronger than a string diff: the guarantee is that shipped text is provably the input's own characters, not merely similar to it.
 5. Per-turn `vault.rehydrate`, then a **second** schema parse against `DraftTurnsResponseSchema` after rehydration, because a restored span can push a turn past the 4,000-char cap. This failure is classified `not_reconstructed` and happens before the audit row is written.
 6. Exactly one audit row is written after the LLM call is attempted: `asr.hosted_draft_labelled` on success or `asr.hosted_draft_failed` with a closed `reason` (`llm_failed` or `not_reconstructed`) on failure (§15). Pre-egress rejections (`401`, `400`, `429`, a `DeidentificationError`) write no row, mirroring the relay pair (§15).
 
@@ -650,25 +650,25 @@ Measured against production on 16/08/26, before chunking:
 
 A real consultation is several thousand characters, so the pass failed on exactly the input it exists for, and the failure was invisible: the client swallowed it and delivered unlabelled prose.
 
-**The cause is the reconstruction guard's granularity, not the guard itself.** Word-for-word alignment is all-or-nothing across whatever was submitted, so one drifted word in four thousand discarded every label. Shrinking the unit shrinks the blast radius without weakening the guarantee, because each chunk is still aligned and re-sliced in full.
+**The Cause Is The Reconstruction Guard's Granularity, Not The Guard Itself.** Word-for-word alignment is all-or-nothing across whatever was submitted, so one drifted word in four thousand discarded every label. Shrinking the unit shrinks the blast radius without weakening the guarantee, because each chunk is still aligned and re-sliced in full.
 
-- **`sliceDeidentified` (`backend/src/deid/index.ts`) cuts the value after the gate, never before it.** Detection is context-sensitive: `Ahmad Ismail` is one `PATIENT` span only while the two words are adjacent, so de-identifying chunk by chunk would let an identifier straddling a boundary through. The whole text is gated once and the result is cut, so every piece inherits a guarantee the whole already earned.
-- **It lives in `deid/` because that module owns the brand.** Rebranding a substring anywhere else is the `as Deidentified` cast `no-stray-brand-casts.test.ts` fails the build on. The function takes a `Deidentified` and returns `Deidentified[]`, so it is a brand-preserving transform and cannot launder a raw string.
-- **Cuts land only on whitespace**, so a vault token can never be split into a `[PATIENT` and a `_1]` that no longer matches `TOKEN_PATTERN`. A single word longer than the budget ships whole rather than being cut.
-- **`assertNoIdentifiers` now runs per chunk** rather than once per request, which is strictly more checking than the unsliced path.
-- **600 characters, at most 4 concurrent.** The size sits inside the range that was reliably passing rather than at its edge. The concurrency bound matters because `MAX_DRAFT_TEXT_CHARACTERS` is 30,000: unbounded fan-out would open up to 50 provider calls for one request, the unbounded-consumption shape `MAX_CONCURRENT_RELAYS` already guards against on the audio route (OWASP LLM10).
-- **A rejected chunk fails the whole pass.** Keeping the surviving chunks and giving the rejected one its neighbour's speaker was considered and refused: it fabricates attribution, presenting up to 600 characters of patient speech as the doctor's with nothing in the response marking it invented, and it would flow into the note and the red-flag engine that way. Failing is safe because the client's fallback is a real one (`proseToDraft`), drafting on-device labels that the review step already describes as guesses.
+- **`sliceDeidentified` (`backend/src/deid/index.ts`) Cuts The Value After The Gate, Never Before It.** Detection is context-sensitive: `Ahmad Ismail` is one `PATIENT` span only while the two words are adjacent, so de-identifying chunk by chunk would let an identifier straddling a boundary through. The whole text is gated once and the result is cut, so every piece inherits a guarantee the whole already earned.
+- **It Lives In `deid/` Because That Module Owns The Brand.** Rebranding a substring anywhere else is the `as Deidentified` cast `no-stray-brand-casts.test.ts` fails the build on. The function takes a `Deidentified` and returns `Deidentified[]`, so it is a brand-preserving transform and cannot launder a raw string.
+- **Cuts Land Only On Whitespace**, so a vault token can never be split into a `[PATIENT` and a `_1]` that no longer matches `TOKEN_PATTERN`. A single word longer than the budget ships whole rather than being cut.
+- **`assertNoIdentifiers` Now Runs Per Chunk** rather than once per request, which is strictly more checking than the unsliced path.
+- **600 Characters, At Most 4 Concurrent.** The size sits inside the range that was reliably passing rather than at its edge. The concurrency bound matters because `MAX_DRAFT_TEXT_CHARACTERS` is 30,000: unbounded fan-out would open up to 50 provider calls for one request, the unbounded-consumption shape `MAX_CONCURRENT_RELAYS` already guards against on the audio route (OWASP LLM10).
+- **A Rejected Chunk Fails The Whole Pass.** Keeping the surviving chunks and giving the rejected one its neighbour's speaker was considered and refused: it fabricates attribution, presenting up to 600 characters of patient speech as the doctor's with nothing in the response marking it invented, and it would flow into the note and the red-flag engine that way. Failing is safe because the client's fallback is a real one (`proseToDraft`), drafting on-device labels that the review step already describes as guesses.
 
 Measured after, same 2,543-character unpunctuated Malay stream: **11 turns, both speakers, every word verbatim, 37.9 s**, against a 150 s client deadline.
 
-**A rejected chunk costs its own labels and nothing else.** Failing the whole pass was tried first and did not hold up: measured in production, a 2,543-character transcript still returned `draft_failed` at ~28 s, because all five chunks had to land. Chunking had shrunk the failure rather than removed it.
+**A Rejected Chunk Costs Its Own Labels And Nothing Else.** Failing the whole pass was tried first and did not hold up: measured in production, a 2,543-character transcript still returned `draft_failed` at ~28 s, because all five chunks had to land. Chunking had shrunk the failure rather than removed it.
 
 The span now ships with its text intact and `undrafted` set on the turn:
 
-- **The marker is server-set only.** `reconstructTurns` builds every returned turn from scratch, so a model emitting `undrafted` is ignored; pinned by a test.
-- **`speaker` is a placeholder on those turns**, which is exactly what the marker tells the client not to trust. It is never merged into a labelled neighbour, because hiding it inside one would defeat the point.
-- **The client renders it as needing a label**, not as a drafted one, and names the count above the list. Resolving it is the doctor's tap.
-- **Every chunk failing is still a failure**, so a model outage or a systematically rejected echo surfaces as `draft_failed` rather than as a transcript with no labels.
+- **The Marker Is Server-Set Only.** `reconstructTurns` builds every returned turn from scratch, so a model emitting `undrafted` is ignored; pinned by a test.
+- **`speaker` Is A Placeholder On Those Turns**, which is exactly what the marker tells the client not to trust. It is never merged into a labelled neighbour, because hiding it inside one would defeat the point.
+- **The Client Renders It As Needing A Label**, not as a drafted one, and names the count above the list. Resolving it is the doctor's tap.
+- **Every Chunk Failing Is Still A Failure**, so a model outage or a systematically rejected echo surfaces as `draft_failed` rather than as a transcript with no labels.
 
 Verified against the real provider on the same 2,543-character stream, in a run where one chunk was genuinely rejected: **6 turns, both speakers, 1 marked undrafted, every word verbatim, 39.5 s**. The same run under the previous rule returned `draft_failed`.
 
@@ -682,8 +682,8 @@ The output of this pass sits behind the identical explicit Apply gate as the on-
 
 ### Gaps, Stated Honestly
 
-- **No per-actor spend cap.** Same posture as the relay (§20) and `analyze` (§13): the 5/min limiter bounds request rate, not cumulative cost.
-- **Not tied to a relay having happened.** Any authenticated session can call this endpoint with arbitrary text within the character bounds; it does not verify the text originated from `/api/asr/transcriptions`.
+- **No Per-Actor Spend Cap.** Same posture as the relay (§20) and `analyze` (§13): the 5/min limiter bounds request rate, not cumulative cost.
+- **Not Tied To A Relay Having Happened.** Any authenticated session can call this endpoint with arbitrary text within the character bounds; it does not verify the text originated from `/api/asr/transcriptions`.
 
 ## 20.6 Capture Constraints: Dictation DSP Off (Addendum To §20.3)
 
@@ -706,7 +706,7 @@ The output of this pass sits behind the identical explicit Apply gate as the on-
 
 - The §20.3 limits paragraph already pointed at the phone-mic audio profile: both ASR arms devoiced the same words at the same spots, which a provider property would not explain.
 - **Every §20.1 to §20.3 measurement was captured with the browser's voice-call DSP on.** That makes the DSP a plausible contributor, not a proven one.
-- **No re-measurement has run yet.** The §20.3 verdicts stand until the protocol below does.
+- **No Re-Measurement Has Run Yet.** The §20.3 verdicts stand until the protocol below does.
 - Constraint values are ideals per the mediacapture spec: a browser may honour none of them without erroring. `track.getSettings()` reports what actually applied, and every future measurement must record that readout beside its figures.
 
 ### Re-Measurement Protocol (Needs A Human Reader)
@@ -725,17 +725,17 @@ The output of this pass sits behind the identical explicit Apply gate as the on-
 
 **Status: `Specified`.** Research recorded 05/09/26, ahead of implementation. This section supersedes the "Batch, Not Streaming, For V1" decision above, and states the model chain a reviewer will ask about, including the question they always ask last: what corrects the speech recogniser.
 
-> **Revised in part, 06/09/26. Read §20.10 first, then §20.9.** The provider changed twice in one day: to ILMU for want of a sign-off, then to Soniox when the sign-off was granted. The transport changed too, and §20.9's reasoning is untouched by it, because both of the reasons below for having no socket were about a socket through our own API rather than one from the browser to a provider. The transport, the segment window, the accuracy chain and the rejection of a transcript-rewriting pass all stand. **The provider does not.** Live transcription moves from `qwen3-asr-flash` to `ilmu-asr-v4.2`, because a second audio egress needs a human sign-off that does not exist. The rows below still name Alibaba and are left standing rather than rewritten, because the measurements behind them are a true record and two probes in §20.9 can still send the design back to them.
+> **Revised In Part, 06/09/26. Read §20.10 First, Then §20.9.** The provider changed twice in one day: to ILMU for want of a sign-off, then to Soniox when the sign-off was granted. The transport changed too, and §20.9's reasoning is untouched by it, because both of the reasons below for having no socket were about a socket through our own API rather than one from the browser to a provider. The transport, the segment window, the accuracy chain and the rejection of a transcript-rewriting pass all stand. **The provider does not.** Live transcription moves from `qwen3-asr-flash` to `ilmu-asr-v4.2`, because a second audio egress needs a human sign-off that does not exist. The rows below still name Alibaba and are left standing rather than rewritten, because the measurements behind them are a true record and two probes in §20.9 can still send the design back to them.
 
 ### Why This Reopens A Closed Decision
 
 "Batch, Not Streaming" rested on three reasons. Only one has changed, and it is the one that was conditional.
 
-| Original reason                                                                                                                  | Status now                                                                                            |
+| Original Reason                                                                                                                  | Status Now                                                                                            |
 | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Latency is already sufficient, "streaming buys a margin nobody has asked for"                                                    | **Overturned.** The margin has now been asked for, by name, as the product's defining feature         |
-| Integration cost: posting chunks reuses the request and response shape the codebase has everywhere, a WebSocket session does not | **Still holds, and decides the transport.** The design below posts chunks and opens no socket         |
-| Exposure surface: a continuously open audio stream is materially larger than discrete posts of bounded chunks                    | **Still holds, and decides the transport.** Segments stay discrete, bounded, and individually audited |
+| Integration cost: posting chunks reuses the request and response shape the codebase has everywhere, a WebSocket session does not | **Still Holds, And Decides The Transport.** The design below posts chunks and opens no socket         |
+| Exposure surface: a continuously open audio stream is materially larger than discrete posts of bounded chunks                    | **Still Holds, And Decides The Transport.** Segments stay discrete, bounded, and individually audited |
 
 Two of the three survive intact. They are not arguments against ambient capture, they are arguments about how to carry it, and the design follows them rather than overriding them.
 
@@ -765,21 +765,21 @@ running transcript            browser memory only, until the doctor finishes
 Finish                        speaker labelling, then the existing full analysis, unchanged
 ```
 
-**Floor revised 05/09/26.** This diagram first specified a 4 second floor. Measured on real speech, a 4 second floor costs 23.5 points of Malay word error against the whole file, where an 8 second floor costs 1.5. A batch model called once per chunk starts cold each time and loses the surrounding speech it uses to disambiguate, so the penalty is measured in multiples rather than percentages. See 20.8.
+**Floor Revised 05/09/26.** This diagram first specified a 4 second floor. Measured on real speech, a 4 second floor costs 23.5 points of Malay word error against the whole file, where an 8 second floor costs 1.5. A batch model called once per chunk starts cold each time and loses the surrounding speech it uses to disambiguate, so the penalty is measured in multiples rather than percentages. See 20.8.
 
 **Why no socket to our API, which is not the same as no socket at all (revised 06/09/26, §20.10).** The reasoning below is unchanged and still correct about the API. It does not reach a socket from the browser to a provider, which is what ambient capture now opens: the rewrite is not in that path and no cookie travels on it. The browser reaches the API only through the Vercel rewrite that makes the session cookie first-party (§17, issue #156). That rewrite proxies HTTP and server-sent events but not WebSocket upgrades, and a direct browser-to-Render socket would lose the cookie and reintroduce the mobile lockout. A provider socket held by the API is possible, and is the phase 2 option, but it is not needed to reach conversational cadence.
 
-**What the doctor experiences.** Text appears a beat after each pause rather than word by word: expected 2 to 4 seconds from the end of an utterance, worst case around 14 seconds if nobody pauses and the ceiling forces the cut. The pane that matters most for safety does not wait on a model at all.
+**What The Doctor Experiences.** Text appears a beat after each pause rather than word by word: expected 2 to 4 seconds from the end of an utterance, worst case around 14 seconds if nobody pauses and the ceiling forces the cut. The pane that matters most for safety does not wait on a model at all.
 
 ### Every Model In The Chain
 
 "Which model does what" has one answer per stage, and each stage names the control that bounds it.
 
-| Stage                              | Model                                                   | Runs on                           | May do                                                                             | May never do                                                                                                                                                                                                                                         |
+| Stage                              | Model                                                   | Runs On                           | May Do                                                                             | May Never Do                                                                                                                                                                                                                                         |
 | ---------------------------------- | ------------------------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Segment the audio                  | **None.** RMS energy over an `AnalyserNode`             | Browser                           | Cut on silence, drop silent segments                                               | Discard speech without the segment counter showing it                                                                                                                                                                                                |
 | Live transcription                 | **`qwen3-asr-flash`** (Alibaba Model Studio, Singapore) | Provider, via our relay           | Audio to text, detect the language                                                 | Return text that any route trusts unvalidated                                                                                                                                                                                                        |
-| Batch transcription                | **`ilmu-asr-v4.2`** (ILMU, Malaysia)                    | Provider, via our relay           | Audio to text                                                                      | **Revised 06/09/26 (§20.9): this path is no longer untouched by ambient work.** The same adapter now also carries the live segment relay, on the same single outbound `fetch`. What it may never do is return text that any route trusts unvalidated |
+| Batch transcription                | **`ilmu-asr-v4.2`** (ILMU, Malaysia)                    | Provider, via our relay           | Audio to text                                                                      | **Revised 06/09/26 (§20.9): This Path Is No Longer Untouched By Ambient Work.** The same adapter now also carries the live segment relay, on the same single outbound `fetch`. What it may never do is return text that any route trusts unvalidated |
 | On-device transcription, unchanged | **`onnx-community/whisper-small`**                      | Browser, WebGPU or WASM           | English and Manglish to text                                                       | Be pointed at Malay, Tamil, Mandarin or Cantonese (§20.1 finding 2)                                                                                                                                                                                  |
 | Mishear expansion                  | **None.** Fixed table, `redflags/mishears.ts`           | Our API, in-process               | Expand measured confusables **inside the matcher only**, keeping an index map back | Change one character of what is quoted to the doctor                                                                                                                                                                                                 |
 | Red flags                          | **None.** Pure functions, `redflags/`                   | Our API, in-process               | Raise flags from the raw transcript                                                | Be filtered, reordered or suppressed by any model (§10)                                                                                                                                                                                              |
@@ -793,14 +793,14 @@ Two properties of that table carry the whole safety argument. **The only stage t
 
 The obvious way to fix a noisy multilingual transcript is to hand it to a language model and ask it to tidy up the speech recognition. **This system does not do that, and must not.** The rejection is recorded here because it is the first optimisation a reasonable engineer reaches for.
 
-| Why a transcript-rewriting pass is rejected    | Detail                                                                                                                                                                                                                                                                                                                                   |
+| Why A Transcript-Rewriting Pass Is Rejected    | Detail                                                                                                                                                                                                                                                                                                                                   |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | It silently voids the primary control          | `hasVerbatimEvidence` (`analysis/evidence.ts`) accepts an assertion only when its evidence span appears in the transcript text. Clean the transcript first and every span still matches, because the span is now checked against the model's own prose. The control keeps reporting green while quoting sentences the patient never said |
 | It deletes a guard that is already shipped     | `draft-turns/reconstruction.ts` exists precisely so a model may label speech and never rewrite it, aligning word for word and re-slicing from the input. A post-cleaner is that guard removed and inverted                                                                                                                               |
 | Correction and hallucination are one operation | Turning "patut" into "batuk" is a fix. Turning "no chest pain" into "some chest pain" is the harm this system exists to prevent. At the text layer both are a model improving fluency, and nothing downstream can tell them apart                                                                                                        |
 | The literature puts the failure exactly here   | Ambient notes carry more hallucination than physician notes, 31% against 20% (§21.6). A generative pass upstream of the note moves work into the layer that is already weakest                                                                                                                                                           |
 
-**What does the accuracy work instead.** Four layers, in the order they act. None of them rewrites the transcript.
+**What Does The Accuracy Work Instead.** Four layers, in the order they act. None of them rewrites the transcript.
 
 | #   | Layer                                      | Mechanism                                                                                                                                                                                                                                                                                                                  | State                   |
 | --- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
@@ -809,36 +809,36 @@ The obvious way to fix a noisy multilingual transcript is to hand it to a langua
 | 3   | Structured extraction as the cleaning step | This is where normalisation legitimately happens. A noisy, code-switched transcript goes in; a closed 34-field schema comes out, in English, every `PRESENT` or `DENIED` carrying a verbatim span, anything unsupported downgraded to `NOT_ASSESSED` rather than guessed. The messy text is interpreted, never overwritten | **Built** (§21.4)       |
 | 4   | The doctor                                 | The note is a draft. Editing is expected, approval is an explicit transition, and the transcript sits beside the note for exactly this reason                                                                                                                                                                              | **Built**               |
 
-**The one admissible form of post-correction** is a suggestion the doctor accepts or rejects. It shipped once as one-tap Malay mishear hints (issue #195) and was removed with the draft-label review (#233). If it returns for ambient mode, it returns in that shape: a proposal on screen, never an automatic edit, and never a rewrite of stored text.
+**The One Admissible Form Of Post-Correction** is a suggestion the doctor accepts or rejects. It shipped once as one-tap Malay mishear hints (issue #195) and was removed with the draft-label review (#233). If it returns for ambient mode, it returns in that shape: a proposal on screen, never an automatic edit, and never a rewrite of stored text.
 
 ### Provider Research, And An Unexplained Gap In The Record
 
-| Provider and model                                                       | Malaysian language coverage                                                                                                                                                                                                                                    | Real time                                                                                     | Residency                                                           | Position                                                                                                             |
+| Provider And Model                                                       | Malaysian Language Coverage                                                                                                                                                                                                                                    | Real Time                                                                                     | Residency                                                           | Position                                                                                                             |
 | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | **`qwen3-asr-flash`**, Alibaba Model Studio Singapore                    | English, Malay, Mandarin, Cantonese, Hokkien, Indonesian and more, with automatic language identification. **Tamil is on no Alibaba ASR language list**                                                                                                        | File calls at low latency; a realtime sibling exists                                          | Singapore, the endpoint and key family already accepted for the LLM | **Recommended.** Already measured here, see below                                                                    |
-| `ilmu-asr-v4.2`, ILMU                                                    | **Vendor claims English, Bahasa Malaysia and Mandarin, "including natural code-switching and background noise"** (model page, read 06/09/26). Malay measured here (§20.3); Mandarin unmeasured in this repo. Tamil and Cantonese absent from the vendor's list | Batch as an API, but RTF 0.024 (§20.3) makes segmented batch viable at conversational cadence | Malaysia, the strongest residency answer available                  | **Under revision, see §20.9.** Previously "keep unchanged as the in-country batch option"                            |
+| `ilmu-asr-v4.2`, ILMU                                                    | **Vendor Claims English, Bahasa Malaysia And Mandarin, "Including Natural Code-switching And Background Noise"** (model page, read 06/09/26). Malay measured here (§20.3); Mandarin unmeasured in this repo. Tamil and Cantonese absent from the vendor's list | Batch as an API, but RTF 0.024 (§20.3) makes segmented batch viable at conversational cadence | Malaysia, the strongest residency answer available                  | **Under Revision, See §20.9.** Previously "keep unchanged as the in-country batch option"                            |
 | `onnx-community/whisper-small`, on device                                | English and Manglish. Other languages come back rewritten into English rather than transcribed                                                                                                                                                                 | No, real-time factor 1.5 to 3.0 on clinic hardware                                            | The device                                                          | Keep as the privacy floor                                                                                            |
 | `mesolitica/malaysian-whisper-*`                                         | Malay, Manglish, Mandarin, Tamil                                                                                                                                                                                                                               | No                                                                                            | Would need a self-hosted GPU                                        | Still the roadmap item of §20.1. No ONNX build published, and §20 rules out self-hosting                             |
-| Azure AI Speech Southeast Asia, Google Speech-to-Text v2 asia-southeast1 | Include Tamil, with continuous language identification                                                                                                                                                                                                         | Yes                                                                                           | Singapore                                                           | **Named remediation for Tamil only.** A second vendor and a new privacy assessment row, so not adopted speculatively |
+| Azure AI Speech Southeast Asia, Google Speech-to-Text v2 asia-southeast1 | Include Tamil, with continuous language identification                                                                                                                                                                                                         | Yes                                                                                           | Singapore                                                           | **Named Remediation For Tamil Only.** A second vendor and a new privacy assessment row, so not adopted speculatively |
 
 **Correction, 06/09/26: the ILMU row said "Malay and English only" and that was wrong.** The vendor's own model page lists Mandarin alongside English and Bahasa Malaysia. The error mattered rather than being cosmetic: language coverage is one of the two grounds on which this table excluded ILMU from the ambient path, and the exclusion was therefore resting on a claim nobody had checked against the vendor. It came from the same 15/08/26 session as §20.3, which is the second time a capability finding from that session has proved dated, so the standing lesson in §21.2 now has two instances behind it rather than one. What the correction does **not** supply is a measurement: the Mandarin claim is the vendor's, and this repo has measured ILMU on Malay and English only.
 
-**The gap worth naming.** §20.1 measured `qwen3-asr-flash` on 13/08/26 against both Whisper sizes on a Manglish sample. It won on every token in that table, ran fastest at 2.8 s for 49.7 s of audio, and was byte-identical across three runs. It then appears nowhere else in this document, and the hosted path shipped on ILMU instead. The reason was almost certainly residency, ILMU processing in Malaysia against Alibaba in Singapore, which is a defensible call. **It was never written down.** This section records the gap, because the best-measured option for exactly the language problem the client cares about was measured and then set aside without a rationale a reviewer could check.
+**The Gap Worth Naming.** §20.1 measured `qwen3-asr-flash` on 13/08/26 against both Whisper sizes on a Manglish sample. It won on every token in that table, ran fastest at 2.8 s for 49.7 s of audio, and was byte-identical across three runs. It then appears nowhere else in this document, and the hosted path shipped on ILMU instead. The reason was almost certainly residency, ILMU processing in Malaysia against Alibaba in Singapore, which is a defensible call. **It was never written down.** This section records the gap, because the best-measured option for exactly the language problem the client cares about was measured and then set aside without a rationale a reviewer could check.
 
-**Tamil is the honest limitation.** No provider on the shortlist that satisfies the residency posture transcribes Tamil. The product says so plainly on the capture surface rather than degrading quietly, which is the same rule §20.1 finding 2 already imposes for declaring a language wrongly.
+**Tamil Is The Honest Limitation.** No provider on the shortlist that satisfies the residency posture transcribes Tamil. The product says so plainly on the capture surface rather than degrading quietly, which is the same rule §20.1 finding 2 already imposes for declaring a language wrongly.
 
 ### 20.7.1 Measured: Reachability, Containers, And The Context Effect
 
 Measured **05/09/26** against the production `QWEN_API_KEY` already in the Render service. A capability probe, not a benchmark, run to answer whether the recommendation above is even reachable before any of it is built. One sentence per condition, one synthesised voice, no ground-truth corpus, so **no word error rate is reported and none should be quoted from this**.
 
-**Sample provenance.** Two clips generated locally by Windows text-to-speech at 16 kHz mono: one English clinical sentence, one Malay clinical sentence. No patient data, real or simulated. Neither clip is committed.
+**Sample Provenance.** Two clips generated locally by Windows text-to-speech at 16 kHz mono: one English clinical sentence, one Malay clinical sentence. No patient data, real or simulated. Neither clip is committed.
 
-**Reachability, settled.**
+**Reachability, Settled.**
 
 | Question                                        | Answer                                                                                                                                                                                                                                                                 |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Does the existing key reach ASR at all          | **Yes.** `qwen3-asr-flash` answers on the key already in production                                                                                                                                                                                                    |
-| Which host                                      | **`dashscope-intl.aliyuncs.com`, unchanged.** The workspace-scoped `{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com` form in the current documentation is not required for this account, so `ALIBABA_ASR_BASE_URL` can reuse the host `QWEN_BASE_URL` already names     |
+| Which host                                      | **`dashscope-intl.aliyuncs.com`, Unchanged.** The workspace-scoped `{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com` form in the current documentation is not required for this account, so `ALIBABA_ASR_BASE_URL` can reuse the host `QWEN_BASE_URL` already names     |
 | Which request form                              | Both work. The DashScope form at `/api/v1/services/aigc/multimodal-generation/generation`, and the OpenAI-compatible chat form at `/compatible-mode/v1/chat/completions`. Audio goes in as a base64 data URI on either                                                 |
 | Is there an OpenAI-style transcription endpoint | **No.** `/compatible-mode/v1/audio/transcriptions` drops the connection rather than answering, confirming §20.7's note that the ILMU adapter is a pattern to copy, not a client to reuse                                                                               |
 | Sibling models                                  | `qwen-audio-3.0-asr-flash` and `fun-asr-flash-2026-06-15` both exist on this key but reject this request shape with `UNSUPPORTED_FORMAT: format is empty`. They need a `format` parameter this probe did not send. Not pursued, because the recommended model answered |
@@ -846,17 +846,17 @@ Measured **05/09/26** against the production `QWEN_API_KEY` already in the Rende
 | Billing unit                                    | Whole audio seconds, reported per call as `usage.seconds`                                                                                                                                                                                                              |
 | Unrequested extra                               | Every response carries an `emotion` annotation. It is not asked for and must not be surfaced, stored, or acted on. The same clip returned `sad` on one call and `neutral` on another, which is reason enough on its own                                                |
 
-**Containers, and why this decides the browser path.** Raw WAV, `webm/opus` and `ogg/opus` are all accepted directly, with identical transcription. A 5.7 s clip is **16 KB as `webm/opus` against 183 KB as WAV**.
+**Containers, And Why This Decides The Browser Path.** Raw WAV, `webm/opus` and `ogg/opus` are all accepted directly, with identical transcription. A 5.7 s clip is **16 KB as `webm/opus` against 183 KB as WAV**.
 
 The consequence is that `MediaRecorder` output goes to the provider **as recorded**. No AudioWorklet, no PCM re-encoding, no second code path in the browser, and a segment small enough that the 2 MB route cap in §20.7 is roughly two orders of magnitude of headroom rather than a real bound.
 
-**The context effect, which is the finding that matters.** All five conditions below are the same Malay clip with `language: "ms"`, varying only the system context. Ground truth is _"Doktor, saya batuk sudah lima hari, demam pun ada. Tekak sakit sangat."_
+**The Context Effect, Which Is The Finding That Matters.** All five conditions below are the same Malay clip with `language: "ms"`, varying only the system context. Ground truth is _"Doktor, saya batuk sudah lima hari, demam pun ada. Tekak sakit sangat."_
 
 | Condition                                          | Returned                                                                     | Reading                                            |
 | -------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------- |
 | No context                                         | "Dr. Sayyabah Taksudali Maharaj, D. Mampun ada, Tekak Saki Tsangat."         | Unusable                                           |
 | Generic Malay prose, no clinical words             | "Doktor, saya betul sudah lima hari, di mampun ada, tekak saya kecenggat."   | Large recovery from language priming alone         |
-| **Clinical Malay vocabulary, none of the answers** | **"Doktor, saya betah sudah lima hari, demam pun ada, tekak sakit sangat."** | **One word wrong. The effect is real and general** |
+| **Clinical Malay Vocabulary, None Of The Answers** | **"Doktor, Saya Betah Sudah Lima Hari, Demam Pun Ada, Tekak Sakit Sangat."** | **One Word Wrong. The Effect Is Real And General** |
 | Clinical Malay vocabulary including the answers    | "Doktor, saya batuk sudah lima hari, demam pun ada, tekak sakit sangat."     | Verbatim, but this condition is circular           |
 | English clinical context                           | "Doktor Sayyabatuk Sudad Limahari, di Mampandai, Tekak Soket Sangat."        | Worse than nothing                                 |
 
@@ -874,20 +874,20 @@ The third row is the load-bearing one, and the fourth exists to make the third h
 
 The row struck through above was wrong, and it is corrected here rather than quietly edited, because it was published before the measurement that tests it.
 
-**What it said.** That automatic language identification could not be relied on, and that ambient capture would therefore need a language the doctor sets per consultation.
+**What It Said.** That automatic language identification could not be relied on, and that ambient capture would therefore need a language the doctor sets per consultation.
 
-**What it was based on.** One observation: the anglicised Malay clip, left to auto-detect, was labelled `en`. That clip is an English voice reading Malay text, so it is acoustically English. Labelling it `en` is defensible behaviour, not a failure, and no conclusion about language detection can rest on it.
+**What It Was Based On.** One observation: the anglicised Malay clip, left to auto-detect, was labelled `en`. That clip is an English voice reading Malay text, so it is acoustically English. Labelling it `en` is defensible behaviour, not a failure, and no conclusion about language detection can rest on it.
 
-**What the follow-up measured.** Two further conditions, on the same day.
+**What The Follow-Up Measured.** Two further conditions, on the same day.
 
-| Audio                                                               | Context supplied  | Detected | Transcript                      |
+| Audio                                                               | Context Supplied  | Detected | Transcript                      |
 | ------------------------------------------------------------------- | ----------------- | -------- | ------------------------------- |
 | Genuine English speech                                              | none              | `en`     | Verbatim                        |
-| **Genuine Mandarin speech**, from the provider's own text to speech | **none**          | **`zh`** | **Verbatim, homophone aside**   |
+| **Genuine Mandarin Speech**, from the provider's own text to speech | **None**          | **`zh`** | **Verbatim, Homophone Aside**   |
 | Genuine Mandarin speech                                             | Chinese clinical  | `zh`     | Identical to the no-context run |
 | Genuine Mandarin speech                                             | four-language mix | `zh`     | Identical to the no-context run |
 
-**Detection works, unprompted, on audio genuinely spoken in a language.** Mandarin was identified and transcribed correctly with no context at all, and neither a Chinese context nor a four-language context changed the result. **No per-consultation language picker is needed**, and §20.7 should not carry one.
+**Detection Works, Unprompted, On Audio Genuinely Spoken In A Language.** Mandarin was identified and transcribed correctly with no context at all, and neither a Chinese context nor a four-language context changed the result. **No per-consultation language picker is needed**, and §20.7 should not carry one.
 
 **The real constraint is narrower, and it is about the context rather than the detection.** A single-language context rescued the acoustically ambiguous Malay clip; a four-language context did not, and left it on `en`. So:
 
@@ -897,21 +897,21 @@ The row struck through above was wrong, and it is corrected here rather than qui
 | Audio acoustically ambiguous  | Detection follows the acoustics. Only a **single-language** context pulls it back                                            |
 | Consequence                   | The context that helps most cannot be chosen until the language is known, and the language is knowable from the audio itself |
 
-**The design that follows needs no user interface at all.** Detect the language from the opening segments with no context, then apply the matching single-language clinical vocabulary for the remainder of the session, revising if detection shifts. That is strictly better than asking the doctor, because it costs nothing at the point of care and cannot be set wrongly and left.
+**The Design That Follows Needs No User Interface At All.** Detect the language from the opening segments with no context, then apply the matching single-language clinical vocabulary for the remainder of the session, revising if detection shifts. That is strictly better than asking the doctor, because it costs nothing at the point of care and cannot be set wrongly and left.
 
-**Still unmeasured, and the reason the register row stays open.** Genuinely spoken Malay, by a human, remains untested: the vendor's text to speech offers no Malay voice, and the machine used here carries only English and Russian. Mid-sentence code-switching, the actual Malaysian consultation register, is untested. Tamil is absent from the vendor's list entirely. The Mandarin result also pairs one vendor's speech synthesis with the same vendor's recogniser, which is a favourable match and is not evidence about a human speaker.
+**Still Unmeasured, And The Reason The Register Row Stays Open.** Genuinely spoken Malay, by a human, remains untested: the vendor's text to speech offers no Malay voice, and the machine used here carries only English and Russian. Mid-sentence code-switching, the actual Malaysian consultation register, is untested. Tamil is absent from the vendor's list entirely. The Mandarin result also pairs one vendor's speech synthesis with the same vendor's recogniser, which is a favourable match and is not evidence about a human speaker.
 
 **One word stayed wrong, and it is the word this repository has already met twice.** "batuk" came back as "betah" and "betul", where §20.3 measured both other engines hardening it to "patut". **It cannot be fixed in layer 2:** "betul" is the everyday Malay word for "correct", so adding it to the `mishears.ts` confusables table would raise a cough flag on any sentence agreeing with the doctor. That module's own header already refuses to widen for exactly this reason. Recognition-time biasing is therefore not merely the cheapest place to fix "batuk", it is the **only** place the layered design permits it to be fixed, which is a stronger argument for layer 1 than the one §20.7 was written with.
 
-**Chunking, one encouraging data point.** A 2 s slice cut mid-sentence returned _"Doctor, I have had a bad."_ It truncated where the audio truncated and invented no completion. Compared with the repetition loops §20.1 measured from Whisper under stress, a recogniser that stops cleanly at a cut is the behaviour segmented capture depends on. One clip is not a boundary-loss measurement, and the segmented-against-whole comparison in the table below still has to be run.
+**Chunking, One Encouraging Data Point.** A 2 s slice cut mid-sentence returned _"Doctor, I have had a bad."_ It truncated where the audio truncated and invented no completion. Compared with the repetition loops §20.1 measured from Whisper under stress, a recogniser that stops cleanly at a cut is the behaviour segmented capture depends on. One clip is not a boundary-loss measurement, and the segmented-against-whole comparison in the table below still has to be run.
 
-**What this does not establish.** The Malay clip is an English voice reading Malay text, so it is anglicised, which §20.3 already ruled out as a basis for any Malay verdict. It is plausibly harder than a Malay speaker, which makes the context effect more striking rather than less, but the direction of that bias is an argument and not a measurement. **This does not establish Malay accuracy.** Tamil, Mandarin and Cantonese were not tested at all. The human-read, per-language corpus remains the gate.
+**What This Does Not Establish.** The Malay clip is an English voice reading Malay text, so it is anglicised, which §20.3 already ruled out as a basis for any Malay verdict. It is plausibly harder than a Malay speaker, which makes the context effect more striking rather than less, but the direction of that bias is an argument and not a measurement. **This does not establish Malay accuracy.** Tamil, Mandarin and Cantonese were not tested at all. The human-read, per-language corpus remains the gate.
 
 ### What Must Be Measured Before This Is Built
 
 §20.1 is a smoke test on one 50-second casual sample, and is cited as one. Ambient capture needs more before any claim reaches a client.
 
-| Measurement                                                                                                   | Why it gates the build                                                                                                                |
+| Measurement                                                                                                   | Why It Gates The Build                                                                                                                |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Word or character error rate per language: Manglish, Malay, Mandarin, Cantonese, Tamil, accented English      | The client will test these personally. A measured number is the only honest answer                                                    |
 | Language identification accuracy on code-switched speech                                                      | Automatic identification is the feature being relied on, and §20.1 finding 2 is what happens when a language is called wrongly        |
@@ -940,50 +940,50 @@ This is the largest single divergence between this system and the industry, and 
 
 Two corroborations of positions this document already took:
 
-- **Voice is itself an identifier.** The HIPAA Safe Harbor list names biometric identifiers "including finger and voice prints" at 45 CFR 164.514(b)(2)(P). That is the same conclusion 20.4 reached from the PDPA 2024 amendment, arrived at from a different statute. It also means transcript redaction alone can never de-identify an ambient pipeline, which is exactly why the audio path is governed by consent and bounds rather than by the gate.
-- **"Risk reduction, not anonymisation"** is the correct framing, and AWS's disclaimer is the strongest available external support for it.
+- **Voice Is Itself An Identifier.** The HIPAA Safe Harbor list names biometric identifiers "including finger and voice prints" at 45 CFR 164.514(b)(2)(P). That is the same conclusion 20.4 reached from the PDPA 2024 amendment, arrived at from a different statute. It also means transcript redaction alone can never de-identify an ambient pipeline, which is exactly why the audio path is governed by consent and bounds rather than by the gate.
+- **"Risk Reduction, Not Anonymisation"** is the correct framing, and AWS's disclaimer is the strongest available external support for it.
 
 ### Where This Design Matches Industry Practice
 
-| Decision here                                                      | Industry position                                                                                                                                                                                       | Evidence                                                                                                                                                           |
+| Decision Here                                                      | Industry Position                                                                                                                                                                                       | Evidence                                                                                                                                                           |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Cascaded pipeline: speech to text, then a language model over text | The standard, and the evidence for it is stark. Measured unsupported-claim rates: human notes 0.01, cascaded 0.21 to 0.23, **end-to-end audio models 0.99 to 1.00**                                     | An end-to-end audio model produces an unsupported claim in essentially every note. Our separation is not conservatism, it is the difference between usable and not |
 | Evidence-bound assertions, every claim carrying a verbatim span    | AWS HealthScribe emits `{EvidenceLinks[], SummarizedSegment}`, one sentence per cluster of transcript segments. Abridge ships the same idea as Linked Evidence. The academic form is Cluster2Sent, 2020 | We arrived at the same structure independently and it is the strongest pattern in the field                                                                        |
 | Full note generated once, at the end                               | AWS HealthScribe generates only on an explicit end-of-session event and has no incremental mode. Nabla has no streaming note endpoint                                                                   | Our decision to run the 20 second pipeline once at Finish is the industry norm, not a compromise                                                                   |
-| No transcript-rewriting correction pass                            | **No vendor documents an ASR post-correction stage.** Nabla instead verifies downstream, splitting the finished note into atomic facts and checking each against the transcript                         | 20.7's rejection was reasoned from our own controls. The industry reached the same place                                                                           |
+| No transcript-rewriting correction pass                            | **No Vendor Documents An ASR Post-Correction Stage.** Nabla instead verifies downstream, splitting the finished note into atomic facts and checking each against the transcript                         | 20.7's rejection was reasoned from our own controls. The industry reached the same place                                                                           |
 
 On that last row the research is unusually decisive. Language-model correction of speech output helps when error rates are high and the corrector is fine-tuned on that recogniser's own mistakes with access to its alternative hypotheses. It hurts in the low-error regime with a general model seeing only final text, which is our situation. A practitioner benchmark found hallucinations in roughly a quarter of cases and concluded the technique is not a breakthrough; Apple's research finds a small specialised model beats a large language model at this with fifteen times fewer parameters. The named failure modes are over-correction of rare proper nouns, which in a clinic means drug and patient names.
 
 ### Where This Design Leads
 
-| Ahead on                                              | Why it matters                                                                                                                                                                                                                                                       |
+| Ahead On                                              | Why It Matters                                                                                                                                                                                                                                                       |
 | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **De-identification before egress**                   | See above. The category does not do this                                                                                                                                                                                                                             |
-| **Deterministic red flags the model cannot suppress** | No industry equivalent was found. The only randomised trial names **negation-detection failure as a counted error class**: "denies chest pain" recorded as chest pain. That is precisely the failure a rules-first engine prevents and a model-mediated one produces |
-| **Live safety and information panes**                 | No reviewed system generates these panes live. This differs from shipped practice and adds an implementation risk.                                                                                                                                                   |
+| **De-Identification Before Egress**                   | See above. The category does not do this                                                                                                                                                                                                                             |
+| **Deterministic Red Flags The Model Cannot Suppress** | No industry equivalent was found. The only randomised trial names **negation-detection failure as a counted error class**: "denies chest pain" recorded as chest pain. That is precisely the failure a rules-first engine prevents and a model-mediated one produces |
+| **Live Safety And Information Panes**                 | No reviewed system generates these panes live. This differs from shipped practice and adds an implementation risk.                                                                                                                                                   |
 
 ### Where This Design Is Behind
 
-| Behind on                     | Industry practice                                                                                                                       | Consequence                                                                                                                                                             |
+| Behind On                     | Industry Practice                                                                                                                       | Consequence                                                                                                                                                             |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Session resumption**        | AWS HealthScribe resumes against the same client-supplied session id, any number of times, within five hours                            | We have nothing. A dropped clinic connection currently loses the consultation, and this is the clearest gap the comparison exposed                                      |
-| **Incremental note assembly** | Nabla accepts the previous note plus only the new transcript and folds the delta in, explicitly to avoid resending a growing transcript | 20.7 plans to re-extract over the whole running transcript every cycle. The fold is cheaper and will churn the screen less. **Adopt it**                                |
-| **Partial results**           | Streaming vendors emit revisable partial text in 200 to 500 ms and finals in 0.7 to 4 seconds                                           | Segmented batch shows the doctor nothing until a segment closes. The screen is empty for the whole segment, which is the real experiential cost of the transport choice |
+| **Session Resumption**        | AWS HealthScribe resumes against the same client-supplied session id, any number of times, within five hours                            | We have nothing. A dropped clinic connection currently loses the consultation, and this is the clearest gap the comparison exposed                                      |
+| **Incremental Note Assembly** | Nabla accepts the previous note plus only the new transcript and folds the delta in, explicitly to avoid resending a growing transcript | 20.7 plans to re-extract over the whole running transcript every cycle. The fold is cheaper and will churn the screen less. **Adopt it**                                |
+| **Partial Results**           | Streaming vendors emit revisable partial text in 200 to 500 ms and finals in 0.7 to 4 seconds                                           | Segmented batch shows the doctor nothing until a segment closes. The screen is empty for the whole segment, which is the real experiential cost of the transport choice |
 
-| **Update policy for a live panel** | Online summarisation research measures screen churn directly, and zero-erasure policies exist | Answered in 20.8.1. Adopt a forced-prefix fold rather than regenerating the panel each cycle |
+| **Update Policy For A Live Panel** | Online summarisation research measures screen churn directly, and zero-erasure policies exist | Answered in 20.8.1. Adopt a forced-prefix fold rather than regenerating the panel each cycle |
 
 ### What The Clinical Literature Says About The Product Category
 
 These findings bound what the evidence supports; they do not describe implementation.
 
-| Finding                                               | Number                                                                                                                                                       | Consequence here                                                                                                                                                         |
+| Finding                                               | Number                                                                                                                                                       | Consequence Here                                                                                                                                                         |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Omission is the dominant failure, not fabrication** | 18% of notes carried accidental omissions against 11.5% hallucinations, n=356                                                                                | The missing-information panel addresses the most common documented failure mode.                                                                                         |
-| **A minority of notes carry serious risk**            | 5.3% of notes contained an error posing serious or imminent risk                                                                                             | The single best citation for why approval must be an explicit clinician act and never a default                                                                          |
-| **Time savings are not established**                  | In the only randomised trial the market-leading scribe showed no significant reduction in documentation time. Burnout and task load improved in both arms    | The trial found no significant reduction in documentation time; burnout and task load improved in both arms.                                                             |
-| **Documenting is not acting**                         | Across 20,302 notes, AI-scribed notes recorded significantly more symptoms yet the clinician was **less** likely to intervene                                | A caution for systems that surface red flags: surfacing is not the outcome; acting is                                                                                    |
-| **Speech recognition hallucination tracks silence**   | Roughly 1% of segments in one corpus, rising with non-vocal duration, and 38% of those carried explicit harm                                                 | The patients who pause are the elderly, the breathless, the distressed and anyone speaking through an interpreter. This is a fairness argument, not only an accuracy one |
-| **No standard benchmark exists**                      | A scoping review found 7 qualifying studies and only 2 public datasets, and named the absence of standard hallucination and error metrics as the central gap | There is no standard benchmark for comparison. Report the evaluation method; PDQI-9 with a severity scale is the closest available convention                            |
+| **Omission Is The Dominant Failure, Not Fabrication** | 18% of notes carried accidental omissions against 11.5% hallucinations, n=356                                                                                | The missing-information panel addresses the most common documented failure mode.                                                                                         |
+| **A Minority Of Notes Carry Serious Risk**            | 5.3% of notes contained an error posing serious or imminent risk                                                                                             | The single best citation for why approval must be an explicit clinician act and never a default                                                                          |
+| **Time Savings Are Not Established**                  | In the only randomised trial the market-leading scribe showed no significant reduction in documentation time. Burnout and task load improved in both arms    | The trial found no significant reduction in documentation time; burnout and task load improved in both arms.                                                             |
+| **Documenting Is Not Acting**                         | Across 20,302 notes, AI-scribed notes recorded significantly more symptoms yet the clinician was **less** likely to intervene                                | A caution for systems that surface red flags: surfacing is not the outcome; acting is                                                                                    |
+| **Speech Recognition Hallucination Tracks Silence**   | Roughly 1% of segments in one corpus, rising with non-vocal duration, and 38% of those carried explicit harm                                                 | The patients who pause are the elderly, the breathless, the distressed and anyone speaking through an interpreter. This is a fairness argument, not only an accuracy one |
+| **No Standard Benchmark Exists**                      | A scoping review found 7 qualifying studies and only 2 public datasets, and named the absence of standard hallucination and error metrics as the central gap | There is no standard benchmark for comparison. Report the evaluation method; PDQI-9 with a severity scale is the closest available convention                            |
 
 ### 20.8.1 The Published Work Closest To This Design
 
@@ -993,7 +993,7 @@ Four results found 05/09/26 that bear on choices made elsewhere in this document
 
 | Pipeline                        | Completeness | Conciseness | Groundedness |
 | ------------------------------- | ------------ | ----------- | ------------ |
-| **Transcript straight to note** | 0.802        | 0.851       | **0.971**    |
+| **Transcript Straight To Note** | 0.802        | 0.851       | **0.971**    |
 | Facts to note                   | 0.814        | 0.878       | 0.922        |
 | Facts to note, refined          | 0.931        | 0.948       | 0.914        |
 
@@ -1001,48 +1001,48 @@ Every intermediate-representation variant scored **lower on groundedness** than 
 
 That result supports the arrangement in section 12: `clinical_facts` and `note_and_gaps` run **concurrently over the same transcript**, and the note is deliberately not written from the assertions. What was recorded there as a latency optimisation turns out to be the grounding-optimal shape as well. **Keep it.** The live pass planned in 20.7 reuses the extraction half to drive the patient card and the gap checklist, which is the correct use of an intermediate representation, and it must not become the source the note is written from.
 
-**The churn problem has a published metric and a published answer.** This section listed screen churn as undocumented across the industry. It is undocumented among vendors, but not in the literature. Online summarisation research defines **Normalized Erasure**, the volume of previously shown output later retracted, and measures five update policies against it:
+**The Churn Problem Has A Published Metric And A Published Answer.** This section listed screen churn as undocumented across the industry. It is undocumented among vendors, but not in the literature. Online summarisation research defines **Normalized Erasure**, the volume of previously shown output later retracted, and measures five update policies against it:
 
 | Policy                                                         | Erasure  | Cost              | Note                                                                                               |
 | -------------------------------------------------------------- | -------- | ----------------- | -------------------------------------------------------------------------------------------------- |
 | Full rewriting each cycle                                      | **13.8** | highest           | Authors report "excessive rewriting" causing "high cognitive strain" even where fluency rated well |
-| **Sliding window with the previous output forced as a prefix** | **0**    | about 1.8x tokens | Best intermediate quality of the set                                                               |
+| **Sliding Window With The Previous Output Forced As A Prefix** | **0**    | about 1.8x tokens | Best intermediate quality of the set                                                               |
 | Independent chunk summaries                                    | 0        | lowest            | Worst quality                                                                                      |
 
 Zero erasure is achievable, and it costs roughly 1.8 times the tokens. For a panel a doctor reads while talking, never retracting a line that has already been shown is worth more than the token saving. This is the concrete mechanism behind the fold that 20.8 recommends adopting from Nabla, and it supersedes "re-extract and re-render each cycle" as the live update policy.
 
 **A language model cannot be used to catch the failure mode that matters most here.** Omission is the dominant documented failure of ambient notes, at 18% against 11.5% for hallucination. A 2026 study measured how well language-model judges detect each:
 
-| What the judge is asked to find           | Discrimination   |
+| What The Judge Is Asked To Find           | Discrimination   |
 | ----------------------------------------- | ---------------- |
 | Content that was added and is unsupported | 0.79 to 0.94     |
-| **Content that is missing**               | **0.50 to 0.63** |
+| **Content That Is Missing**               | **0.50 To 0.63** |
 
 At 0.50 a judge is guessing. **Judges verify presence, not absence.** A dedicated per-fact pipeline recovered only 24.6% to 36.9% of omissions at a 2.7% to 6.2% false-alarm rate.
 
 Published findings support the gap engine's shape in section 12. `deriveGaps` does not ask a model what is missing. It enumerates a fixed checklist and reports every field whose assertion state is `NOT_ASSESSED` or `UNKNOWN`, which is absence detection by construction rather than by judgement. Any future proposal to replace it with a model that reads the note and lists what is absent should be refused on this evidence.
 
-**Two cautions about evaluation and claims.**
+**Two Cautions About Evaluation And Claims.**
 
 - An audit of three deployed commercial scribes over 142 consultations found **31.3% of notes carried a verified failure**, concentrated in allergy and medication information, invented patient identity, and history written up as examination on telephone consultations where no examination occurred. More usefully, the same work found the measured failure rate ranged from **28% to 97% depending on the evaluation instrument**, with review instructions alone moving verification rates from 9.3% to 79.0%. Any error rate quoted for this system, ours included, is a statement about the rubric as much as about the software.
-- **Approval as an API state transition.** AWS and Abridge state this requirement in prose, but neither cited contract enforces it. CatatMD makes the `approved` transition explicit, requires doctor action, and pins it with a guard test.
+- **Approval As An API State Transition.** AWS and Abridge state this requirement in prose, but neither cited contract enforces it. CatatMD makes the `approved` transition explicit, requires doctor action, and pins it with a guard test.
 
-**One number for the live panes.** The only published latency budget for anything shown to a clinician mid-consultation is Suki's, at **sub-300 ms** for voice-command intent, achieved by keeping a language model out of the hot path entirely and using sentence encoders with nearest-neighbour search instead. Nothing note-shaped has a published budget. That supports the split in 20.7: the deterministic red-flag pass is the surface that must feel immediate, and the model-backed card is allowed to lag.
+**One Number For The Live Panes.** The only published latency budget for anything shown to a clinician mid-consultation is Suki's, at **sub-300 ms** for voice-command intent, achieved by keeping a language model out of the hot path entirely and using sentence encoders with nearest-neighbour search instead. Nothing note-shaped has a published budget. That supports the split in 20.7: the deterministic red-flag pass is the surface that must feel immediate, and the model-backed card is allowed to lag.
 
 ### What The Research Changed In 20.7
 
 | Item                             | Before                                          | After                                                                                                                                                                                                                                                                                                                                                                                      |
 | -------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Segment window                   | 4 to 12 seconds                                 | **8 second floor.** Measured: a 4 second floor costs 23.5 points of Malay word error, an 8 second floor costs 1.5                                                                                                                                                                                                                                                                          |
+| Segment window                   | 4 to 12 seconds                                 | **8 Second Floor.** Measured: a 4 second floor costs 23.5 points of Malay word error, an 8 second floor costs 1.5                                                                                                                                                                                                                                                                          |
 | Per-consultation language picker | Proposed, then retracted                        | Stays retracted. Detection works unprompted on genuinely spoken audio. **Additionally: constrain the candidate set to the languages expected and exclude Indonesian**, which is what every vendor supporting code-switching advises and what removes the confusion measured here mechanically                                                                                              |
-| Tamil                            | "Not on the vendor's list"                      | **Definitively unsupported.** Qwen3-ASR covers 30 languages plus 22 Chinese dialects and Tamil is absent, which is why language identification failed on all four clips. **Speechmatics ships a single `cmn_en_ms_ta` model covering Mandarin, English, Malay and Tamil**, and is the only vendor with a Malay-English product. It deserves evaluation before Tamil is declared impossible |
+| Tamil                            | "Not on the vendor's list"                      | **Definitively Unsupported.** Qwen3-ASR covers 30 languages plus 22 Chinese dialects and Tamil is absent, which is why language identification failed on all four clips. **Speechmatics ships a single `cmn_en_ms_ta` model covering Mandarin, English, Malay and Tamil**, and is the only vendor with a Malay-English product. It deserves evaluation before Tamil is declared impossible |
 | Incremental analysis             | Re-extract over the whole transcript each cycle | Fold the delta into the previous result, following the one documented incremental contract in the field                                                                                                                                                                                                                                                                                    |
 
 ### Two Accuracy Findings To Carry Forward
 
-**The Malay result is optimistic, and by a lot.** FLEURS is read, scripted, studio-clean speech. On spontaneous Singaporean Malay the same class of model scores 33 to 58 percent word error against the 13.2 percent measured here. Recording conditions alone account for a factor of two and a half to four before code-switching is considered.
+**The Malay Result Is Optimistic, And By A Lot.** FLEURS is read, scripted, studio-clean speech. On spontaneous Singaporean Malay the same class of model scores 33 to 58 percent word error against the 13.2 percent measured here. Recording conditions alone account for a factor of two and a half to four before code-switching is considered.
 
-**Code-switching is the unmeasured risk.** On Singaporean Malay-English, Whisper-class models exceed 100 percent word error, meaning insertions make the output longer than the reference and unusable. No vendor anywhere publishes a code-switched error rate against a monolingual baseline, and a systematic review of 127 code-switching papers found contextual biasing not discussed at all. There is no public Malaysian conversational Malay-English benchmark. **If the client records his own consultations, that recording becomes the most authoritative Malaysian data in existence on this question**, which is a better thing to offer him than a number from a read-speech corpus.
+**Code-Switching Is The Unmeasured Risk.** On Singaporean Malay-English, Whisper-class models exceed 100 percent word error, meaning insertions make the output longer than the reference and unusable. No vendor anywhere publishes a code-switched error rate against a monolingual baseline, and a systematic review of 127 code-switching papers found contextual biasing not discussed at all. There is no public Malaysian conversational Malay-English benchmark. **If the client records his own consultations, that recording becomes the most authoritative Malaysian data in existence on this question**, which is a better thing to offer him than a number from a read-speech corpus.
 
 ## 20.9 Ambient Capture On ILMU, And The Mechanism Behind 20.8's Post-Correction Row
 
@@ -1061,12 +1061,12 @@ The sign-off above is unchanged and is not re-opened: same vendor, socket, regio
 | Compose surface        | A card in the review page's 620px middle column      | The theatre, one column while listening and two after Stop                    |
 | One dictation yields   | One prescription                                     | Several, each with its own sig, confirmed together                            |
 
-**Four implementation consequences, and the audit one is the load-bearing one.**
+**Four Implementation Consequences, And The Audit One Is The Load-Bearing One.**
 
-- **`LiveSessionRequestSchema` stopped being `consent: z.literal(true)`.** It is an optional boolean with a `refine` that requires `true` on ambient, so ambient behaviour is unchanged byte for byte (defaults apply before `refine`, so a bare `{}` still resolves to ambient and still fails 400) while dictation may legitimately assert nothing. The alternative, leaving the literal and having the client keep sending `true`, would have filled the trail with patient agreements that were never collected. A client that stops asking must stop claiming.
-- **`consentAsserted` in `backend/src/audit/index.ts` widened from `true` to `boolean`.** It was typed as the literal, so the route could not have recorded anything else even if it had wanted to.
-- **The dictation session cap moved 120 to 300**, because the surface now takes a whole prescription sheet in one pass. See the cap history above.
-- **`PrescriptionSchema.dictated` moved `max(400)` to `max(2000)`**, and its meaning narrowed: it is now the stretch of the dictation belonging to that drug, not the whole utterance. At 400 the box stopped a four-drug prescription mid-sentence while the doctor was still speaking, and the stop was silent because the cap flag was destructured away at the call site.
+- **`LiveSessionRequestSchema` Stopped Being `consent: z.literal(true)`.** It is an optional boolean with a `refine` that requires `true` on ambient, so ambient behaviour is unchanged byte for byte (defaults apply before `refine`, so a bare `{}` still resolves to ambient and still fails 400) while dictation may legitimately assert nothing. The alternative, leaving the literal and having the client keep sending `true`, would have filled the trail with patient agreements that were never collected. A client that stops asking must stop claiming.
+- **`consentAsserted` In `backend/src/audit/index.ts` Widened From `true` To `boolean`.** It was typed as the literal, so the route could not have recorded anything else even if it had wanted to.
+- **The Dictation Session Cap Moved 120 To 300**, because the surface now takes a whole prescription sheet in one pass. See the cap history above.
+- **`PrescriptionSchema.dictated` Moved `max(400)` To `max(2000)`**, and its meaning narrowed: it is now the stretch of the dictation belonging to that drug, not the whole utterance. At 400 the box stopped a four-drug prescription mid-sentence while the doctor was still speaking, and the stop was silent because the cap flag was destructured away at the call site.
 
 **The per-drug sig is the one new piece of logic, and it is client-side.** `parseSig` answers one sig per phrase, so a four-drug dictation cannot yield four from one response. The theatre re-sends each accepted drug's own stretch of text to the same parse route, bounded by the next drug name the matcher heard, and prints that stretch on the row it filled. The route is deterministic, stores nothing, writes no audit row and allows thirty a minute, so this needed no backend change. It fails toward an empty field rather than an inherited one: the slice starts at the drug's own name, so a dose spoken before the name is lost rather than drug two opening with drug one's trailing sig.
 
@@ -1074,7 +1074,7 @@ The sign-off above is unchanged and is not re-opened: same vendor, socket, regio
 
 **Bounding a slice at the next drug name is only half a boundary** (#369). A drug the lexicon does not hold raises no candidate, so nothing bounds the previous slice, which then runs to the end of the utterance and quotes a second drug's whole sig as evidence for fields that text never supplied. Brands are outside the lexicon by D-001, which makes that the ordinary case rather than the rare one.
 
-| Piece                               | Where                                       | What it is                                                                                                                                                                                   |
+| Piece                               | Where                                       | What It Is                                                                                                                                                                                   |
 | ----------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `parseSigWithSpan(text)`            | `backend/src/medications/sig.ts`            | `{ sig, readTo }`, where `readTo` is the maximum `Claim.end` already tracked internally, or `null` when no field parsed. `parseSig` is now a wrapper over it, so its own tests are untouched |
 | `sigReadTo`                         | `PrescriptionParseResponseSchema`           | The offset on the wire. `nullish` for deploy skew, and a sibling of `sig` because `sig` is a `PrescriptionSchema` pick and may hold only stored-prescription fields                          |
@@ -1082,16 +1082,16 @@ The sign-off above is unchanged and is not re-opened: same vendor, socket, regio
 
 Four properties hold it in place.
 
-- **`readTo` is an offset and nothing else.** No claim about what the remaining text means, and no drug proposed for it.
-- **The quote is cut from the posted string, never re-sliced from `parsedFrom`.** Pressing Check replaces `parsedFrom` while staged rows keep the spans they were cut with, so re-slicing there would quote new text at old offsets.
-- **`sourceSpan` is kept apart from `span`.** `span` is the drug's name and decides which candidates stay on offer; `sourceSpan` is the stretch its fields came from and decides which characters no row accounts for. One field doing both would suppress a candidate merely for sitting downstream of an accepted drug.
-- **`null` leaves the claim alone.** No field read is no evidence about where the drug's text stops, and a quote cut on nothing is worse than one that is too wide.
+- **`readTo` Is An Offset And Nothing Else.** No claim about what the remaining text means, and no drug proposed for it.
+- **The Quote Is Cut From The Posted String, Never Re-Sliced From `parsedFrom`.** Pressing Check replaces `parsedFrom` while staged rows keep the spans they were cut with, so re-slicing there would quote new text at old offsets.
+- **`sourceSpan` Is Kept Apart From `span`.** `span` is the drug's name and decides which candidates stay on offer; `sourceSpan` is the stretch its fields came from and decides which characters no row accounts for. One field doing both would suppress a candidate merely for sitting downstream of an accepted drug.
+- **`null` Leaves The Claim Alone.** No field read is no evidence about where the drug's text stops, and a quote cut on nothing is worse than one that is too wide.
 
 #### Amended 06/10/26: One Read Returns Every Line
 
 **The per-drug re-parse and the unclaimed-stretch panel are replaced by one read of the whole box** (D-001, amended 06/10/26). The two sections above are the history of that mechanism; `narrowToSig`, `unclaimedStretches` and the per-row parse are gone.
 
-| Piece                                     | Where                                       | What it is                                                                                                                                          |
+| Piece                                     | Where                                       | What It Is                                                                                                                                          |
 | ----------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `parsePrescriptionLines(text, profileId)` | `backend/src/medications/lines.ts`          | Pure. Cuts the dictation into clauses, places each on a line, then fills shared fields. No model, no I/O                                            |
 | `PrescriptionLineSchema`                  | `shared/src/medications.ts`                 | `{ start, end, candidates, exact, sig, shared }`. An empty `candidates` is a line nobody named                                                      |
@@ -1099,9 +1099,9 @@ Four properties hold it in place.
 | `readFrom`, `doseAt`, `claims`            | `parseSigWithSpan`                          | Where the first sig field and the dose start, and every stretch a field was read from, so an unknown word before or beside a dose can be told apart |
 | `rowsFrom`, `lineKeys`, `toConfirm`       | `frontend/src/review/prescription-draft.ts` | Pure. The parse plus the doctor's edits make the table; ticked rows make the save                                                                   |
 
-**How a clause is placed.** Clauses split on `, ; .`, a new line, and `and`, `dan`, `then`, `plus`, `also`, never inside a heard drug name. A matcher reading made only of sig words ("10 mg sekali"), or reaching back over a boundary from sig words ("day. Amoxicillin" as doxycycline), is not a heard name and is dropped before clauses are cut. "Dosed" below means a dose `parseSig` reads, or a count of puffs, sprays, drops or lozenges, which it does not read as a dose but which still marks another product.
+**How A Clause Is Placed.** Clauses split on `, ; .`, a new line, and `and`, `dan`, `then`, `plus`, `also`, never inside a heard drug name. A matcher reading made only of sig words ("10 mg sekali"), or reaching back over a boundary from sig words ("day. Amoxicillin" as doxycycline), is not a heard name and is dropped before clauses are cut. "Dosed" below means a dose `parseSig` reads, or a count of puffs, sprays, drops or lozenges, which it does not read as a dose but which still marks another product.
 
-| Clause                                                                                       | Goes to                                                                                                                                                                                                |
+| Clause                                                                                       | Goes To                                                                                                                                                                                                |
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Holds a drug name                                                                            | A new line for that drug. Text before the name joins it, unless it opens on another word with a sig ("Panadol 1 g amoxicillin"). Two names in one clause make both lines not exact                     |
 | The same exact name again, before any dose                                                   | The same line, as a self-correction. Never when either mention is a near-match                                                                                                                         |
@@ -1113,9 +1113,9 @@ Four properties hold it in place.
 
 **`exact`** is `score === 1` on the best candidate, with no other candidate reaching past it over a word the sig does not own, and no other name in the same clause. Reaching over a unit ("g amoxicillin") does not count.
 
-**On the client, a line that is not exact is undecided** until the doctor ticks it, picks another reading, types a name or leaves it out, and an undecided line holds Confirm like an unnamed one.
+**On The Client, A Line That Is Not Exact Is Undecided** until the doctor ticks it, picks another reading, types a name or leaves it out, and an undecided line holds Confirm like an unnamed one.
 
-**On the client**, the box is re-read 600 ms after the last edit, and a response for text since changed is dropped. Each line keeps its doctor's edits under a key built from its drug, or from its words when unnamed, so a correction earlier in the box does not move them. `dictated` is the line's own words, then `…` and the shared clause it used, falling back to the line alone past 2000 characters.
+**On The Client**, the box is re-read 600 ms after the last edit, and a response for text since changed is dropped. Each line keeps its doctor's edits under a key built from its drug, or from its words when unnamed, so a correction earlier in the box does not move them. `dictated` is the line's own words, then `…` and the shared clause it used, falling back to the line alone past 2000 characters.
 
 **What this costs is stated in `docs/DPIA.md` as a residual risk rather than closed here.** MMC 003/2023 cl.18 wants consent specific to the purpose before capture and the PDPA 2024 amendment makes voice biometric data requiring explicit consent. Neither is asked for on this path now. Ambient capture and the ILMU relay are untouched and keep both halves of the rule.
 
@@ -1141,7 +1141,7 @@ ILMU is already the single approved audio egress, so routing ambient through it 
 
 ILMU returned 2.0 to 2.4 s on 83 s of audio and 2.3 to 2.5 s on 99.2 s (§20.3). That is almost entirely fixed per-call cost, not compute.
 
-**On an 8 second segment the overhead does not shrink.** Effective real-time factor becomes roughly 0.29 rather than 0.024, against roughly 0.1 for `qwen3-asr-flash` (§20.7.1). It still meets the 2 to 4 s target on paper, and it means there is no latency knob left: cutting shorter segments cannot make it faster, and it costs accuracy. If the Vercel to Render hop pushes the fixed cost past roughly 3.5 s, this choice has no recovery and the answer is Alibaba plus the sign-off.
+**On An 8 Second Segment The Overhead Does Not Shrink.** Effective real-time factor becomes roughly 0.29 rather than 0.024, against roughly 0.1 for `qwen3-asr-flash` (§20.7.1). It still meets the 2 to 4 s target on paper, and it means there is no latency knob left: cutting shorter segments cannot make it faster, and it costs accuracy. If the Vercel to Render hop pushes the fixed cost past roughly 3.5 s, this choice has no recovery and the answer is Alibaba plus the sign-off.
 
 ### What Choosing ILMU Costs
 
@@ -1153,26 +1153,26 @@ ILMU returned 2.0 to 2.4 s on 83 s of audio and 2.3 to 2.5 s on 99.2 s (§20.3).
 | Prose quality            | ILMU returns a flat lowercase stream with no punctuation and no segments (§20.3 finding 5). Under ambient capture that is what the doctor watches grow on screen for the whole consultation, and what the live note is written from |
 | The DPIA release gate    | `DPIA.md` requires review whenever a new hosted-ASR path is introduced. Same processor does not exempt a new path. See `DPIA.md`                                                                                                    |
 
-**The biasing cost is survivable, and only because the provider is ILMU.** Every error in ILMU's measured family is already in `redflags/mishears.ts`, which is layer 2, built and versioned. §20.7.1's claim that an error can only be fixed at layer 1 was about a **Qwen** error, "batuk" returning as "betul", where the wrong word is an everyday Malay word that cannot be added to a confusable table. That claim does not transfer to a different recogniser with a different error family.
+**The Biasing Cost Is Survivable, And Only Because The Provider Is ILMU.** Every error in ILMU's measured family is already in `redflags/mishears.ts`, which is layer 2, built and versioned. §20.7.1's claim that an error can only be fixed at layer 1 was about a **Qwen** error, "batuk" returning as "betul", where the wrong word is an everyday Malay word that cannot be added to a confusable table. That claim does not transfer to a different recogniser with a different error family.
 
 ### Post-Correction: The Mechanism Behind 20.8's Row
 
 §20.8 already records that no vendor documents an ASR post-correction stage, and that the technique "hurts in the low-error regime with a general model seeing only final text, which is our situation". That conclusion is unchanged. What follows is the mechanism, because the research names four distinct techniques and only one of them is what §20.8 rejected.
 
-| Form                                                                         | What it requires                                                                       | Reported effect                                                                                                                    | Available on ILMU                                           |
+| Form                                                                         | What It Requires                                                                       | Reported Effect                                                                                                                    | Available On ILMU                                           |
 | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | Generative error correction over the N-best list (HyPoradise, NeurIPS 2023)  | The recogniser's alternative hypotheses                                                | Up to 53.9 percent WER reduction on its own test sets                                                                              | **No.** ILMU returns `{text, usage}` only (§20.3 finding 5) |
 | Contextual biasing, also called keyterm boosting (Deepgram, AWS, AssemblyAI) | A hotword or context field at decode time                                              | The production-standard lever across vendors. Shapes the transcript before it exists rather than editing it after                  | **No**, pending the probe below                             |
 | Prompt-only rewriting of the 1-best text                                     | Nothing                                                                                | Hallucination that "may lead to the modification of the correct text"; survey material reports over-correction raising error rates | Yes, and it is the form §20.8 rejected                      |
 | Multi-stage correction with verification (RLLM-CF, arXiv 2505.24347)         | Three passes: error pre-detection, chain-of-thought correction, reasoning verification | 21, 11, 9 and 11.4 percent relative CER and WER reductions, no fine-tuning                                                         | Yes, at three times the calls                               |
 
-**This sharpens §20.8's row rather than softening it.** The row's condition, "with access to its alternative hypotheses", is exactly the N-best list, and the first row of the table above is why that condition cannot be met here: our provider does not return one. Choosing ILMU therefore forecloses the only form with a large reported effect.
+**This Sharpens §20.8's Row Rather Than Softening It.** The row's condition, "with access to its alternative hypotheses", is exactly the N-best list, and the first row of the table above is why that condition cannot be met here: our provider does not return one. Choosing ILMU therefore forecloses the only form with a large reported effect.
 
 ### What Ambient Noise Does To Safety
 
 The most consequential finding for an ambient product, and it reframes what accuracy work is for. "Beyond WER: A Paired Acoustic Stress Test for Ambient Clinical Scribes" (arXiv 2606.05909) tests Whisper-large-v3 into Qwen3-235B, which is this system's pipeline shape.
 
-| Condition                                     | WER                    | Unsafe outputs           |
+| Condition                                     | WER                    | Unsafe Outputs           |
 | --------------------------------------------- | ---------------------- | ------------------------ |
 | Clean                                         | 16.54%                 | 13.60%                   |
 | Stationary ambient noise, 15 dB               | 17.25%, up 0.71 points | 27.21%                   |
@@ -1181,9 +1181,9 @@ The most consequential finding for an ambient product, and it reframes what accu
 
 Unsafe is scored at or below 2 on a 1 to 5 clinical rubric, where 2 is a major error such as an omitted red flag or a wrong dose and 1 is a safety hallucination.
 
-**Word error rate is not the safety variable.** A 0.71 point WER move nearly doubled unsafe output, and a second voice in the room quintupled it. Chasing word accuracy does not buy clinical safety, and for a consulting room the dominant risk is a bystander speaking, not a slightly worse transcript.
+**Word Error Rate Is Not The Safety Variable.** A 0.71 point WER move nearly doubled unsafe output, and a second voice in the room quintupled it. Chasing word accuracy does not buy clinical safety, and for a consulting room the dominant risk is a bystander speaking, not a slightly worse transcript.
 
-**The implementation uses the same control pattern.** An extractor attaches verbatim evidence, a verifier removes unsupported content, and a symbolic filter discards any quoted span not present as an exact substring, nulling high-stakes fields. That is `applyEvidenceCheck` and `hasVerbatimEvidence` (§21.4), including the downgrade to `NOT_ASSESSED`. The paper states its authors did **not** clean the ASR transcript, and the reason is structural: the symbolic filter only means anything against the raw transcript. This finding supports the existing evidence check and informs the correction design below, which proposes changes rather than rewriting the transcript.
+**The Implementation Uses The Same Control Pattern.** An extractor attaches verbatim evidence, a verifier removes unsupported content, and a symbolic filter discards any quoted span not present as an exact substring, nulling high-stakes fields. That is `applyEvidenceCheck` and `hasVerbatimEvidence` (§21.4), including the downgrade to `NOT_ASSESSED`. The paper states its authors did **not** clean the ASR transcript, and the reason is structural: the symbolic filter only means anything against the raw transcript. This finding supports the existing evidence check and informs the correction design below, which proposes changes rather than rewriting the transcript.
 
 ### The Correction Shape That Was Chosen
 
@@ -1192,7 +1192,7 @@ Decided by the owner on 06/09/26, after review of the material above. It is the 
 | Property                      | Decision                                                                                                                                                                                                                                                                                                                          |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Generation                    | The RLLM-CF three-stage shape: detect candidate spans, propose a replacement, verify and drop                                                                                                                                                                                                                                     |
-| Application                   | **Proposals only.** The stored transcript stays verbatim until the doctor taps to accept one                                                                                                                                                                                                                                      |
+| Application                   | **Proposals Only.** The stored transcript stays verbatim until the doctor taps to accept one                                                                                                                                                                                                                                      |
 | Constraint on the replacement | Drawn from a static, versioned clinical vocabulary, so an arbitrary word cannot be proposed. Same mechanism as ID-constrained citations, and it makes §20.7's named harm, turning "no chest pain" into "some chest pain", structurally unreachable                                                                                |
 | Where it runs                 | Once, after the segment stream closes. Not per segment: three calls per cycle at ambient cadence is roughly 75 calls per consultation for a surface nobody can act on while still talking                                                                                                                                         |
 | The bar it must clear         | The 11-entry table in `redflags/mishears.ts` was measured on ILMU, covers exactly ILMU's error family, and costs nothing. **The model pass earns its place only if it finds correct corrections the table does not.** If it finds none, ship the deterministic proposals alone and record the model pass as measured and rejected |
@@ -1201,7 +1201,7 @@ Decided by the owner on 06/09/26, after review of the material above. It is the 
 
 §20.7's own measurement table still governs. These are the additional probes this deviation creates, and the first two can reverse it.
 
-| Probe                                                                              | Question                                                                                                                                                             | What a bad answer means                                                                                                      |
+| Probe                                                                              | Question                                                                                                                                                             | What A Bad Answer Means                                                                                                      |
 | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Per-segment latency, through the deployed relay rather than direct to the provider | Does the fixed overhead hold near 2.3 s at an 8 to 20 s segment, once the Vercel to Render hop is inside the number                                                  | Above roughly 3.5 s median, the ILMU choice has no recovery. Alibaba plus the sign-off                                       |
 | Segmented against whole-file penalty on ILMU, at 8, 12 and 20 s                    | §20.8's 8 second floor was measured on `qwen3-asr-flash`. It is not known to transfer to a different recogniser                                                      | A large penalty at the 20 s ceiling means no window works, and no downstream layer recovers boundary loss                    |
@@ -1215,39 +1215,39 @@ Three runs per condition, because §20.3 measured `temperature=0` as not byte-de
 
 Discharges probe 2 of the table above. Harness: `evals/asr-ab.ts --segment --wer` (#264, PR #265), three runs per condition, the §20.3 rojak sample, 16 kHz mono wav, direct to the provider. Scored by `evals/wer.ts`, whose normalisation is a port of the script behind §20.8's `qwen3-asr-flash` table: NFKC, lowercased, punctuation stripped.
 
-| Condition                     | WER       | CER      | vs whole file |
+| Condition                     | WER       | CER      | vs Whole File |
 | ----------------------------- | --------- | -------- | ------------- |
 | Whole file, transcoded, uncut | 16.2%     | 7.5%     | baseline      |
 | Fixed 8 s                     | 18.4%     | 9.7%     | +2.2          |
 | Fixed 12 s                    | 19.7%     | 10.1%    | +3.5          |
 | **Fixed 20 s**                | **15.8%** | **6.9%** | **-0.4**      |
 
-**The `qwen3-asr-flash` cliff does not transfer.** §20.8 measured silence cuts at a 4 second floor costing +23.5 points on Malay. On ILMU the worst window tested costs +3.5, and the 20 s ceiling costs nothing measurable. The probe's stated failure condition, a large penalty surviving at the 20 s ceiling, is not met, so this does not reverse the ILMU decision.
+**The `qwen3-asr-flash` Cliff Does Not Transfer.** §20.8 measured silence cuts at a 4 second floor costing +23.5 points on Malay. On ILMU the worst window tested costs +3.5, and the 20 s ceiling costs nothing measurable. The probe's stated failure condition, a large penalty surviving at the 20 s ceiling, is not met, so this does not reverse the ILMU decision.
 
-**The control is transcoded, not the original file.** `--segment 0` re-encodes through the same encoder as the cut arms, so the rows differ only in whether the audio was cut. A control that kept the original AAC would have let a transcoding penalty read as a segmentation penalty.
+**The Control Is Transcoded, Not The Original File.** `--segment 0` re-encodes through the same encoder as the cut arms, so the rows differ only in whether the audio was cut. A control that kept the original AAC would have let a transcoding penalty read as a segmentation penalty.
 
 Limits, stated per the §20.1 convention:
 
-- **One sample, one reader, one recording.** Indicative, not a benchmark.
-- **Not a curve, and not monotonic.** Within-condition spread across three runs reached 0.6 points, so 12 s scoring worse than both neighbours is not credible as a trend. 20 s beating the uncut control is noise: read it as no measurable penalty at 20 s, not as cutting helping.
-- **Fixed windows, not silence cuts.** The frontend segmenter (#266) cuts on a 600 ms silence hold above an 8 s floor, which is untested here. For whoever tests it: §20.8's cutter used `hangover_ms=600` by default, the same value, and at an 8 to 20 s window it tied fixed 10 s at 10.3% exactly. The +23.5 point row was that same cutter at 4 to 12 s. The floor carried that result, not the cutting strategy.
+- **One Sample, One Reader, One Recording.** Indicative, not a benchmark.
+- **Not A Curve, And Not Monotonic.** Within-condition spread across three runs reached 0.6 points, so 12 s scoring worse than both neighbours is not credible as a trend. 20 s beating the uncut control is noise: read it as no measurable penalty at 20 s, not as cutting helping.
+- **Fixed Windows, Not Silence Cuts.** The frontend segmenter (#266) cuts on a 600 ms silence hold above an 8 s floor, which is untested here. For whoever tests it: §20.8's cutter used `hangover_ms=600` by default, the same value, and at an 8 to 20 s window it tied fixed 10 s at 10.3% exactly. The +23.5 point row was that same cutter at 4 to 12 s. The floor carried that result, not the cutting strategy.
 - **Capture DSP.** This is the §20.3 sample, recorded before §20.6 turned the voice-call DSP off. That makes it the right audio for a segmentation delta, where the arms share it and it cancels, and the wrong audio for an absolute ILMU accuracy claim.
-- **Cutting costs slightly more to bill**, 101 to 105 seconds against 100 uncut, because each call rounds up independently.
+- **Cutting Costs Slightly More To Bill**, 101 to 105 seconds against 100 uncut, because each call rounds up independently.
 
-**Still open: the latency probe.** Direct-to-provider per-chunk latency measured roughly 315 ms for an 8 s chunk, so the relay hop would have to add over 3 s to breach the 3.5 s threshold. That is an argument from the direct number, not a measurement of the relay. The threshold stays formally unanswered until `--via-relay` is run against the deployment, and this argument must not be cited as the answer.
+**Still Open: The Latency Probe.** Direct-to-provider per-chunk latency measured roughly 315 ms for an 8 s chunk, so the relay hop would have to add over 3 s to breach the 3.5 s threshold. That is an argument from the direct number, not a measurement of the relay. The threshold stays formally unanswered until `--via-relay` is run against the deployment, and this argument must not be cited as the answer.
 
 ### Provenance Of The Sources In This Section
 
 Stated because §20.1's convention requires it, and because this section mixes read sources with search summaries.
 
-| Source                                                                                                                     | How it was obtained                                                                                                                                                                                                                                                                              |
+| Source                                                                                                                     | How It Was Obtained                                                                                                                                                                                                                                                                              |
 | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ILMU model page language list, containers, price                                                                           | The vendor's published model page, read 06/09/26 through a text-extraction proxy after the site refused direct fetches. Corroborated by three independent search summaries, and the quoted price of RM 0.0002 per second matches §20.3's independently measured RM 0.012 per consultation-minute |
 | Beyond WER, arXiv 2606.05909                                                                                               | Abstract and body read directly. Figures quoted are the paper's own                                                                                                                                                                                                                              |
 | RLLM-CF, arXiv 2505.24347                                                                                                  | Abstract read directly. The paper reports relative reductions only and states no absolute baselines                                                                                                                                                                                              |
-| HyPoradise, NeurIPS 2023                                                                                                   | **Search summary only, not read.** The 53.9 percent figure and the 316,000-pair dataset size are reported rather than verified here                                                                                                                                                              |
-| Over-correction raising error rates; a Whisper model degrading from 2.7 to over 20 percent WER after medical customisation | **Search summaries only, not read.** Directionally consistent with §20.8 and with §20.7.1's finding that English context over Malay audio scored worse than none, but not primary-verified                                                                                                       |
-| The segmentation table above                                                                                               | **Measured on this system**, 06/09/26, with `evals/asr-ab.ts`. Four dated reports in the gitignored `evals/reports/`, per the §20.3 convention that the harness writes a report and a human transcribes the figures                                                                              |
+| HyPoradise, NeurIPS 2023                                                                                                   | **Search Summary Only, Not Read.** The 53.9 percent figure and the 316,000-pair dataset size are reported rather than verified here                                                                                                                                                              |
+| Over-correction raising error rates; a Whisper model degrading from 2.7 to over 20 percent WER after medical customisation | **Search Summaries Only, Not Read.** Directionally consistent with §20.8 and with §20.7.1's finding that English context over Malay audio scored worse than none, but not primary-verified                                                                                                       |
+| The segmentation table above                                                                                               | **Measured On This System**, 06/09/26, with `evals/asr-ab.ts`. Four dated reports in the gitignored `evals/reports/`, per the §20.3 convention that the harness writes a report and a human transcribes the figures                                                                              |
 
 **The segmentation table is the only measurement of this system in this section**, and it was added on 06/09/26; everything else here is a vendor claim or a published result about someone else's pipeline. This does not establish ambient accuracy in any language, including in the measured table: it quantifies a segmentation delta on one scripted sample recorded before §20.6, not accuracy.
 
@@ -1285,7 +1285,7 @@ The grant above is scoped to ambient capture, and its "What it does not" row nam
 
 **This basis is weaker than the one above, and is recorded as weaker.** The 06/09/26 grant rested on the owner's own usability test of code-switched speech. This one rests on an argument about scope: what changes is which surface may open the socket, not where the audio goes or who receives it. Nothing about dictation accuracy on this provider is measured, and the "What Is Not Measured" table below applies to it unchanged.
 
-**What it does not license is the interesting half.** The two-control consent rule is not waived by the surface being small: a dictated phrase leaves the device exactly as a consultation does, so it takes the same standing device preference plus a per-consultation tick that dies with the component. On-device Whisper stays the floor on that page and is where every failure lands (`docs/decisions/` D-001). **Both halves of that sentence were overtaken the same day.** The default moved in the next subsection, and the tick was removed outright in the one after it; the paragraph is kept as written because the grant rested on it and a reader needs to see what was undertaken before seeing what was withdrawn.
+**What It Does Not License Is The Interesting Half.** The two-control consent rule is not waived by the surface being small: a dictated phrase leaves the device exactly as a consultation does, so it takes the same standing device preference plus a per-consultation tick that dies with the component. On-device Whisper stays the floor on that page and is where every failure lands (`docs/decisions/` D-001). **Both halves of that sentence were overtaken the same day.** The default moved in the next subsection, and the tick was removed outright in the one after it; the paragraph is kept as written because the grant rested on it and a reader needs to see what was undertaken before seeing what was withdrawn.
 
 ### Extended 28/09/26: The Sign-Off Reaches Two-Way Translation
 
@@ -1296,7 +1296,7 @@ The grant above is scoped to ambient capture, and its "What it does not" row nam
 | What it does not | Any other language pair, translation on prescription dictation, any spoken or synthesised output, and any other vendor or transport                                       |
 | What prompted it | Pakistani and Bangladeshi patients who cannot describe symptoms in English or Malay, and #389 measuring translation as one first-frame field with a deterministic pairing |
 
-**Not a new surface and not a new egress.** Ambient capture opens the socket exactly as before. What changes is the recognition config in the first frame, selected by a closed enum, and the processor now translates as well as transcribes. That second half is what this row exists to name.
+**Not A New Surface And Not A New Egress.** Ambient capture opens the socket exactly as before. What changes is the recognition config in the first frame, selected by a closed enum, and the processor now translates as well as transcribes. That second half is what this row exists to name.
 
 ### Extended 06/10/26: Mandarin And Tamil
 
@@ -1318,11 +1318,11 @@ The sign-off above is unchanged and is not re-opened here: same vendor, socket, 
 | Below the hardware floor | Dictate hidden, typing only                             | Dictate offered, because a socket loads no weights                                                                                       |
 | Any streaming failure    | Not applicable                                          | On-device or typing, never the cloud, never silently                                                                                     |
 
-**Three implementation consequences, none of which the sign-off anticipated.**
+**Three Implementation Consequences, None Of Which The Sign-Off Anticipated.**
 
-- **`loadAudioSettings` now treats absent and corrupt differently, for this field only.** An absent `dictationEngine` reads as the current default, so the decision reaches a device that already holds a `catatmd.audio` key; any present value other than `'streaming'` reads as `'local'`, so corruption still fails closed. Reading positively for both, as `engine` does, would have left every existing device on-device and made the new default reach nobody.
+- **`loadAudioSettings` Now Treats Absent And Corrupt Differently, For This Field Only.** An absent `dictationEngine` reads as the current default, so the decision reaches a device that already holds a `catatmd.audio` key; any present value other than `'streaming'` reads as `'local'`, so corruption still fails closed. Reading positively for both, as `engine` does, would have left every existing device on-device and made the new default reach nobody.
 - **Every review page carrying an analysed note now issues `GET /asr/live-sessions/config?mode=dictation` on mount.** That is the shape `AmbientCapture` has used since #268, but it is new traffic on a page that previously issued none. It also makes the config-failure copy commonly visible, so that copy now distinguishes a 503 (this deployment has no key) from any other failure (the network did not answer), rather than asserting the first for both.
-- **Expected mint volume on the dictation bucket rises**, because the path is now taken by default rather than by opt-in. The per-mode limiter and the 120 second per-session cap added in #356 are what absorb it. The absence of a global spend cap recorded in `.claude/rules/security.md` is unchanged and now carries more load; it remains a gap rather than a control.
+- **Expected Mint Volume On The Dictation Bucket Rises**, because the path is now taken by default rather than by opt-in. The per-mode limiter and the 120 second per-session cap added in #356 are what absorb it. The absence of a global spend cap recorded in `.claude/rules/security.md` is unchanged and now carries more load; it remains a gap rather than a control.
 
 **What it costs is a control, and `docs/decisions/` D-001 carries the full accounting.** In short: the standing device preference ships already set to send, so this surface holds one defaulted preference and one deliberate tick rather than two chosen controls. The tick is untouched and still gates every send. Separately, #363 found the preference had been unreachable from the review page for the whole of #357's life, because its only writer was mounted in `CapturePanel`; it is now mounted on both surfaces, which stay mutually exclusive by their render conditions.
 
@@ -1334,7 +1334,7 @@ The device preference this subsection describes no longer exists (`docs/decision
 
 §20.9's own analysis is what makes the case, because it names three costs and calls one of them the risk.
 
-| Property              | Soniox `stt-rt-v5`                                     | ILMU per segment (§20.9)                                                             |
+| Property              | Soniox `stt-rt-v5`                                     | ILMU Per Segment (§20.9)                                                             |
 | --------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | Recogniser            | Streaming                                              | Batch, called once per chunk, cold every time                                        |
 | Latency               | Tokens arrive while the sentence is still being spoken | 2.0 to 2.5 s fixed overhead per call, and §20.9 states there is no latency knob left |
@@ -1352,7 +1352,7 @@ Neither reason touches a socket from the browser to a third party, which is what
 
 What that costs is the property §20.9 leans on, that the API is the only audio egress. What it buys is that our servers never hold the audio at all. The API remains the policy point:
 
-| Control              | Where it lives                                                                                        |
+| Control              | Where It Lives                                                                                        |
 | -------------------- | ----------------------------------------------------------------------------------------------------- |
 | Who may stream       | `POST /api/asr/live-sessions` behind the session guard, like every other protected route              |
 | How often            | `liveSessionRateLimit`, 5 per minute per client key, its own bucket                                   |
@@ -1399,9 +1399,9 @@ Two properties of that flow are load-bearing rather than incidental. The microph
 
 ### What Is Not Measured
 
-**Nothing about this provider is measured in this repo.** The owner's own test is the only evidence, and it was a judgement about usability rather than a benchmark. Per the §20.1 convention this is stated rather than softened, and per §20.9's own closing rule this does not establish ambient accuracy in any language.
+**Nothing About This Provider Is Measured In This Repo.** The owner's own test is the only evidence, and it was a judgement about usability rather than a benchmark. Per the §20.1 convention this is stated rather than softened, and per §20.9's own closing rule this does not establish ambient accuracy in any language.
 
-| Unmeasured                        | Why it matters                                                                                        |
+| Unmeasured                        | Why It Matters                                                                                        |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Word error rate on real speech    | Synthetic voices only, below. No number from a person speaking in a consulting room                   |
 | Latency through the deployed path | §20.9's 3.5 s threshold was about a relay this design does not use, so it does not transfer           |
@@ -1415,48 +1415,48 @@ Two properties of that flow are load-bearing rather than incidental. The microph
 
 Two native ElevenLabs voices per language read the six synthetic lines in `backend/src/fixtures/languages.ts`, alternating. The joined audio streamed through a session minted by production's own `/api/asr/live-sessions`, in 250 ms slices as the SPA sends it, with production's Auto-Detect config (`stt-rt-v5`, hints `ms`, `en`, `zh`, `ta`). Scored with `evals/wer.ts`.
 
-| Language  | Metric | Rate      | Tagged as  | Reading                                                                                                   |
+| Language  | Metric | Rate      | Tagged As  | Reading                                                                                                   |
 | --------- | ------ | --------- | ---------- | --------------------------------------------------------------------------------------------------------- |
 | Tamil     | WER    | **8.2%**  | `ta` 95/95 | Usable. Most errors are numbers written as digits ("3" for மூன்று)                                        |
 | Mandarin  | CER    | **6.5%**  | `zh` 59/59 | Usable. Digits again, and one homophone (药 heard as 要)                                                  |
 | Malay     | WER    | **9.4%**  | `ms` 61/61 | Usable                                                                                                    |
 | Cantonese | CER    | **62.5%** | `zh` 62/62 | **Unusable.** Recognised as Mandarin with the content wrong. A `yue` hint is refused by the real-time API |
 
-- **Tamil reverses §20.7's limitation for this provider.** That position came from `qwen3-asr-flash`, which does not list Tamil; Soniox does, and reads it.
-- **Cantonese is stated as unsupported** on the Record tab (D-009). Part of its rate is the traditional-to-simplified swap, but the content errors are most of it.
-- **What it does not establish:** six read lines per language from synthetic voices. Real speech, Malaysian accents and code-switching are unmeasured, and this does not support an accuracy claim.
+- **Tamil Reverses §20.7's Limitation For This Provider.** That position came from `qwen3-asr-flash`, which does not list Tamil; Soniox does, and reads it.
+- **Cantonese Is Stated As Unsupported** on the Record tab (D-009). Part of its rate is the traditional-to-simplified swap, but the content errors are most of it.
+- **What It Does Not Establish:** six read lines per language from synthetic voices. Real speech, Malaysian accents and code-switching are unmeasured, and this does not support an accuracy claim.
 
 ### Observed 09/09/26: The Devoicing Family Reaches This Provider Too
 
-**§20.3's consonant-devoicing family is now recorded on a third arm.** A captured ambient consultation returned _"saya **teman** since 3 days ago"_ where the audio was _"saya **demam**"_, in a turn whose next line transcribed _"demam tu tinggi tak?"_ correctly and whose patient answer gave _"38.5"_. The same capture returned _"**Are there checked** temperature dekat rumah"_ for _"**Ada check** temperature dekat rumah"_.
+**§20.3's Consonant-Devoicing Family Is Now Recorded On A Third Arm.** A captured ambient consultation returned _"saya **teman** since 3 days ago"_ where the audio was _"saya **demam**"_, in a turn whose next line transcribed _"demam tu tinggi tak?"_ correctly and whose patient answer gave _"38.5"_. The same capture returned _"**Are there checked** temperature dekat rumah"_ for _"**Ada check** temperature dekat rumah"_.
 
 |                              |                                                                                                                                                                                                                                  |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **What it closes**           | `redflags/mishears.ts` states that its table applies to ambient capture without anything proving those pairs occur on that provider. `demam` to `teman` is now recorded on Soniox as well as on ILMU and `whisper-small` (§20.3) |
-| **What it does not close**   | One turn of one consultation, no ground-truth corpus, no word error rate. It is an existence proof for one pair, not a measurement of the family                                                                                 |
-| **Consequence for layer 2**  | The confusable table earns its ambient scope on evidence rather than on the additive argument the module header falls back to                                                                                                    |
-| **Consequence for the note** | `expandMishears` reaches `redflags/triggers.ts` only, so the rules engine saw `demam` and the note pipeline saw `teman`. The safety net held and the structured note did not. Issue #308                                         |
+| **What It Closes**           | `redflags/mishears.ts` states that its table applies to ambient capture without anything proving those pairs occur on that provider. `demam` to `teman` is now recorded on Soniox as well as on ILMU and `whisper-small` (§20.3) |
+| **What It Does Not Close**   | One turn of one consultation, no ground-truth corpus, no word error rate. It is an existence proof for one pair, not a measurement of the family                                                                                 |
+| **Consequence For Layer 2**  | The confusable table earns its ambient scope on evidence rather than on the additive argument the module header falls back to                                                                                                    |
+| **Consequence For The Note** | `expandMishears` reaches `redflags/triggers.ts` only, so the rules engine saw `demam` and the note pipeline saw `teman`. The safety net held and the structured note did not. Issue #308                                         |
 
-**The second error is deliberately not being fixed.** "Are there checked" for "Ada check" is a code-switch boundary error, and the clinical meaning survives it. Repairing it means letting a model rewrite grammar, which is the paraphrase risk `draft-turns/reconstruction.ts` exists to prevent. Recorded here so a later reader does not mistake the omission for an oversight.
+**The Second Error Is Deliberately Not Being Fixed.** "Are there checked" for "Ada check" is a code-switch boundary error, and the clinical meaning survives it. Repairing it means letting a model rewrite grammar, which is the paraphrase risk `draft-turns/reconstruction.ts` exists to prevent. Recorded here so a later reader does not mistake the omission for an oversight.
 
 ### Built 09/09/26: Layer 1 Vocabulary, And What It Is Not Evidence Of
 
 `liveSessionConfig()` now sends a `terms` array alongside `general` (issue #307). `backend/src/lib/asr/vocabulary.ts` holds it: Malay consultation register, drug names in English, and `CONFUSABLE_TARGETS` derived from the `mishears.ts` map so layer 1 and layer 2 cannot disagree about what they are aiming at.
 
-**The evidence behind it is §20.7.1, and §20.7.1 was measured on Qwen.** That section carried a Malay clip from unusable to one word wrong with a clinical Malay vocabulary containing none of the sentence's content words, and it measured "batuk" returning as "betul", a pair no confusable table can claim without raising a cough flag on every sentence agreeing with the doctor. Both findings argue for the layer. Neither was measured on Soniox, and Soniox's `terms` is a vendor-documented array rather than the system context §20.7.1 varied, so **the mechanism is an inference and the outcome is unmeasured here.**
+**The Evidence Behind It Is §20.7.1, And §20.7.1 Was Measured On Qwen.** That section carried a Malay clip from unusable to one word wrong with a clinical Malay vocabulary containing none of the sentence's content words, and it measured "batuk" returning as "betul", a pair no confusable table can claim without raising a cough flag on every sentence agreeing with the doctor. Both findings argue for the layer. Neither was measured on Soniox, and Soniox's `terms` is a vendor-documented array rather than the system context §20.7.1 varied, so **the mechanism is an inference and the outcome is unmeasured here.**
 
 Two specific things a later measurement should settle:
 
-- **Whether the array does anything at all.** §20.3 finding 5 recorded ILMU's `prompt` biasing field as a no-op. A vendor field that is accepted and ignored is a live possibility, and nothing in the test suite can see it: `soniox.test.ts` proves the terms are _sent_, never that they are _used_.
-- **Whether English drug names cost anything.** §20.7.1's fifth condition scored an English clinical context worse than no context at all on Malay audio, and the language-detection follow-up found a four-language context failing to rescue an acoustically ambiguous clip where a single-language one succeeded. Drug names are in the list because Malaysian doctors speak them in English, so priming them in Malay could not match the audio; that is a domain fact, and its interaction with the language-priming effect is untested. Dropping `ENGLISH_DRUG_TERMS` is a one-line A/B if a measurement disagrees.
+- **Whether The Array Does Anything At All.** §20.3 finding 5 recorded ILMU's `prompt` biasing field as a no-op. A vendor field that is accepted and ignored is a live possibility, and nothing in the test suite can see it: `soniox.test.ts` proves the terms are _sent_, never that they are _used_.
+- **Whether English Drug Names Cost Anything.** §20.7.1's fifth condition scored an English clinical context worse than no context at all on Malay audio, and the language-detection follow-up found a four-language context failing to rescue an acoustically ambiguous clip where a single-language one succeeded. Drug names are in the list because Malaysian doctors speak them in English, so priming them in Malay could not match the audio; that is a domain fact, and its interaction with the language-priming effect is untested. Dropping `ENGLISH_DRUG_TERMS` is a one-line A/B if a measurement disagrees.
 
 ### Recorded 10/09/26: The Drug Half Was A Second Hand-Written Copy, And The Budget Is Now Full
 
 `ENGLISH_DRUG_TERMS` was written by hand, while `backend/src/medications/lexicon.ts` separately holds the names the doctor can accept as a candidate. The two had drifted. Eleven lexicon drugs were primed nowhere, the entire urinary antibacterial set among them: clarithromycin, doxycycline, phenoxymethylpenicillin, nitrofurantoin, trimethoprim, cotrimoxazole, fosfomycin, ciprofloxacin, norfloxacin, cefalexin and phenazopyridine.
 
-**The two halves of the chain were aiming at different targets**, which is the failure the vocabulary module's own header warns about when it derives `CONFUSABLE_TARGETS` from the `mishears.ts` map rather than copying it: a name the recogniser was never primed for is one `matchMedication` can only offer after the doctor has already typed it. #356 derives the drug terms from the lexicon, in the same shape and for the same reason.
+**The Two Halves Of The Chain Were Aiming At Different Targets**, which is the failure the vocabulary module's own header warns about when it derives `CONFUSABLE_TARGETS` from the `mishears.ts` map rather than copying it: a name the recogniser was never primed for is one `matchMedication` can only offer after the doctor has already typed it. #356 derives the drug terms from the lexicon, in the same shape and for the same reason.
 
-**The cost is the remaining budget, all of it.** Measured 10/09/26, the deduped ambient list lands at **exactly 120 against `MAX_ASR_CONTEXT_TERMS = 120`**:
+**The Cost Is The Remaining Budget, All Of It.** Measured 10/09/26, the deduped ambient list lands at **exactly 120 against `MAX_ASR_CONTEXT_TERMS = 120`**:
 
 | Source                                     | Terms   |
 | ------------------------------------------ | ------- |
@@ -1464,17 +1464,17 @@ Two specific things a later measurement should settle:
 | Existing drug and dosage-form terms        | 28      |
 | `MEDICATION_LEXICON` generics and synonyms | 39      |
 | `CONFUSABLE_TARGETS`                       | 7       |
-| **Deduped total**                          | **120** |
+| **Deduped Total**                          | **120** |
 
 Nothing has to be dropped, and the brand names survive, which matters because a patient says "Panadol" where the lexicon deliberately holds only generics. What it means is that the next lexicon entry is not a free addition: it forces a decision about the cap. That cap is small on purpose. A list crossing the audio egress cannot be de-identified, so review by eye is the only review it can get, and 120 terms is already near the limit of what an eye will actually check.
 
-**Prescription dictation sends a different, narrower list** (#356). The Malay symptom register and the confusable targets are excluded, because a prescription phrase carries no symptoms and 61 terms of the wrong domain is the effect §20.7.1 measured scoring worse than no context at all. What it sends instead is the lexicon plus the sig vocabulary the parser already owns, so every primed phrase is one `parseSig` can act on.
+**Prescription Dictation Sends A Different, Narrower List** (#356). The Malay symptom register and the confusable targets are excluded, because a prescription phrase carries no symptoms and 61 terms of the wrong domain is the effect §20.7.1 measured scoring worse than no context at all. What it sends instead is the lexicon plus the sig vocabulary the parser already owns, so every primed phrase is one `parseSig` can act on.
 
 ### Built 09/09/26: Per-Token Confidence, Shown As A Cue (Issue #309)
 
 Soniox returns a confidence with every token and `SonioxTokenSchema` did not declare it, so Zod's implicit strip discarded it at the same line that discards `error_message`. Nothing in the product told a doctor which words the recogniser was unsure of. This is the first half of §19 row 15.
 
-**What was built.** The field is carried into `LiveToken`, folded per segment into character ranges on `LiveSegment`, re-based onto turns by `carryUncertain` in `frontend/src/audio/draft-turns.ts`, stored inside `TranscriptTurnSchema.uncertain`, and rendered as a dotted underline in the live pane and the review transcript.
+**What Was Built.** The field is carried into `LiveToken`, folded per segment into character ranges on `LiveSegment`, re-based onto turns by `carryUncertain` in `frontend/src/audio/draft-turns.ts`, stored inside `TranscriptTurnSchema.uncertain`, and rendered as a dotted underline in the live pane and the review transcript.
 
 | Decision                                    | Why                                                                                                                                                                                                                                                            |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1484,13 +1484,13 @@ Soniox returns a confidence with every token and `SonioxTokenSchema` did not dec
 | A dotted underline, not a filled mark       | A filled mark is what this codebase uses for a finding the doctor must decide about. Nothing here claims a word is wrong                                                                                                                                       |
 | Nothing is gated on it                      | No red flag, suggestion or note field reads `uncertain`. It is display metadata, the same posture `RedFlagSchema.evidenceLink` holds                                                                                                                           |
 
-**The threshold has no measurement behind it.** `UNCERTAIN_CONFIDENCE_THRESHOLD` is 0.6, chosen to mark the visibly shaky words in the captures seen so far. Nothing in this repo has scored this provider's confidence against a ground-truth transcript in any language, so it sits on the same pile as the vocabulary array above. What settles it is a labelled sample: the threshold that catches most real errors without underlining correct speech. Until then the cost of it being wrong is bounded by what the cue does, which is nothing except ask a doctor to look.
+**The Threshold Has No Measurement Behind It.** `UNCERTAIN_CONFIDENCE_THRESHOLD` is 0.6, chosen to mark the visibly shaky words in the captures seen so far. Nothing in this repo has scored this provider's confidence against a ground-truth transcript in any language, so it sits on the same pile as the vocabulary array above. What settles it is a labelled sample: the threshold that catches most real errors without underlining correct speech. Until then the cost of it being wrong is bounded by what the cue does, which is nothing except ask a doctor to look.
 
-**The offset hazard, which is the part worth reading.** `tokensToSegments` built its text with a tidy step that collapses whitespace runs and trims the ends, and then discarded the tokens. Offsets computed on the raw token join are therefore wrong in the emitted text, and wrong silently: Soniox tokens carry their own leading spaces, so a segment cut on a speaker change begins with one and every naive offset lands a character early, putting the highlight on the neighbouring word with nothing thrown. The text and the per-token spans are now built in a single pass, and `live-tokens.test.ts` slices the ranges back out of the segment's own text and compares them to the expected words, because a comparison of range numbers would pass while the highlight sat in the wrong place.
+**The Offset Hazard, Which Is The Part Worth Reading.** `tokensToSegments` built its text with a tidy step that collapses whitespace runs and trims the ends, and then discarded the tokens. Offsets computed on the raw token join are therefore wrong in the emitted text, and wrong silently: Soniox tokens carry their own leading spaces, so a segment cut on a speaker change begins with one and every naive offset lands a character early, putting the highlight on the neighbouring word with nothing thrown. The text and the per-token spans are now built in a single pass, and `live-tokens.test.ts` slices the ranges back out of the segment's own text and compares them to the expected words, because a comparison of range numbers would pass while the highlight sat in the wrong place.
 
-**Everything downstream fails closed.** A turn that cannot be located in the segments carries no ranges; a segment or line whose text is not already normalised carries none, because the offsets describe the un-normalised string; ranges past the per-turn cap are dropped rather than allowed to fail the transcript; and a line the doctor edited carries none, because the re-attachment across the textarea is an exact-text match. A missing cue costs a doctor nothing. A cue on the wrong word tells them a correct transcription is suspect.
+**Everything Downstream Fails Closed.** A turn that cannot be located in the segments carries no ranges; a segment or line whose text is not already normalised carries none, because the offsets describe the un-normalised string; ranges past the per-turn cap are dropped rather than allowed to fail the transcript; and a line the doctor edited carries none, because the re-attachment across the textarea is an exact-text match. A missing cue costs a doctor nothing. A cue on the wrong word tells them a correct transcription is suspect.
 
-**What this is not.** It is not a correction and it proposes nothing. Issue #309's second half, the constrained model pass that reads these ranges as its gate, is not built here; §19 row 22 still governs whether it earns its place.
+**What This Is Not.** It is not a correction and it proposes nothing. Issue #309's second half, the constrained model pass that reads these ranges as its gate, is not built here; §19 row 22 still governs whether it earns its place.
 
 ### Built 09/09/26: Layer 3, The Constrained Cleanup Pass (Issue #309)
 
@@ -1500,36 +1500,36 @@ The third accuracy layer, built and shipped **off**. Layer 1 primes the recognis
 
 **Every control is in `policy.ts` or the response schema. None is the prompt.**
 
-| Control                                                      | What it stops                                                                                                                                |
+| Control                                                      | What It Stops                                                                                                                                |
 | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | Model schema is `{ original, replacement }` and no more      | A response asserting a position, or claiming it came from the measured table. Positions are located server-side                              |
 | Span must overlap a recogniser-flagged uncertain range       | Rewriting words nothing ever doubted, which is the regime arXiv 2407.21414 measured as degrading a transcript                                |
-| **A `model` edit that would remove a fired flag is dropped** | A doctor's accepted edit silently removing a red flag on re-analysis. Differential, not positional; see below. `source: 'mishear'` is exempt |
+| **A `model` Edit That Would Remove A Fired Flag Is Dropped** | A doctor's accepted edit silently removing a red flag on re-analysis. Differential, not positional; see below. `source: 'mishear'` is exempt |
 | Word delta at most one, bounded anchor                       | A sentence rewrite wearing a word's clothes. §20.10 records the code-switch boundary error as deliberately not repaired                      |
 | Character class on the replacement                           | Digits, brackets, and therefore a rehydrated vault token, reaching a proposal                                                                |
 | Single-occurrence anchor across the whole transcript         | Correcting the wrong instance of a repeated word                                                                                             |
 
-**Why the two sources are treated differently** is the part worth keeping. `expandMishears` already reaches `redflags/triggers.ts`, so a rule that fired on a table pair fired _because_ the engine read the corrected word; accepting that same correction moves the stored text to where the engine already was. A model edit has no such relationship, so accepting one can change a word a rule matched and stop the flag firing. `mergeRedFlags` is untouched and the doctor is the actor, so the invariant is not breached in letter; running the engine before proposing is what stops exercising it being one click away.
+**Why The Two Sources Are Treated Differently** is the part worth keeping. `expandMishears` already reaches `redflags/triggers.ts`, so a rule that fired on a table pair fired _because_ the engine read the corrected word; accepting that same correction moves the stored text to where the engine already was. A model edit has no such relationship, so accepting one can change a word a rule matched and stop the flag firing. `mergeRedFlags` is untouched and the doctor is the actor, so the invariant is not breached in letter; running the engine before proposing is what stops exercising it being one click away.
 
-**The suppression check is differential, and the first design was not.** Protecting each fired flag's evidence span looks sufficient and is not, because whether a match becomes a flag depends on text outside the span it matched: `isNegated` reads sixty characters before it, `isSafetyNetting` a hundred and twenty, and `asserts` and `findDeniedAbility` read the neighbouring turn entirely.
+**The Suppression Check Is Differential, And The First Design Was Not.** Protecting each fired flag's evidence span looks sufficient and is not, because whether a match becomes a flag depends on text outside the span it matched: `isNegated` reads sixty characters before it, `isSafetyNetting` a hundred and twenty, and `asserts` and `findDeniedAbility` read the neighbouring turn entirely.
 
 The case that settled it, found in review rather than in testing: a patient turn reading "Ada batuk berdarah" raises `haemoptysis` on "batuk berdarah". An edit changing "Ada" to "Tiada" is one word, letters only, zero word delta, sits inside an uncertain range, and touches no protected span, so every positional bound admits it. `tiada` is a Malay negator, so on re-analysis the emergency flag is gone. A `RedFlag` also carries no position at all (`evidence` is a bare string; `evidenceLink` is audio timing that may never influence a flag), which is what made the positional version awkward as well as wrong.
 
 So the policy asks the question that actually matters: run the engine over the transcript the proposal would produce, and refuse it if any rule that fired before does not fire after. `evaluateRedFlags` is pure, which is what makes asking affordable. Each proposal is judged alone, which is sufficient because the client refetches against the stored text after every accept, so a second correction is judged against a transcript already carrying the first.
 
-**The trigger set is chosen inside the policy, not passed in.** It was a parameter taking the caller's clinical profile, which was a hole of the same family: `profile.redFlagTriggers` is a filtered slice, the two shipped profiles share one trigger out of twelve, `profileId` arrived in the request body, and nothing ties a consultation to the profile it was analysed under. Every trigger is the only safe set, and over-protecting can only drop more model edits.
+**The Trigger Set Is Chosen Inside The Policy, Not Passed In.** It was a parameter taking the caller's clinical profile, which was a hole of the same family: `profile.redFlagTriggers` is a filtered slice, the two shipped profiles share one trigger out of twelve, `profileId` arrived in the request body, and nothing ties a consultation to the profile it was analysed under. Every trigger is the only safe set, and over-protecting can only drop more model edits.
 
 #### The Deviation From §20.9, Recorded Rather Than Left As Drift
 
 §20.9's chosen shape says the replacement must be "drawn from a static, versioned clinical vocabulary, so an arbitrary word cannot be proposed. Same mechanism as ID-constrained citations". **What shipped is not that.** The owner chose the character-class shape on 09/09/26, after the alternative was put with its trade-off.
 
-| §20.9 as decided 06/09/26                                  | Shipped 09/09/26                                                                          |
+| §20.9 As Decided 06/09/26                                  | Shipped 09/09/26                                                                          |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Replacement is an enum over a versioned vocabulary         | Replacement matches a character class, at most two words                                  |
 | Hallucinated or out-of-domain word structurally impossible | Hallucinated word bounded by the uncertainty gate and the two overlap rules, not excluded |
 | Cannot fix a mishear whose target is outside the register  | Can fix any word-level mishear                                                            |
 
-**State the cost plainly.** §20.7 names "no chest pain" becoming "some chest pain" as the harm this layer must not create, and §20.9 credited the vocabulary constraint with making it structurally unreachable. Under the shipped shape it is not unreachable: a negation flip is one word, passes the character class, and would be caught only if the span sits outside every uncertain range or overlaps a fired flag's evidence. The prompt forbids it, and a prompt is a Tier-4 control that does not count. `ASR_VOCABULARY_VERSION` already exists in `backend/src/lib/asr/vocabulary.ts`, so tightening this to an enum later is a small diff, and it is the first thing to reach for if a measurement shows over-correction.
+**State The Cost Plainly.** §20.7 names "no chest pain" becoming "some chest pain" as the harm this layer must not create, and §20.9 credited the vocabulary constraint with making it structurally unreachable. Under the shipped shape it is not unreachable: a negation flip is one word, passes the character class, and would be caught only if the span sits outside every uncertain range or overlaps a fired flag's evidence. The prompt forbids it, and a prompt is a Tier-4 control that does not count. `ASR_VOCABULARY_VERSION` already exists in `backend/src/lib/asr/vocabulary.ts`, so tightening this to an enum later is a small diff, and it is the first thing to reach for if a measurement shows over-correction.
 
 #### Off By Default, And What Would Turn It On
 
@@ -1544,11 +1544,11 @@ The one thing about this design that could be verified without a provider key, v
 | Probe                                             | Result                                                            |
 | ------------------------------------------------- | ----------------------------------------------------------------- |
 | `wss://stt-rt.soniox.com/transcribe-websocket`    | Socket **opened**. The policy permits it and the endpoint answers |
-| `wss://stt-rt.eu.soniox.com/transcribe-websocket` | **Refused by `connect-src`** before any connection was attempted  |
+| `wss://stt-rt.eu.soniox.com/transcribe-websocket` | **Refused By `connect-src`** before any connection was attempted  |
 
 The second row is the one worth keeping. It means the policy is pinned to one region rather than to the vendor, so moving `SONIOX_REGION` without moving the CSP host fails closed in the browser instead of quietly streaming somewhere else. It also confirms the pairing this section claims: redirecting this egress needs both a bad response and a policy change.
 
-**This measures reachability and policy, and nothing about recognition.** No audio was sent and no key was used.
+**This Measures Reachability And Policy, And Nothing About Recognition.** No audio was sent and no key was used.
 
 ### Measured 06/09/26: What The Endpoint Actually Does
 
@@ -1560,9 +1560,9 @@ Run against the real endpoint with the production credential, on a mint and two 
 | Mint response                        | `{ api_key, expires_at }` and nothing else. The quarantined schema matches exactly                                                                           |
 | Config frame                         | Accepted. The first reply carries `tokens`, `final_audio_proc_ms` and `total_audio_proc_ms`                                                                  |
 | Error shape                          | `error_code`, `error_type`, `error_message`, `more_info`, `request_id`. **Only `error_code` survives our schema**, which is the point of writing it that way |
-| **Does one key open one connection** | **No. A second connection on the same key was accepted.** This was an assumption and it was wrong                                                            |
+| **Does One Key Open One Connection** | **No. A Second Connection On The Same Key Was Accepted.** This was an assumption and it was wrong                                                            |
 
-**The last row is the one that changes a control.** The session cap bounds how long each stream may run; it does not bound how many streams a key can start. What narrows that is the key's own lifetime, which is why it is thirty seconds rather than the sixty first written: the browser already holds an open microphone before it asks for a key, so the gap between minting and connecting is one round trip, and the slow part, the permission prompt, deliberately happens first.
+**The Last Row Is The One That Changes A Control.** The session cap bounds how long each stream may run; it does not bound how many streams a key can start. What narrows that is the key's own lifetime, which is why it is thirty seconds rather than the sixty first written: the browser already holds an open microphone before it asks for a key, so the gap between minting and connecting is one round trip, and the slow part, the permission prompt, deliberately happens first.
 
 **It does not close the spend gap, and this section does not claim it does.** No global budget exists. `.claude/rules/security.md` states that as a gap rather than implying coverage, and it is the follow-up worth doing before this path is pointed at anything real.
 
@@ -1578,18 +1578,18 @@ Vendor statements, read 06/09/26 and **unverified by us**: real-time audio and t
 
 ### Measured 07/10/26: Roles Now Follow The Voice (#388)
 
-**The mix-up was two problems, and only one was the provider's.** Two synthetic voices read scripted URTI consultations in English and Malay. The audio was joined at known turn boundaries and streamed through a production-minted ambient session exactly as the SPA streams it. Each segment's speaker and drafted role were then scored against the script.
+**The Mix-Up Was Two Problems, And Only One Was The Provider's.** Two synthetic voices read scripted URTI consultations in English and Malay. The audio was joined at known turn boundaries and streamed through a production-minted ambient session exactly as the SPA streams it. Each segment's speaker and drafted role were then scored against the script.
 
-| Condition, 5 voice pairs           | Diarisation                                          | Labelling pass      | Pattern fallback | Either, after the vote |
+| Condition, 5 Voice Pairs           | Diarisation                                          | Labelling Pass      | Pattern Fallback | Either, After The Vote |
 | ---------------------------------- | ---------------------------------------------------- | ------------------- | ---------------- | ---------------------- |
 | Clean turns, 600 ms apart, English | 100% of segments                                     | 79 to 100% of words | 98% of words     | 100%                   |
 | Clean turns, Malay                 | 100%                                                 | 94 to 100%          | 59 to 63%        | 100%                   |
 | Room echo and noise, 150 ms apart  | 100%                                                 | 94 to 100%          | 60 to 98%        | 100%                   |
 | Turns overlapping by 300 ms        | 91%, and one Malay pair merged into a single speaker | not scored          | not scored       | unchanged, by design   |
 
-- **Stored roles ignored the diariser.** Both the labelling pass and its fallback draft roles from text alone. Text cannot place a bare "Okay", and the fallback's patterns do not read Malay. `voteRolesBySpeaker` now gives each line the role its voice was drafted most often, and cuts a drafted line where the voice changes.
-- **The vote stands down when diarisation cannot be trusted.** It acts only with two voices that each hold enough of the words and a decisive lead for one of them. The merged Malay run therefore kept its drafted roles rather than flipping wholesale.
-- **What the doctor saw on screen is the provider's.** The live chips show the provider's speaker numbers, and overlapping speech is what moved them in these runs. Nothing here changes those numbers. The thresholds are set from synthetic runs, and real consulting-room audio is unmeasured.
+- **Stored Roles Ignored The Diariser.** Both the labelling pass and its fallback draft roles from text alone. Text cannot place a bare "Okay", and the fallback's patterns do not read Malay. `voteRolesBySpeaker` now gives each line the role its voice was drafted most often, and cuts a drafted line where the voice changes.
+- **The Vote Stands Down When Diarisation Cannot Be Trusted.** It acts only with two voices that each hold enough of the words and a decisive lead for one of them. The merged Malay run therefore kept its drafted roles rather than flipping wholesale.
+- **What The Doctor Saw On Screen Is The Provider's.** The live chips show the provider's speaker numbers, and overlapping speech is what moved them in these runs. Nothing here changes those numbers. The thresholds are set from synthetic runs, and real consulting-room audio is unmeasured.
 
 ### Follow-Ups This Section Creates
 
@@ -1610,10 +1610,10 @@ Vendor statements, read 06/09/26 and **unverified by us**: real-time audio and t
 
 | Pane                    | Source                                        | Cadence              |
 | ----------------------- | --------------------------------------------- | -------------------- |
-| **Red flags**           | `evaluateRedFlags`, deterministic, no model   | Every closed segment |
-| **Missing information** | `deriveGaps` over the merged facts, no model  | Every 12 s, at most  |
-| **Patient card**        | `live_facts` through `LLMClient`, then merged | Every 12 s, at most  |
-| **The note**            | Unchanged. `analyseNote` at Finish            | Once, at the end     |
+| **Red Flags**           | `evaluateRedFlags`, deterministic, no model   | Every closed segment |
+| **Missing Information** | `deriveGaps` over the merged facts, no model  | Every 12 s, at most  |
+| **Patient Card**        | `live_facts` through `LLMClient`, then merged | Every 12 s, at most  |
+| **The Note**            | Unchanged. `analyseNote` at Finish            | Once, at the end     |
 
 Two routes rather than one, because the cadences differ by roughly 40x and the fast pane must not wait on the slow one. Neither writes a `Consultation` column nor moves `status`; the precedent is `POST /analyze-ephemeral`.
 
@@ -1656,9 +1656,9 @@ Each window repeats the previous window's last closed segment. `findDeniedAbilit
 
 ### What This Does Not Do
 
-- **No spend cap**, per-actor or global. The two limiters bound a caller, not a bill. Same open gap as `hostedAsrRateLimit`.
-- **Nothing is persisted**, so a reload loses the live panes exactly as it loses the transcript. A dropped socket now reconnects; a reload is only guarded by the leave-page prompt (#256, D-010).
-- **The live pass is additive and advisory.** It can surface a flag earlier than Finish would; it can never remove one. `evaluateRedFlags` over the whole stored transcript at Finish stays the authoritative, persisted, audited run.
+- **No Spend Cap**, per-actor or global. The two limiters bound a caller, not a bill. Same open gap as `hostedAsrRateLimit`.
+- **Nothing Is Persisted**, so a reload loses the live panes exactly as it loses the transcript. A dropped socket now reconnects; a reload is only guarded by the leave-page prompt (#256, D-010).
+- **The Live Pass Is Additive And Advisory.** It can surface a flag earlier than Finish would; it can never remove one. `evaluateRedFlags` over the whole stored transcript at Finish stays the authoritative, persisted, audited run.
 
 ---
 
@@ -1682,14 +1682,14 @@ Researched 28/09/26 across Soniox, the hyperscalers, and specialist and open-sou
 | AWS Transcribe                  | **No**     | bn-IN only | No                       | Disqualified                                                   |
 | Deepgram, Speechmatics          | Yes        | Yes        | No                       | Recognition only, with no Urdu or Bengali translation          |
 
-- **The deciding property is egress.** Every other candidate is a third audio egress, needing a fresh sign-off, a CSP change, a new guard and a new way to authenticate a browser.
-- **Accuracy evidence for Urdu and Bengali is vendor-published everywhere.** Soniox quotes 6.3% WER for both, against Google at 13.4% and 48.9%. No independent benchmark covers any commercial vendor on either language.
-- **Independent numbers exist only for open models.** On FLEURS, SeamlessM4T v2 scores 9.6% CER on Urdu and 9.0% on Bengali. Whisper large-v3 scores 9.4% and 33.9%, so the on-device path is a poor fallback for Bengali in particular.
-- **Clinical guidance.** NHS England advises against automated translation in place of professional interpreters, for consent and high-stakes content above all.
+- **The Deciding Property Is Egress.** Every other candidate is a third audio egress, needing a fresh sign-off, a CSP change, a new guard and a new way to authenticate a browser.
+- **Accuracy Evidence For Urdu And Bengali Is Vendor-Published Everywhere.** Soniox quotes 6.3% WER for both, against Google at 13.4% and 48.9%. No independent benchmark covers any commercial vendor on either language.
+- **Independent Numbers Exist Only For Open Models.** On FLEURS, SeamlessM4T v2 scores 9.6% CER on Urdu and 9.0% on Bengali. Whisper large-v3 scores 9.4% and 33.9%, so the on-device path is a poor fallback for Bengali in particular.
+- **Clinical Guidance.** NHS England advises against automated translation in place of professional interpreters, for consent and high-stakes content above all.
 
 ### The Mechanism
 
-| Piece       | What it is                                                                                                                                                                                               |
+| Piece       | What It Is                                                                                                                                                                                               |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Request     | `POST /api/asr/live-sessions` takes `translation: 'ur' \| 'bn'`, valid with `mode: 'ambient'` only. Consent, cap and rate-limit bucket are ambient's, unchanged                                          |
 | Config      | `translatedAmbientConfig(language)` in `backend/src/lib/asr/soniox.ts`, a written-out table selected by a closed enum. `liveSessionConfig` is untouched                                                  |
@@ -1704,7 +1704,7 @@ Researched 28/09/26 across Soniox, the hyperscalers, and specialist and open-sou
 
 | Question                                   | Answer                                                                                                                             |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Where does a translated segment end?       | **Translations arrive in lockstep.** Every translation run directly follows the original chunk it translates, with zero violations |
+| Where does a translated segment end?       | **Translations Arrive In Lockstep.** Every translation run directly follows the original chunk it translates, with zero violations |
 | Does `<end>` ever precede its translation? | Never. With endpoint detection off the lockstep still holds, so it belongs to the translation pipeline rather than to endpointing  |
 | Timing on translation tokens               | None. Turn timing comes from the original tokens                                                                                   |
 | Non-final translation tokens               | None seen. Translations arrive final, 10 to 60 ms after their original chunk                                                       |
@@ -1714,11 +1714,11 @@ Researched 28/09/26 across Soniox, the hyperscalers, and specialist and open-sou
 | `language_hints_strict`                    | Accepted, and behaved identically to plain hints, so it is not used                                                                |
 | Latency                                    | Text settles about 0.7 s after the speaker stops, and the translation follows within about 50 ms                                   |
 
-**The lockstep is what makes pairing safe.** `findDeniedAbility` composes an emergency flag from turn adjacency alone on unreviewed labels, so a translated "No." attached to the wrong turn would silently drop that flag. Pairing each translation with the chunk directly before it is deterministic, and the UI tests pin it (#393).
+**The Lockstep Is What Makes Pairing Safe.** `findDeniedAbility` composes an emergency flag from turn adjacency alone on unreviewed labels, so a translated "No." attached to the wrong turn would silently drop that flag. Pairing each translation with the chunk directly before it is deterministic, and the UI tests pin it (#393).
 
 ### Measured 28/09/26: Malay Is The Dangerous Case
 
-| Hints                  | The patient says "Tak ada, doktor." ("No, doctor")                                          |
+| Hints                  | The Patient Says "Tak Ada, Doktor." ("No, Doctor")                                          |
 | ---------------------- | ------------------------------------------------------------------------------------------- |
 | `[bn, en]`             | Heard as Bengali script "তা আদা, ডক্টর।" and translated **"Yes, doctor."**, a negation flip |
 | `[bn, en]` plus strict | The same flip                                                                               |
@@ -1730,9 +1730,9 @@ This is §20.1 finding 2 on a new vendor: declaring the wrong language produces 
 
 One patient sentence per trigger, in each language, run through the real engine:
 
-- **Before #390: 7/12 in both languages.** Every translation was semantically right. The five misses were plain English the engine lacked: "blood is coming along with the cough", saliva coming out of the mouth, "my body is shaking", "passed out" and "haven't been able to urinate".
+- **Before #390: 7/12 In Both Languages.** Every translation was semantically right. The five misses were plain English the engine lacked: "blood is coming along with the cough", saliva coming out of the mouth, "my body is shaking", "passed out" and "haven't been able to urinate".
 - **After #390: 12/12.** `redflag-list-v13` appends those forms. Review of #390 also found "No, I haven't been able to urinate" silenced by its leading "No". That is fixed and pinned.
-- **Full dialogues.** Both raise chest pain, dyspnoea, fever, and the swallowing flag from "Can you swallow?" followed by "No.". The negated "No blood comes with the cough" raises nothing.
+- **Full Dialogues.** Both raise chest pain, dyspnoea, fever, and the swallowing flag from "Can you swallow?" followed by "No.". The negated "No blood comes with the cough" raises nothing.
 
 ### Decisions A Reviewer Will Question
 
@@ -1748,18 +1748,18 @@ One patient sentence per trigger, in each language, run through the real engine:
 
 ### Never Sent To A Model
 
-- **What is shielded.** `otherLanguage.text` is Bengali or Urdu script, which no name detector reads, so a name written in it would pass them untouched.
-- **What enforces it.** `backend/src/deid/no-stray-other-language.test.ts` pins it behaviourally, on `serialiseTranscript` and the copilot digest.
-- **Structurally, too.** The same test finds the field named nowhere in backend source. The API stores the transcript and never needs to read this field. That half matches the name only, so a spread or a stringified transcript would slip past it.
-- **At the gate, whatever a client sends.** The `SCRIPT` detector (#391) tokenises any run of Bengali, Arabic or Devanagari script, so script reaching model-bound text by any route becomes a token. `assertNoIdentifiers` re-runs it at egress.
-- **The gap that remains, narrowed (#418).** Chinese and Tamil script sit outside `SCRIPT` on purpose, because ambient capture hints both and tokenising them would blind the note. A name in either is now tokenised where a cue marks it: a self-introduction ("我叫", "我姓", "என் பெயர்", or a Latin "my name is" or "nama saya" before the script) or a title (the surname alone directly before 先生, 小姐 or 医生, where it starts a word; one word after திரு, திருமதி or செல்வி). A Chinese name must open on a listed surname unless it ends the clause, and a cued name that ends a clause is found again where it repeats. A name said with neither still passes the gate on the untranslated Auto-detect path (`decisions/` D-011).
-- **Mandarin and Tamil on a translated session.** The original rides in `otherLanguage` like Urdu and Bengali, and the script guard in `frontend/src/audio/live/bilingual.ts`, an allowlist of Latin script, keeps Chinese, Tamil and any neighbouring script out of `turn.text`. It runs in the browser, so on these two pairs it and `no-stray-other-language.test.ts` are the protection, with no gate-side backstop: a client other than the SPA, or a doctor's edit to the transcript, bypasses it, exactly as on Auto-detect.
-- **Pinyin names.** Mandarin translation spells a Chinese name in Pinyin, which the Malaysian romanisations in the gazetteer never match, so thirty common Pinyin surnames were added with #385.
+- **What Is Shielded.** `otherLanguage.text` is Bengali or Urdu script, which no name detector reads, so a name written in it would pass them untouched.
+- **What Enforces It.** `backend/src/deid/no-stray-other-language.test.ts` pins it behaviourally, on `serialiseTranscript` and the copilot digest.
+- **Structurally, Too.** The same test finds the field named nowhere in backend source. The API stores the transcript and never needs to read this field. That half matches the name only, so a spread or a stringified transcript would slip past it.
+- **At The Gate, Whatever A Client Sends.** The `SCRIPT` detector (#391) tokenises any run of Bengali, Arabic or Devanagari script, so script reaching model-bound text by any route becomes a token. `assertNoIdentifiers` re-runs it at egress.
+- **The Gap That Remains, Narrowed (#418).** Chinese and Tamil script sit outside `SCRIPT` on purpose, because ambient capture hints both and tokenising them would blind the note. A name in either is now tokenised where a cue marks it: a self-introduction ("我叫", "我姓", "என் பெயர்", or a Latin "my name is" or "nama saya" before the script) or a title (the surname alone directly before 先生, 小姐 or 医生, where it starts a word; one word after திரு, திருமதி or செல்வி). A Chinese name must open on a listed surname unless it ends the clause, and a cued name that ends a clause is found again where it repeats. A name said with neither still passes the gate on the untranslated Auto-detect path (`decisions/` D-011).
+- **Mandarin And Tamil On A Translated Session.** The original rides in `otherLanguage` like Urdu and Bengali, and the script guard in `frontend/src/audio/live/bilingual.ts`, an allowlist of Latin script, keeps Chinese, Tamil and any neighbouring script out of `turn.text`. It runs in the browser, so on these two pairs it and `no-stray-other-language.test.ts` are the protection, with no gate-side backstop: a client other than the SPA, or a doctor's edit to the transcript, bypasses it, exactly as on Auto-detect.
+- **Pinyin Names.** Mandarin translation spells a Chinese name in Pinyin, which the Malaysian romanisations in the gazetteer never match, so thirty common Pinyin surnames were added with #385.
 - **Erasure.** `eraseConsultation` already nulls the whole transcript column, originals included.
 
 ### What Is Not Measured
 
-| Unmeasured                             | Why it matters                                                                                                          |
+| Unmeasured                             | Why It Matters                                                                                                          |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Accuracy on real speech                | #389 used clean synthetic voices. It measures the wire and the pipeline, not recognition quality                        |
 | Translation quality                    | No vendor publishes BLEU or COMET for Urdu or Bengali, and nothing here scores it                                       |
@@ -1768,7 +1768,7 @@ One patient sentence per trigger, in each language, run through the real engine:
 | Pashto and Sindhi                      | Not supported by the vendor                                                                                             |
 | Overlapping speech, load, clinic noise | None of these occur in synthetic audio                                                                                  |
 
-**Machine translation is a third fabrication surface**, after recognition and before the engine. §20.3 finding 1 has already measured a translation erasing the exact phrase the chest-pain trigger matches. This does not establish translated accuracy.
+**Machine Translation Is A Third Fabrication Surface**, after recognition and before the engine. §20.3 finding 1 has already measured a translation erasing the exact phrase the chest-pain trigger matches. This does not establish translated accuracy.
 
 ### Follow-Ups
 
@@ -1793,9 +1793,9 @@ One patient sentence per trigger, in each language, run through the real engine:
 
 **Update 16/10/26:** batch `scribe_v2` was adopted for post-Stop refinement of untranslated ambient consultations (§20.14). The realtime verdict above is unchanged.
 
-- **The question.** The owner asked whether Scribe v2 Realtime can replace Soniox `stt-rt-v5`. The motive was accuracy.
-- **The hard requirement.** Diarisation, because ambient capture is a doctor and a patient.
-- **Languages that matter.** English, Malay, Mandarin and Tamil, plus code-switching. Translation is not a priority yet.
+- **The Question.** The owner asked whether Scribe v2 Realtime can replace Soniox `stt-rt-v5`. The motive was accuracy.
+- **The Hard Requirement.** Diarisation, because ambient capture is a doctor and a patient.
+- **Languages That Matter.** English, Malay, Mandarin and Tamil, plus code-switching. Translation is not a priority yet.
 
 ### Scope Change And How It Is Recorded
 
@@ -1819,8 +1819,8 @@ Written before any run, before the scope widened.
 
 | Question                                 | Answer                                                                                                                                                                                                                                                                                                                                       |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ambient replacement                      | **Fails on diarisation alone, in every language.** Soniox stays                                                                                                                                                                                                                                                                              |
-| Accuracy motive                          | **Mixed, not met.** Pooled Manglish and Malay is 4.5% against 5.6%, a 1.1-point difference under the 2-point bar                                                                                                                                                                                                                             |
+| Ambient replacement                      | **Fails On Diarisation Alone, In Every Language.** Soniox stays                                                                                                                                                                                                                                                                              |
+| Accuracy motive                          | **Mixed, Not Met.** Pooled Manglish and Malay is 4.5% against 5.6%, a 1.1-point difference under the 2-point bar                                                                                                                                                                                                                             |
 | Clean turns, Scribe Realtime             | Better than Soniox on Malay, Malay with English, Mandarin and Malaysian Mandarin; about level on English                                                                                                                                                                                                                                     |
 | Where it is worse                        | Much worse on Tamil, loses turns under overlap, changes script under automatic language, and fabricates symptoms when tuned to commit per turn                                                                                                                                                                                               |
 | Any safe configuration                   | None tested was safe across all four languages                                                                                                                                                                                                                                                                                               |
@@ -1839,7 +1839,7 @@ Written before any run, before the scope widened.
 | Feeding      | Every arm got the same PCM in 250 ms real-time-paced slices, as the SPA sends it                                                                                                                                                                                                                                                    |
 | Attribution  | Share of words, each placed in a ground-truth turn by its timestamp midpoint (words inside an overlap excluded), whose speaker label matches the turn under the best one-to-one label-to-role mapping                                                                                                                               |
 
-**Authored fixtures:**
+**Authored Fixtures:**
 
 | Fixture                           | Content                                                          |
 | --------------------------------- | ---------------------------------------------------------------- |
@@ -1869,7 +1869,7 @@ Written before any run, before the scope widened.
 | Diarize probe                   | The `ms` variant plus `diarize=true` and `num_speakers=2` on the realtime socket                                                                                                                                                                                                                                                                        |
 | Batch reference                 | `scribe_v2_medical` on the finished file, `diarize=true`, `num_speakers=2`, word timestamps, all 120 terms as keyterms                                                                                                                                                                                                                                  |
 
-**Harness self-check, passed before any Scribe number was read:**
+**Harness Self-Check, Passed Before Any Scribe Number Was Read:**
 
 - Soniox attributed 100% of words on clean turns, as #388 measured.
 - Soniox read the Malay fixture at 7.8% WER (#218 measured 9.4% on different lines).
@@ -1885,17 +1885,17 @@ Manglish and Malay fixtures pooled, 12 results per cell. The rule is applied to 
 | `scribe_v2_realtime`, auto | 5.9%      | 22.3%       | 0%               | 0%                     | 0%                       |
 | `scribe_v2_medical`, batch | 4.5%      | 5.3%        | 100%             | 61.6%                  | 67.5%                    |
 
-- **Per-run WER, both conditions pooled.** Soniox 5.6 / 6.1 / 5.8%; Scribe Realtime ms 13.0 / 13.0 / 13.3%; batch medical 4.4 / 5.5 / 4.8%.
-- **English fixture.** Soniox 3.1% clean / 3.5% overlap, 100% attribution. Scribe Realtime ms 2.7% / 2.7%, 0% attribution. Batch medical 1.9% / 2.7%, 91.7% / 75.7% attribution.
-- **The Malay-only gap of 2.6 points** (Soniox 7.8%, Scribe Realtime ms 5.2%, clean) is a subgroup read after the fact. It is recorded as an observation and not as a win under the rule.
+- **Per-Run WER, Both Conditions Pooled.** Soniox 5.6 / 6.1 / 5.8%; Scribe Realtime ms 13.0 / 13.0 / 13.3%; batch medical 4.4 / 5.5 / 4.8%.
+- **English Fixture.** Soniox 3.1% clean / 3.5% overlap, 100% attribution. Scribe Realtime ms 2.7% / 2.7%, 0% attribution. Batch medical 1.9% / 2.7%, 91.7% / 75.7% attribution.
+- **The Malay-Only Gap Of 2.6 Points** (Soniox 7.8%, Scribe Realtime ms 5.2%, clean) is a subgroup read after the fact. It is recorded as an observation and not as a win under the rule.
 
 ### Results On The Widened Scope
 
 Additional evidence, not the basis of the verdict. Error rates in percent. Scribe RT is Scribe Realtime. "VAD 0.5 s" is the partial best-effort arm.
 
-**Clean turns:**
+**Clean Turns:**
 
-| Fixture                            | Metric          | Soniox | Scribe RT (ms) | Scribe RT (auto) | Scribe RT (ms, VAD 0.5 s, partial) | Batch |
+| Fixture                            | Metric          | Soniox | Scribe RT (ms) | Scribe RT (Auto) | Scribe RT (ms, VAD 0.5 s, Partial) | Batch |
 | ---------------------------------- | --------------- | ------ | -------------- | ---------------- | ---------------------------------- | ----- |
 | Malay                              | WER             | 7.8    | 5.2            | 9.1              | 8.8                                | 4.1   |
 | Malay + English words              | WER             | 11.7   | 5.1            | 5.1              | 9.4                                | 5.1   |
@@ -1908,9 +1908,9 @@ Additional evidence, not the basis of the verdict. Error rates in percent. Scrib
 | Tamil + English                    | WER, marks kept | 12.8   | 36.9           | 71.5             | 25.0                               | 82.7  |
 | Three languages, rare              | CER             | 8.7    | 36.4           | 36.9             | 34.9                               | 16.1  |
 
-**Turns overlapping by 300 ms:**
+**Turns Overlapping By 300 ms:**
 
-| Fixture                            | Metric          | Soniox | Scribe RT (ms) | Scribe RT (auto) | Scribe RT (ms, VAD 0.5 s, partial) | Batch |
+| Fixture                            | Metric          | Soniox | Scribe RT (ms) | Scribe RT (Auto) | Scribe RT (ms, VAD 0.5 s, Partial) | Batch |
 | ---------------------------------- | --------------- | ------ | -------------- | ---------------- | ---------------------------------- | ----- |
 | Malay                              | WER             | 9.5    | 6.9            | 8.4              | 7.1                                | 4.8   |
 | Malay + English words              | WER             | 11.4   | 6.1            | 6.1              | 6.1                                | 5.1   |
@@ -1923,7 +1923,7 @@ Additional evidence, not the basis of the verdict. Error rates in percent. Scrib
 | Tamil + English                    | WER, marks kept | 16.7   | 7.7            | 48.1             | 8.7                                | 32.7  |
 | Three languages, rare              | CER             | 8.8    | 23.9           | 24.9             | 30.6                               | 9.3   |
 
-**Number-blind, clean turns:**
+**Number-Blind, Clean Turns:**
 
 | Fixture               | Soniox | Scribe RT (ms) |
 | --------------------- | ------ | -------------- |
@@ -1934,7 +1934,7 @@ Additional evidence, not the basis of the verdict. Error rates in percent. Scrib
 
 Digits therefore account for about half of Soniox's Mandarin and Tamil error.
 
-**Speaker attribution, every in-scope fixture, both conditions:**
+**Speaker Attribution, Every In-Scope Fixture, Both Conditions:**
 
 | Arm                          | Words Attributed                                                                  |
 | ---------------------------- | --------------------------------------------------------------------------------- |
@@ -1946,14 +1946,14 @@ Digits therefore account for about half of Soniox's Mandarin and Tamil error.
 
 | #   | Finding                                                                            | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | --- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **No diarisation on the realtime model**                                           | 0 of 25,187 words across 364 Scribe Realtime streams carried a speaker. `diarize=true` and `num_speakers=2` on the socket are silently ignored: no error, no warning, and the `session_started` config does not echo them. ElevenLabs documents diarisation only for the batch models                                                                                                                                                                                                                                                                                                                                                  |
-| 2   | **Drops a speaker under overlap**                                                  | Manglish fixture: 0 of 6 doctor turns for one voice pair and 4 of 6 for the other, on every run. Tamil: the doctor's question "காய்ச்சல் இருக்கிறதா?" ("Do you have a fever?") survived in 3 of 12 results. Soniox and batch kept 12 of 12. Losing a doctor's question matters beyond WER: the red-flag engine reads the question-denial shape                                                                                                                                                                                                                                                                                         |
-| 3   | **Changes script under automatic language**                                        | Tamil with English came back in Devanagari ("इन्नकी एन्ना problem"). Overlapping Malaysian Mandarin came back as pinyin ("Nihao, jingtian shi yao wèn ti"), which is where the 199.8% CER comes from                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| 4   | **Fabricates and inverts symptoms when committing per turn**                       | With 0.5 s VAD (partial arm), short Mandarin turns were relabelled Malay or English and rewritten. "喉咙痛吗？" ("Sore throat?") became "Hidung tersumbat" ("blocked nose"), a symptom nobody said. "有没有发烧？" became "You have fever?". "有，晚上会发烧" became "You, when shall we have a show?". A Mandarin result came back partly in Latin script in 4 of 8 runs. Tamil "மூச்சு விடுவதில் சிரமம் இல்லை" ("no difficulty breathing") became "சிரமம் மிகுந்து விட்டது" ("the difficulty has increased") in 2 of 8, a fabricated red-flag symptom. The setting that would fix long-segment truncation makes the output less safe |
-| 5   | **Truncates Tamil mid-character**                                                  | The text ended in U+FFFD in 4 of 120 results for each realtime config, never on Soniox or batch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| 6   | **The medical batch model merges voices and, with our Malay keyterms, translates** | It returned the Tamil-with-English consultation as Malay ("Selamat pagi. Hari ini apa masalahnya?"), hence 82.7%. Without keyterms the medical model read Tamil with English at 1.5%, so the translation came from the medical model combined with Malay keyterms. Its diarisation is 51 to 92%, with some runs returning one voice. The standard `scribe_v2` model behaves differently: see the next subsection                                                                                                                                                                                                                       |
-| 7   | **Soniox makes its own errors**                                                    | On Malay with English words, the most common Malaysian shape, Soniox heard "Ada batuk sikit" ("a little cough") as "Tak ada batuk" ("no cough") in 3 of 12 results, a negation flip. It lost "chest pain" (as "chestbone") in 3 of 12, and misheard 咳嗽 ("cough") as 可搜 in some Mandarin results. Every ElevenLabs arm kept "a little cough" and "chest pain" in 12 of 12. Scribe Realtime reads clean Malay and Mandarin better than Soniox does                                                                                                                                                                                   |
-| 8   | **Commit latency is not comparable**                                               | Scribe's committed text arrived a median 1.2 to 2.0 s after the last word; Soniox's final tokens 5.3 to 5.7 s, because ambient runs with endpoint detection off by design (§20.10) and shows non-final tokens immediately. VAD commits need 1.5 s of silence, so on the overlap audio Scribe committed nothing until the stream ended                                                                                                                                                                                                                                                                                                  |
+| 1   | **No Diarisation On The Realtime Model**                                           | 0 of 25,187 words across 364 Scribe Realtime streams carried a speaker. `diarize=true` and `num_speakers=2` on the socket are silently ignored: no error, no warning, and the `session_started` config does not echo them. ElevenLabs documents diarisation only for the batch models                                                                                                                                                                                                                                                                                                                                                  |
+| 2   | **Drops A Speaker Under Overlap**                                                  | Manglish fixture: 0 of 6 doctor turns for one voice pair and 4 of 6 for the other, on every run. Tamil: the doctor's question "காய்ச்சல் இருக்கிறதா?" ("Do you have a fever?") survived in 3 of 12 results. Soniox and batch kept 12 of 12. Losing a doctor's question matters beyond WER: the red-flag engine reads the question-denial shape                                                                                                                                                                                                                                                                                         |
+| 3   | **Changes Script Under Automatic Language**                                        | Tamil with English came back in Devanagari ("इन्नकी एन्ना problem"). Overlapping Malaysian Mandarin came back as pinyin ("Nihao, jingtian shi yao wèn ti"), which is where the 199.8% CER comes from                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 4   | **Fabricates And Inverts Symptoms When Committing Per Turn**                       | With 0.5 s VAD (partial arm), short Mandarin turns were relabelled Malay or English and rewritten. "喉咙痛吗？" ("Sore throat?") became "Hidung tersumbat" ("blocked nose"), a symptom nobody said. "有没有发烧？" became "You have fever?". "有，晚上会发烧" became "You, when shall we have a show?". A Mandarin result came back partly in Latin script in 4 of 8 runs. Tamil "மூச்சு விடுவதில் சிரமம் இல்லை" ("no difficulty breathing") became "சிரமம் மிகுந்து விட்டது" ("the difficulty has increased") in 2 of 8, a fabricated red-flag symptom. The setting that would fix long-segment truncation makes the output less safe |
+| 5   | **Truncates Tamil Mid-Character**                                                  | The text ended in U+FFFD in 4 of 120 results for each realtime config, never on Soniox or batch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 6   | **The Medical Batch Model Merges Voices And, With Our Malay Keyterms, Translates** | It returned the Tamil-with-English consultation as Malay ("Selamat pagi. Hari ini apa masalahnya?"), hence 82.7%. Without keyterms the medical model read Tamil with English at 1.5%, so the translation came from the medical model combined with Malay keyterms. Its diarisation is 51 to 92%, with some runs returning one voice. The standard `scribe_v2` model behaves differently: see the next subsection                                                                                                                                                                                                                       |
+| 7   | **Soniox Makes Its Own Errors**                                                    | On Malay with English words, the most common Malaysian shape, Soniox heard "Ada batuk sikit" ("a little cough") as "Tak ada batuk" ("no cough") in 3 of 12 results, a negation flip. It lost "chest pain" (as "chestbone") in 3 of 12, and misheard 咳嗽 ("cough") as 可搜 in some Mandarin results. Every ElevenLabs arm kept "a little cough" and "chest pain" in 12 of 12. Scribe Realtime reads clean Malay and Mandarin better than Soniox does                                                                                                                                                                                   |
+| 8   | **Commit Latency Is Not Comparable**                                               | Scribe's committed text arrived a median 1.2 to 2.0 s after the last word; Soniox's final tokens 5.3 to 5.7 s, because ambient runs with endpoint detection off by design (§20.10) and shows non-final tokens immediately. VAD commits need 1.5 s of silence, so on the overlap audio Scribe committed nothing until the stream ended                                                                                                                                                                                                                                                                                                  |
 
 ### Batch `scribe_v2`: The Non-Streaming Option (Measured 15/10/26)
 
@@ -1969,7 +1969,7 @@ The owner asked whether batch Scribe v2 can diarise as a non-streaming option: t
 | (d)    | `scribe_v2`, `num_speakers=2` with `detect_speaker_roles=true`, which labels speakers `agent` and `customer` |
 | (e)    | `scribe_v2_medical`, defaults                                                                                |
 
-**Diarisation, in-scope fixtures pooled.** Each cell is word attribution / turn majority, then the results that came back as one voice.
+**Diarisation, In-Scope Fixtures Pooled.** Each cell is word attribution / turn majority, then the results that came back as one voice.
 
 | Config                                            | Clean                  | Overlap                |
 | ------------------------------------------------- | ---------------------- | ---------------------- |
@@ -1981,9 +1981,9 @@ The owner asked whether batch Scribe v2 can diarise as a non-streaming option: t
 | `scribe_v2`, threshold 0.1                        | 99.8 / 100 (0 of 40)   | 98.4 / 96.8 (1 of 40)  |
 | `scribe_v2`, roles                                | 99.5 / 100 (0 of 40)   | 100 / 98.3 (0 of 40)   |
 
-**Doctor and patient, named directly.** `detect_speaker_roles` labelled the doctor `agent` and the patient `customer` on 99.5% of words clean and 100% overlap, read literally with no mapping. Soniox returns numbered speakers, which the app labels afterwards (`voteRolesBySpeaker`).
+**Doctor And Patient, Named Directly.** `detect_speaker_roles` labelled the doctor `agent` and the patient `customer` on 99.5% of words clean and 100% overlap, read literally with no mapping. Soniox returns numbered speakers, which the app labels afterwards (`voteRolesBySpeaker`).
 
-**Accuracy, number-blind.** `scribe_v2` with `num_speakers=2` and keyterms against Soniox, error rates in percent (WER, or CER for Chinese; Tamil with marks kept).
+**Accuracy, Number-Blind.** `scribe_v2` with `num_speakers=2` and keyterms against Soniox, error rates in percent (WER, or CER for Chinese; Tamil with marks kept).
 
 | Fixture                      | `scribe_v2` Clean | Soniox Clean | `scribe_v2` Overlap | Soniox Overlap |
 | ---------------------------- | ----------------- | ------------ | ------------------- | -------------- |
@@ -1999,9 +1999,9 @@ The owner asked whether batch Scribe v2 can diarise as a non-streaming option: t
 | Three languages, rare        | 14.0              | 7.1          | 17.7                | 7.2            |
 
 - **Tamil.** Batch's remaining Tamil differences are harmless: டாக்டர் written "doctor", and ஆமாம் written ஆமா. Soniox inserted ஞ and in one result dropped the patient's ஆமாம் ("yes").
-- **Raw WER on Malay.** Worse for batch (12.7% against 7.8%) because batch spells numbers out.
+- **Raw WER On Malay.** Worse for batch (12.7% against 7.8%) because batch spells numbers out.
 
-**Clinical-meaning checks.** `scribe_v2` configs (8 results each) against Soniox (12 results).
+**Clinical-Meaning Checks.** `scribe_v2` configs (8 results each) against Soniox (12 results).
 
 | Check                                         | Batch `scribe_v2` | Soniox   |
 | --------------------------------------------- | ----------------- | -------- |
@@ -2012,7 +2012,7 @@ The owner asked whether batch Scribe v2 can diarise as a non-streaming option: t
 | Mandarin rewritten in Latin script            | 0 of 8            | 0 of 12  |
 | Tamil with English translated into Malay      | 0 of 8            | 0 of 12  |
 
-**Wait after Stop.** Median wall time per minute of audio:
+**Wait After Stop.** Median wall time per minute of audio:
 
 | Config              | Seconds    |
 | ------------------- | ---------- |
@@ -2022,9 +2022,9 @@ The owner asked whether batch Scribe v2 can diarise as a non-streaming option: t
 
 Extrapolated, a 10-minute consultation would wait about a minute. That is unmeasured: the files were at most 40 s.
 
-**Browser-direct upload is possible.** `POST /v1/single-use-token/batch_scribe` minted a token with our key, so the audio need not pass through our servers. Not built, and not measured end to end.
+**Browser-Direct Upload Is Possible.** `POST /v1/single-use-token/batch_scribe` minted a token with our key, so the audio need not pass through our servers. Not built, and not measured end to end.
 
-**What it would cost the product:**
+**What It Would Cost The Product:**
 
 | Cost                                             | Detail                                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -2051,14 +2051,14 @@ Read 15/10/26, unverified by us.
 
 ### What It Would Have Cost To Adopt
 
-- **The code hard-wires Soniox.** `provider: z.literal('soniox')` and the websocket URL check in `shared/src/` (exported from `index.ts`), the CSP in `vercel.json`, and `no-stray-websocket.test.ts`.
-- **There is no ASR port in code,** despite §20's description.
-- **A second vendor is a new audio egress,** needing the owner's sign-off under §20.10.
+- **The Code Hard-Wires Soniox.** `provider: z.literal('soniox')` and the websocket URL check in `shared/src/` (exported from `index.ts`), the CSP in `vercel.json`, and `no-stray-websocket.test.ts`.
+- **There Is No ASR Port In Code,** despite §20's description.
+- **A Second Vendor Is A New Audio Egress,** needing the owner's sign-off under §20.10.
 
 ### Out Of Scope: Bengali, Urdu And Translation
 
-- **Not a reason for the verdict.** The owner placed these outside the languages that matter for ambient capture, and translation is not a priority yet.
-- **Recorded so it is not lost.** In `urti-script-mixed-paste`, Scribe Realtime omitted the Bengali and Urdu sentences with no marker, where Soniox returned both in the right scripts. Revisit if translated capture (§20.12) is prioritised.
+- **Not A Reason For The Verdict.** The owner placed these outside the languages that matter for ambient capture, and translation is not a priority yet.
+- **Recorded So It Is Not Lost.** In `urti-script-mixed-paste`, Scribe Realtime omitted the Bengali and Urdu sentences with no marker, where Soniox returned both in the right scripts. Revisit if translated capture (§20.12) is prioritised.
 
 ### What It Does Not Establish
 
@@ -2090,10 +2090,10 @@ Read 15/10/26, unverified by us.
 
 **Status: `Decided, building`.** Recorded 16/10/26 (issue #436, `docs/decisions/` D-014). Production is inert until the gated items below are done: nothing is offered while `ELEVENLABS_API_KEY` is unset, and the measurement gate has not run. Realtime stays on Soniox (§20.10, §20.13).
 
-- **What it does.** Soniox streams during capture exactly as before. After Stop on an untranslated ambient consultation, the whole recording is re-transcribed with batch ElevenLabs `scribe_v2`, and that is the transcript the doctor reviews.
-- **On failure.** Any failed sanity check, timeout, Skip, or lost connection keeps the live Soniox transcript, with a notice. Never silently.
+- **What It Does.** Soniox streams during capture exactly as before. After Stop on an untranslated ambient consultation, the whole recording is re-transcribed with batch ElevenLabs `scribe_v2`, and that is the transcript the doctor reviews.
+- **On Failure.** Any failed sanity check, timeout, Skip, or lost connection keeps the live Soniox transcript, with a notice. Never silently.
 - **Default.** On when configured, with a per-device opt-out.
-- **Depends on #435.** Batch writes identifiers as words, which the current de-identification gate cannot see (§20.13 measured the synthetic IC number returned as words in 8 of 8 results). This change must not merge before #435.
+- **Depends On #435.** Batch writes identifiers as words, which the current de-identification gate cannot see (§20.13 measured the synthetic IC number returned as words in 8 of 8 results). This change must not merge before #435.
 
 ### The Sign-Off
 
@@ -2122,11 +2122,11 @@ Read 15/10/26, unverified by us.
 
 **Phase.** A new `'refining'` phase sits between `'finishing'` and `'labelling'` in `AmbientCapture.tsx`, untranslated branch only. The mint and upload run under the upload timeout; the refined labelling and the check run under the labelling bound. A "Use Live Transcript" Skip button stops whichever is running and takes focus when the phase starts. Refinement never starts if the panel was unmounted after Stop. `onLiveChange(false)` now fires after delivery, in a `finally`, so Consultation Settings stay locked and the leave-page guard holds through refinement and labelling.
 
-**Why the check runs after labelling.** The clinical-safety review showed the engine is sensitive to where turns break: a negation reads back only within a turn, and a denied ability pairs adjacent turns. The recogniser's segments are not the turns the labelling pass and the voice vote make of them, so "nothing lost" on segments did not mean nothing lost in the record.
+**Why The Check Runs After Labelling.** The clinical-safety review showed the engine is sensitive to where turns break: a negation reads back only within a turn, and a denied ability pairs adjacent turns. The recogniser's segments are not the turns the labelling pass and the voice vote make of them, so "nothing lost" on segments did not mean nothing lost in the record.
 
 ### Controls
 
-| Control                  | How it is enforced                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Control                  | How It Is Enforced                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Key never in the SPA     | `backend/src/lib/asr/elevenlabs.ts` reads `ELEVENLABS_API_KEY` through `env` only. Unset gives 503 `asr_unavailable` and `batchRefinement` is absent from the config response, so other configs are byte-identical                                                                                                                                                                                                                                                                                                                                  |
 | Backend carries no audio | `elevenlabs.ts` is the only backend module that may talk to the vendor. The origin is a literal, `redirect: 'error'`, 10 s timeout, no retries, error bodies never read, status mapped to a closed reason set, response Zod-stripped to `{ token }`                                                                                                                                                                                                                                                                                                 |
@@ -2142,17 +2142,17 @@ Read 15/10/26, unverified by us.
 | Client-enforced surface  | The untranslated-ambient-only scope, the consent tick and the acceptance verdict are enforced in the SPA. The mint does not know the capture mode, and the token binds neither the mode nor the vendor parameters, so a caller holding a session could upload other audio under other settings. The 5/min limiter, the audit row and the vendor credit quota are what bound that, stated as a gap in `.claude/rules/security.md`                                                                                                                    |
 | One caller               | `frontend/src/no-stray-fetch.test.ts` also pins, across the whole SPA, that only `AmbientCapture.tsx` imports the upload module or mints a batch token, so no other surface can reach the egress the grant scopes to post-Stop ambient refinement                                                                                                                                                                                                                                                                                                   |
 
-**The refinement check.** The server runs `evaluateRedFlags` with `ALL_REDFLAG_TRIGGERS` over both sides, with `source: 'asr_live'` and `labelsReviewed: false` set server-side. The result is a differential: rule ids fired on live but not on refined. It writes no audit row (precedent: the live-flags route). Texts only, up to 1500 turns and 100000 characters per side.
+**The Refinement Check.** The server runs `evaluateRedFlags` with `ALL_REDFLAG_TRIGGERS` over both sides, with `source: 'asr_live'` and `labelsReviewed: false` set server-side. The result is a differential: rule ids fired on live but not on refined. It writes no audit row (precedent: the live-flags route). Texts only, up to 1500 turns and 100000 characters per side.
 
-**The speaker is set server-side too, and differs by side.** With unreviewed labels, the only label-dependent reading is the doctor-only safety-netting suppression, and it can only remove a hit.
+**The Speaker Is Set Server-Side Too, And Differs By Side.** With unreviewed labels, the only label-dependent reading is the doctor-only safety-netting suppression, and it can only remove a hit.
 
-| Side    | Read as                                                                      | Why                                                                                                                                                                                  |
+| Side    | Read As                                                                      | Why                                                                                                                                                                                  |
 | ------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Live    | Every turn the patient's, read by segment and as one whole turn, hits pooled | The most the live transcript could raise under any labelling. Segments alone are not an upper bound: a pause can split a phrase so neither half fires while the stored turn joins it |
 | Refined | Every turn the doctor's                                                      | The least the refined transcript could raise, so it passes whatever its labels end up                                                                                                |
 
-- **Why not the same reading on both sides.** That was the first design, and the clinical-safety review found it unsound. A patient's "I coughed up blood" dropped by the refined pass stayed covered by the doctor's closing "come back if you cough up blood" read as the patient's. Nothing looked lost, and the stored transcript, with the advice labelled the doctor's, raised no haemoptysis. `asr-refinement-check.test.ts` pins that case.
-- **The cost.** A symptom named only in safety-netting advice reads as lost, so the live transcript is kept. Closing advice often names one, so this will refuse many refinements until the owner decides otherwise. It is the safe direction, and the measurement gate should count how often it fires.
+- **Why Not The Same Reading On Both Sides.** That was the first design, and the clinical-safety review found it unsound. A patient's "I coughed up blood" dropped by the refined pass stayed covered by the doctor's closing "come back if you cough up blood" read as the patient's. Nothing looked lost, and the stored transcript, with the advice labelled the doctor's, raised no haemoptysis. `asr-refinement-check.test.ts` pins that case.
+- **The Cost.** A symptom named only in safety-netting advice reads as lost, so the live transcript is kept. Closing advice often names one, so this will refuse many refinements until the owner decides otherwise. It is the safe direction, and the measurement gate should count how often it fires.
 
 ### Sanity Checks
 
@@ -2171,9 +2171,9 @@ Any failure keeps the live transcript with a notice.
 | 9   | No Bengali, Arabic or Devanagari script that the live text lacked (§20.13 finding 3)                                                   |
 | 10  | The server red-flag check, on the turns that will be stored, finds no lost flags                                                       |
 
-**What the unit ratio does not cover.** It lets a refined transcript drop up to a fifth of what live heard. The red-flag check protects only the rule triggers, so allergies, medicines, durations and checklist facts in that fifth are unprotected until the gate sets the ratio.
+**What The Unit Ratio Does Not Cover.** It lets a refined transcript drop up to a fifth of what live heard. The red-flag check protects only the rule triggers, so allergies, medicines, durations and checklist facts in that fifth are unprotected until the gate sets the ratio.
 
-**Token mapping.** A `spacing` element folds into the next word, which keeps its own timing so the 1500 ms segment backstop still sees pauses. `speaker_N` becomes `"N+1"`, `confidence` is `null`, and `audio_event` is dropped.
+**Token Mapping.** A `spacing` element folds into the next word, which keeps its own timing so the 1500 ms segment backstop still sees pauses. `speaker_N` becomes `"N+1"`, `confidence` is `null`, and `audio_event` is dropped.
 
 ### Thresholds Pending The Measurement Gate
 
@@ -2191,7 +2191,7 @@ Each is a named constant, **provisional until the measurement gate**.
 
 ### Gate Results
 
-**Not run.** The gate needs the owner's laptop, the vendor key and synthetic audio. It also carries the browser checks for the owner's `/verify`:
+**Not Run.** The gate needs the owner's laptop, the vendor key and synthetic audio. It also carries the browser checks for the owner's `/verify`:
 
 - Requests fire in order: `POST /api/asr/batch-sessions`, one vendor `POST`, `refinement-check`, then `draft-turns` carrying the refined text.
 - Diarised roles land correctly and playback seeks work.
@@ -2215,15 +2215,15 @@ Each is a named constant, **provisional until the measurement gate**.
 
 ### Known Costs
 
-- **No uncertainty underlines.** Refined transcripts carry no confidence (`confidence: null`), so the underlines are lost.
-- **No model-edit cleanup layer.** That pass only edits inside uncertain ranges (§20.10, #309), so it never runs on a refined transcript. The deterministic mishear proposals are unaffected, since they key on `asr_live`.
-- **A second labelling pass on refusal.** The refined text is labelled before the check, so a refused refinement labels the live text as well, adding up to one more bounded wait.
-- **Safety-netting advice refuses refinement.** See the refinement check above.
-- **Only this pass is checked.** A refined pass appended to earlier text is compared with its own live text, not across the boundary with the earlier passes. Low likelihood, recorded rather than covered.
-- **Sore-throat score pre-fill.** The score reads temperature digits only (`backend/src/calculators/sore-throat-score.ts:138`, regex `\d{2}(?:\.\d{1,2})?`), so a spelled-out "thirty-eight point two" from batch no longer pre-fills it.
+- **No Uncertainty Underlines.** Refined transcripts carry no confidence (`confidence: null`), so the underlines are lost.
+- **No Model-Edit Cleanup Layer.** That pass only edits inside uncertain ranges (§20.10, #309), so it never runs on a refined transcript. The deterministic mishear proposals are unaffected, since they key on `asr_live`.
+- **A Second Labelling Pass On Refusal.** The refined text is labelled before the check, so a refused refinement labels the live text as well, adding up to one more bounded wait.
+- **Safety-Netting Advice Refuses Refinement.** See the refinement check above.
+- **Only This Pass Is Checked.** A refined pass appended to earlier text is compared with its own live text, not across the boundary with the earlier passes. Low likelihood, recorded rather than covered.
+- **Sore-Throat Score Pre-Fill.** The score reads temperature digits only (`backend/src/calculators/sore-throat-score.ts:138`, regex `\d{2}(?:\.\d{1,2})?`), so a spelled-out "thirty-eight point two" from batch no longer pre-fills it.
 - **Price.** About $0.22 to $0.27/hour at list price, and keyterms add 20% (§20.13).
-- **Live panes unchanged.** Soniox still streams during capture, so the live panes and live red-flag hints are as before.
-- **Not a diagnosis.** The doctor still reviews, edits and approves every note.
+- **Live Panes Unchanged.** Soniox still streams during capture, so the live panes and live red-flag hints are as before.
+- **Not A Diagnosis.** The doctor still reviews, edits and approves every note.
 
 ### Follow-Ups
 

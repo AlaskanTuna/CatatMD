@@ -28,7 +28,7 @@ bun install            # also installs the Git hooks
 docker compose up -d   # Postgres 16 on port 5434 (override with POSTGRES_PORT)
 ```
 
-> **Never point local work at a shared or production database.** The test suites and every mutating control write real rows, and audit rows cannot be removed because the chain is append-only.
+> **Never Point Local Work At A Shared Or Production Database.** The test suites and every mutating control write real rows, and audit rows cannot be removed because the chain is append-only.
 
 ## 4. Configure The Environment
 

@@ -16,8 +16,8 @@
 | ------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | **Who**            | Malaysian GPs in private practice and panel clinics                                                         | A reviewer of the code                                |
 | **Context**        | Between patients, 10 to 20 consultations a session, screen shared with a real desk and a real queue outside | Reading the repo and using the guided demo tour once  |
-| **Time budget**    | 30 to 60 seconds per note review                                                                            | 90 seconds to first real output                       |
-| **What they need** | To see what the AI got wrong, fast, and sign off on something they can defend                               | Verify the safety controls against the implementation |
+| **Time Budget**    | 30 to 60 seconds per note review                                                                            | 90 seconds to first real output                       |
+| **What They Need** | To see what the AI got wrong, fast, and sign off on something they can defend                               | Verify the safety controls against the implementation |
 
 The primary user is not impressed by software. They are interrupted, accountable, and medico-legally exposed. Every second of decoration is a second not spent on the patient outside.
 
@@ -25,7 +25,7 @@ The primary user is not impressed by software. They are interrupted, accountable
 
 Turn a GP consultation transcript into a reviewable structured clinical note, with missing-information prompts, red-flag detection, and cited suggestions.
 
-**The product does not diagnose.** The doctor reviews, edits, and approves every output and remains fully responsible. That is not a disclaimer bolted on; it is the shape of the interface. Approval is a deliberate act, never a default, and the UI must never imply the machine has decided anything.
+**The Product Does Not Diagnose.** The doctor reviews, edits, and approves every output and remains fully responsible. That is not a disclaimer bolted on; it is the shape of the interface. Approval is a deliberate act, never a default, and the UI must never imply the machine has decided anything.
 
 ## Positioning
 
@@ -40,16 +40,16 @@ The interface should reflect these engineering choices. **Restraint is the brand
 
 ## Brand Personality
 
-- **Composed, not clinical-cold.** Warm ground rather than hospital white. The doctor is at a desk, not in theatre.
-- **Quiet until it matters.** One accent, used scarcely. When something is wrong, that is the only loud thing on screen.
-- **Legible under pressure.** Generous type, high contrast, no density for its own sake.
-- **Shows its work.** Evidence spans, guideline IDs, and `NOT_ASSESSED` fields are visible rather than hidden. The interface makes clinical evidence and review status auditable.
+- **Composed, Not Clinical-Cold.** Warm ground rather than hospital white. The doctor is at a desk, not in theatre.
+- **Quiet Until It Matters.** One accent, used scarcely. When something is wrong, that is the only loud thing on screen.
+- **Legible Under Pressure.** Generous type, high contrast, no density for its own sake.
+- **Shows Its Work.** Evidence spans, guideline IDs, and `NOT_ASSESSED` fields are visible rather than hidden. The interface makes clinical evidence and review status auditable.
 
 ## Anti-References
 
 What this must not resemble, and why:
 
-| Anti-reference                                                                  | Why it fails here                                                                                                                                    |
+| Anti-Reference                                                                  | Why It Fails Here                                                                                                                                    |
 | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Consumer health apps (illustration, mascots, encouragement)                     | Reads as a wellness product. Stream 08 concluded that a companion mascot conflicts most with the safety-first design; it is out of the current build |
 | Hospital marketing sites (badge walls, phone numbers, WhatsApp FABs, carousels) | Over-signals to patients when the primary user is a doctor already using the clinical workflow                                                       |
@@ -59,12 +59,12 @@ What this must not resemble, and why:
 
 ## Strategic Design Principles
 
-1. **Safety content is never on glass, never behind motion, never colour-only.** Red flags, gaps, and note text sit on solid opaque surfaces with an icon and a word label. Translucency is for chrome.
-2. **`NOT_ASSESSED` is visible, not blank.** A field the consultation never covered must read as unestablished, never as normal. This is the single most important thing the interface does.
-3. **Rule-sourced and model-sourced are visually distinct**, always, with no legend required to tell them apart.
-4. **AI-generated and clinician-approved are visually distinct**, on screen and in print.
-5. **Approve is the only large filled accent element on the review screen.** Nothing else competes with it, and it takes two steps.
-6. **Motion degrades to an instant state change, never to no state change.** Reduced motion removes the transition, never the outcome.
+1. **Safety Content Is Never On Glass, Never Behind Motion, Never Colour-Only.** Red flags, gaps, and note text sit on solid opaque surfaces with an icon and a word label. Translucency is for chrome.
+2. **`NOT_ASSESSED` Is Visible, Not Blank.** A field the consultation never covered must read as unestablished, never as normal. This is the single most important thing the interface does.
+3. **Rule-Sourced And Model-Sourced Are Visually Distinct**, always, with no legend required to tell them apart.
+4. **AI-Generated And Clinician-Approved Are Visually Distinct**, on screen and in print.
+5. **Approve Is The Only Large Filled Accent Element On The Review Screen.** Nothing else competes with it, and it takes two steps.
+6. **Motion Degrades To An Instant State Change, Never To No State Change.** Reduced motion removes the transition, never the outcome.
 
 ## Accessibility
 

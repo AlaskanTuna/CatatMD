@@ -6,7 +6,7 @@ Part of the [Technical Reference](../TRD.md).
 
 Source: `prisma/schema.prisma`. Datasource: Postgres, pooled `DATABASE_URL` (`:6543`, runtime) versus direct `DIRECT_URL` (`:5432`, migrations only).
 
-## Auth Models (better-auth Prisma Adapter)
+## Auth Models (Better-auth Prisma Adapter)
 
 | Model          | Fields                                                                                                                                                                                              | Indexes        |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
@@ -17,7 +17,7 @@ Source: `prisma/schema.prisma`. Datasource: Postgres, pooled `DATABASE_URL` (`:6
 
 ## Clinical Domain
 
-**`ConsultationStatus` enum:** `draft`, `analyzing`, `awaiting_review`, `approved`, matches `ConsultationStatusSchema` exactly.
+**`ConsultationStatus` Enum:** `draft`, `analyzing`, `awaiting_review`, `approved`, matches `ConsultationStatusSchema` exactly.
 
 **`Consultation`**
 

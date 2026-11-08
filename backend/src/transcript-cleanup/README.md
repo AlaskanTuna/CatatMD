@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# transcript-cleanup
+# Transcript-Cleanup
 
 Proposes constrained transcript corrections for uncertain spans without modifying the stored transcript.
 

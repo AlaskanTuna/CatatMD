@@ -6,7 +6,7 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 
 ## 1. Think Before Coding
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+**Don't Assume. Don't Hide Confusion. Surface Tradeoffs.**
 
 Before implementing:
 
@@ -17,7 +17,7 @@ Before implementing:
 
 ## 2. Simplicity First
 
-**Minimum code that solves the problem. Nothing speculative.**
+**Minimum Code That Solves The Problem. Nothing Speculative.**
 
 - No features beyond what was asked.
 - No abstractions for single-use code.
@@ -29,7 +29,7 @@ Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, sim
 
 ## 3. Surgical Changes
 
-**Touch only what you must. Clean up only your own mess.**
+**Touch Only What You Must. Clean Up Only Your Own Mess.**
 
 When editing existing code:
 
@@ -47,7 +47,7 @@ The test: Every changed line should trace directly to the user's request.
 
 ## 4. Goal-Driven Execution
 
-**Define success criteria. Loop until verified.**
+**Define Success Criteria. Loop Until Verified.**
 
 Transform tasks into verifiable goals:
 
@@ -67,7 +67,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+**These Guidelines Are Working If:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
 <!-- andrej-karpathy-skills -->
 

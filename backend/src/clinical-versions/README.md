@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# clinical-versions
+# Clinical-Versions
 
 Centralizes the version stamps for active clinical content and selects stamps for a profile.
 

@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# backend
+# Backend
 
 The backend is the Express API that stores consultation data, runs guarded clinical workflows and serves reviewable results to the frontend.
 

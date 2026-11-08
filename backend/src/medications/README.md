@@ -1,4 +1,4 @@
-# medications
+# Medications
 
 Deterministic support for a prescription the doctor dictates: a versioned list of generic drug names, a matcher that offers spelling candidates for names the recogniser garbled, and a parser that reads a dosing phrase into fields. No LLM, no I/O, no clock, no randomness.
 
@@ -6,7 +6,7 @@ Deterministic support for a prescription the doctor dictates: a versioned list o
 
 ## The Boundary
 
-**This is a spelling aid, not a formulary.** It holds drug names and nothing else: no dose, no indication, no interaction, no recommendation, and no brand names. It never proposes a drug the doctor did not say, never validates one, and never edits the text it was given. Its whole output is a candidate the doctor accepts or rejects, because look-alike sound-alike confusion is a leading medication-error class and published guidance on speech recognition names selection from a list as the control. `docs/decisions/` D-001 is the recorded scope decision and its Not Built table governs; the ingested CPG chunks draw the identical line for themselves.
+**This Is A Spelling Aid, Not A Formulary.** It holds drug names and nothing else: no dose, no indication, no interaction, no recommendation, and no brand names. It never proposes a drug the doctor did not say, never validates one, and never edits the text it was given. Its whole output is a candidate the doctor accepts or rejects, because look-alike sound-alike confusion is a leading medication-error class and published guidance on speech recognition names selection from a list as the control. `docs/decisions/` D-001 is the recorded scope decision and its Not Built table governs; the ingested CPG chunks draw the identical line for themselves.
 
 ---
 
@@ -24,11 +24,11 @@ Deterministic support for a prescription the doctor dictates: a versioned list o
 
 ## Three Things Worth Knowing Before Changing It
 
-**Synonyms are alternative names, never mishears.** `redflags/mishears.ts` caps its confusable table at pairs measured on real audio, and this repository has no drug-mishear measurements. Adding a guessed spelling here would be a second, unversioned confusable table. The phonetic matcher absorbs mishears instead, which is why it exists.
+**Synonyms Are Alternative Names, Never Mishears.** `redflags/mishears.ts` caps its confusable table at pairs measured on real audio, and this repository has no drug-mishear measurements. Adding a guessed spelling here would be a second, unversioned confusable table. The phonetic matcher absorbs mishears instead, which is why it exists.
 
-**Both similarity measures are load-bearing, and the bars are measured.** Each admits a real garbling the other misses, with a worked case apiece in `similarity.test.ts`. The bars sit above the loudest noise found on this lexicon (0.500 phonetic, 0.400 orthographic between a drug name and an ordinary consultation word). Moving either changes which names reach a doctor, so they are asserted against their literals in a test.
+**Both Similarity Measures Are Load-Bearing, And The Bars Are Measured.** Each admits a real garbling the other misses, with a worked case apiece in `similarity.test.ts`. The bars sit above the loudest noise found on this lexicon (0.500 phonetic, 0.400 orthographic between a drug name and an ordinary consultation word). Moving either changes which names reach a doctor, so they are asserted against their literals in a test.
 
-**Dose units are kept as spoken; duration units are translated.** `hari` and `minggu` have exact English equivalents, so `selama lima hari` and `for five days` both give `5 days`, which is what lets the same prescription in either language parse to the same object. `biji` and `sudu` do not: `sudu` is 5 ml or 15 ml depending on the spoon, and converting it would be a clinical judgement this module must not make.
+**Dose Units Are Kept As Spoken; Duration Units Are Translated.** `hari` and `minggu` have exact English equivalents, so `selama lima hari` and `for five days` both give `5 days`, which is what lets the same prescription in either language parse to the same object. `biji` and `sudu` do not: `sudu` is 5 ml or 15 ml depending on the spoon, and converting it would be a clinical judgement this module must not make.
 
 ---
 

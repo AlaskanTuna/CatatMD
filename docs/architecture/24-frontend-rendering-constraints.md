@@ -6,7 +6,7 @@ Part of the [Technical Reference](../TRD.md).
 
 Browser-level constraints that dictate component **structure** rather than styling. They are here because they cannot be discovered by reading the CSS: each one produces a build that looks correct in development and wrong in production, and each has already cost a shipped bug.
 
-**Split with `docs/DESIGN.md`.** That file owns the visual rules, including "glass is chrome only" and the one-line form of each constraint below. This section owns the mechanism, the components it binds, and how to verify a change. A frontend agent should read DESIGN.md for what the interface should look like and this section for what the browser will actually do.
+**Split With `docs/DESIGN.md`.** That file owns the visual rules, including "glass is chrome only" and the one-line form of each constraint below. This section owns the mechanism, the components it binds, and how to verify a change. A frontend agent should read DESIGN.md for what the interface should look like and this section for what the browser will actually do.
 
 ## Glass Inside Glass Is Always Flat
 
@@ -14,13 +14,13 @@ An element with `backdrop-filter` establishes a **backdrop root**. A descendant'
 
 This is not a browser bug and there is no CSS that fixes it in place. The only fix is to stop being a descendant.
 
-| Surface                                                   | Escapes the backdrop root?                                                           |
+| Surface                                                   | Escapes The Backdrop Root?                                                           |
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `<dialog>` (`HelpButton`, `ConsultationList`, `Settings`) | **Yes, already.** The top layer is outside any backdrop root, so modals need nothing |
-| Dropover panels (notifications, account)                  | **Only by portal.** `ChromeCluster`, their parent, is `.glass`                       |
+| `<dialog>` (`HelpButton`, `ConsultationList`, `Settings`) | **Yes, Already.** The top layer is outside any backdrop root, so modals need nothing |
+| Dropover panels (notifications, account)                  | **Only By Portal.** `ChromeCluster`, their parent, is `.glass`                       |
 | Anything new that floats over a glass ancestor            | **No.** Portal it                                                                    |
 
-**The standing pattern is `createPortal(panel, document.body)`**, as in `frontend/src/shell/Dropover.tsx`. Two consequences a naive portal gets wrong, both of which this codebase hit:
+**The Standing Pattern Is `createPortal(panel, document.body)`**, as in `frontend/src/shell/Dropover.tsx`. Two consequences a naive portal gets wrong, both of which this codebase hit:
 
 - **Positioning.** The panel has left its wrapper, so `absolute` no longer places it. Measure from the trigger's `getBoundingClientRect()` and recompute on `scroll` (capturing, so nested scrollers fire) and `resize`.
 - **Dismissal.** The panel is no longer inside the wrapper, so an outside-click check written as `wrap.contains(target)` closes the panel on its own buttons. Test the panel node as well.
@@ -29,7 +29,7 @@ Also carry `data-print="hide"` onto the portalled node when the original inherit
 
 ## Verifying A Glass Change
 
-**Never the dev server.** Two of the three constraints here only manifest after a production build, and one only manifests in a specific DOM position.
+**Never The Dev Server.** Two of the three constraints here only manifest after a production build, and one only manifests in a specific DOM position.
 
 ```bash
 bun run --cwd frontend build   # then serve dist, not `vite dev`
@@ -51,8 +51,8 @@ for (let el = panel.parentElement; el && el !== document.documentElement; el = e
 
 Restated here only far enough to be findable, with the detail kept in DESIGN.md:
 
-- **Property order is load-bearing.** `-webkit-backdrop-filter` first, standard last. Reversed, the minifier keeps the last of what it reads as one duplicated property and ships the prefix alone, so the frost degrades to flat translucency in production while dev looks perfect.
-- **Glass needs texture behind it.** Over a flat fill there is nothing to blur. The page dot grid is what makes frost read as frost, which is why it is on both shells.
+- **Property Order Is Load-Bearing.** `-webkit-backdrop-filter` first, standard last. Reversed, the minifier keeps the last of what it reads as one duplicated property and ships the prefix alone, so the frost degrades to flat translucency in production while dev looks perfect.
+- **Glass Needs Texture Behind It.** Over a flat fill there is nothing to blur. The page dot grid is what makes frost read as frost, which is why it is on both shells.
 
 ## Public Build Inputs
 

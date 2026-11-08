@@ -37,7 +37,7 @@ No `deid/`, `lib/llm/`, `redflags/` or `guidelines/` path changes; nothing new i
 
 ## What The Platform Will Not Do
 
-**Known limitation, not a defect:** the report has no page numbers and no per-page running attribution.
+**Known Limitation, Not A Defect:** the report has no page numbers and no per-page running attribution.
 
 Page numbers and running footers need `@page` margin boxes and `counter(page)`, CSS Paged Media features Chrome does not implement; they work only in print processors such as Prince or WeasyPrint. A `position: fixed` footer is repeated per page in Chrome but overlaps body content on pages 2+ unless `@page { margin: 0 }` is paired with `box-decoration-break: clone`, a trade not worth making for this artefact.
 

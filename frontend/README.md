@@ -10,11 +10,11 @@ From the repository root, **bun run dev:frontend** in the root [package.json](..
 
 | Action                               | Command               |
 | ------------------------------------ | --------------------- |
-| Start Vite                           | **bun run dev**       |
-| Build TypeScript and the Vite bundle | **bun run build**     |
-| Run frontend tests                   | **bun run test**      |
-| Check TypeScript                     | **bun run typecheck** |
-| Serve the production bundle locally  | **bun run preview**   |
+| Start Vite                           | **bun Run Dev**       |
+| Build TypeScript and the Vite bundle | **bun Run Build**     |
+| Run frontend tests                   | **bun Run Test**      |
+| Check TypeScript                     | **bun Run Typecheck** |
+| Serve the production bundle locally  | **bun Run Preview**   |
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 

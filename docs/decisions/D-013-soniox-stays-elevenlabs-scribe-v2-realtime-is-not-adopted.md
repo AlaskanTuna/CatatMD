@@ -24,8 +24,8 @@ Batch `scribe_v2` is not decided here: it diarised and read the four languages w
 
 ## What This Decision Does Not License
 
-- **No ElevenLabs audio egress of any kind.** The evaluation sent synthetic audio only.
-- **Not a rejection of batch `scribe_v2`.** It is measured and open, not adopted.
-- **No claim that Soniox is more accurate everywhere.** Scribe Realtime read clean Malay and Mandarin better, and Soniox flipped a symptom to its denial in 3 of 12 Malay-with-English results.
-- **No claim about Soniox accuracy on real speech.** §20.10's unmeasured table still applies.
-- **What reverses it:** a realtime model with documented and measured diarisation that reads English, Malay, Mandarin and Tamil without dropping or rewriting turns, taken through a fresh owner sign-off.
+- **No ElevenLabs Audio Egress Of Any Kind.** The evaluation sent synthetic audio only.
+- **Not A Rejection Of Batch `scribe_v2`.** It is measured and open, not adopted.
+- **No Claim That Soniox Is More Accurate Everywhere.** Scribe Realtime read clean Malay and Mandarin better, and Soniox flipped a symptom to its denial in 3 of 12 Malay-with-English results.
+- **No Claim About Soniox Accuracy On Real Speech.** §20.10's unmeasured table still applies.
+- **What Reverses It:** a realtime model with documented and measured diarisation that reads English, Malay, Mandarin and Tamil without dropping or rewriting turns, taken through a fresh owner sign-off.

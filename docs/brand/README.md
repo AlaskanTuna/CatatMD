@@ -61,7 +61,7 @@ Both were rejected on legibility, not taste.
 `frontend/public/og.jpg` is what a link to the app unfurls into, referenced from
 the `og:image` and `twitter:image` tags in `frontend/index.html`.
 
-**The type is composited, not generated.** `og-bg.png` is the generated ground
+**The Type Is Composited, Not Generated.** `og-bg.png` is the generated ground
 only: a woven teal canvas carrying no text at all. Image models mangle
 lettering, and an approximated wordmark on a share card is the one place the
 brand is seen by people who have not opened the product. `og-card.html` lays the

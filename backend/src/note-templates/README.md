@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# note-templates
+# Note-Templates
 
 Stores the version stamp for the Malaysian medical-record template used by the backend.
 

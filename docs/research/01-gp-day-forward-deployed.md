@@ -5,7 +5,7 @@
 ## Method And Its Biggest Limitation
 
 - Sources: Malaysian Medical Council guidelines, Malaysian statute/regulation, a leading Malaysian TPA's panel-clinic contract, peer-reviewed Malaysian primary-care research, Malaysian clinic-software vendors, and Malaysian health press.
-- **The load-bearing gap:** almost every published Malaysian study of primary-care documentation was done in **public** clinics (Klinik Kesihatan). Private GP note-writing is essentially unstudied in the literature. The verdict below therefore rests on regulation, payer contracts, and product evidence rather than on an audit of real private GP notes.
+- **The Load-Bearing Gap:** almost every published Malaysian study of primary-care documentation was done in **public** clinics (Klinik Kesihatan). Private GP note-writing is essentially unstudied in the literature. The verdict below therefore rests on regulation, payer contracts, and product evidence rather than on an audit of real private GP notes.
 - Where a source could only be read through a search index (page blocked direct fetch), it is marked **VERIFIED (index)**.
 
 ---
@@ -18,12 +18,12 @@
 
 ### VERIFIED — No Malaysian Rule Mandates SOAP
 
-**MMC Guideline 002/2006, _Medical Records and Medical Reports_, never mentions SOAP.** What it actually prescribes is a chronological, signed, contemporaneous entry:
+**MMC Guideline 002/2006, _Medical Records And Medical Reports_, Never Mentions SOAP.** What it actually prescribes is a chronological, signed, contemporaneous entry:
 
 | MMC Section | What It Requires                                                                                                                                                                                                                                                                                             |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1.2         | A content **inventory**: doctor's clinical notes, referral notes, lab/histopath reports, imaging, clinical photographs, drug prescriptions, nurses' reports, consent forms, computerised/electronic records                                                                                                  |
-| 1.3         | **"The use of Integrated Clinical Notes is encouraged"** — doctor, nurse, and others make contemporaneous entries on the **same Continuation Sheet**. Each entry records **"the Date, Time and the Procedure or Treatment, in chronological sequence, and should be signed by the person making the entry"** |
+| 1.3         | **"The Use Of Integrated Clinical Notes Is Encouraged"** — doctor, nurse, and others make contemporaneous entries on the **same Continuation Sheet**. Each entry records **"the Date, Time and the Procedure or Treatment, in chronological sequence, and should be signed by the person making the entry"** |
 | 1.4         | Abbreviations and short forms **"should generally be avoided"**                                                                                                                                                                                                                                              |
 | 1.5         | No blank spaces between entries (to prevent retrospective back-filling); entries must be objective and relevant                                                                                                                                                                                              |
 | 1.6         | Corrections struck through but still legible, and signed                                                                                                                                                                                                                                                     |
@@ -50,12 +50,12 @@ Panel/MCO patients are a major share of Malaysian private GP volume. PMCare (a l
 2. PMCare membership number
 3. Date and time for each visit
 4. Consent for the release of medical information
-5. **Medical condition**
-6. **Treatment and service rendered**
-7. **Results of diagnostic tests and procedures, if any**
-8. **Note on referral, if applicable**
+5. **Medical Condition**
+6. **Treatment And Service Rendered**
+7. **Results Of Diagnostic Tests And Procedures, If Any**
+8. **Note On Referral, If Applicable**
 
-**Working Guidelines §1.15 — what must accompany the claim** (abridged): _"Medical condition and/or diagnosis and treatment given"_; medication — _"drug name, dosage, amount dispensed and itemized cost"_; injection (drug, dose, route); nebuliser; sutures; dressing type; minor surgery; X-ray; lab test with result attached; and **"Medical (sick) leave certificate — please provide MC to deserving case and indicate number of days clearly."**
+**Working Guidelines §1.15 — What Must Accompany The Claim** (abridged): _"Medical condition and/or diagnosis and treatment given"_; medication — _"drug name, dosage, amount dispensed and itemized cost"_; injection (drug, dose, route); nebuliser; sutures; dressing type; minor surgery; X-ray; lab test with result attached; and **"Medical (sick) leave certificate — please provide MC to deserving case and indicate number of days clearly."**
 
 Source: <https://www.mediline.com.my/popalert/WGGPClinics_Revision7.pdf>
 
@@ -97,10 +97,10 @@ And private is likely **worse**, not better. QUALICOPC Malaysia (221 public + 23
 
 | Figure                                     | Value                                                                                    | Source                          |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------- |
-| Median attendances/day, **private** clinic | **32.3 patients**                                                                        | Sivasampu et al., PLOS One 2017 |
+| Median attendances/day, **private** clinic | **32.3 Patients**                                                                        | Sivasampu et al., PLOS One 2017 |
 | Median attendances/day, public clinic      | 133.8 patients (>4×)                                                                     | same                            |
 | Private clinics vs public                  | outnumber by **5.6:1** (clinics), **3.9:1** (doctors); ~5,335 primary care clinics total | same                            |
-| 2016 survey of **1,800 Malaysian GPs**     | **~70% of clinics saw fewer than 30 patients/day**                                       | CodeBlue / FPMPAM               |
+| 2016 survey of **1,800 Malaysian GPs**     | **~70% Of Clinics Saw Fewer Than 30 patients/day**                                       | CodeBlue / FPMPAM               |
 | FPMPAM president's own KL clinic           | ~30/day, ~600/month; 9–5 weekdays, 9–1 Sat                                               | CodeBlue                        |
 | A two-doctor Klang clinic                  | 60–100/day; 9am–9pm, closed Sundays                                                      | CodeBlue                        |
 
@@ -108,11 +108,11 @@ Sources: <https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.01
 
 ### VERIFIED — Minutes Per Consultation
 
-- **The regulator now prices consultations in 10-minute bands.** Schedule 7 of the Private Healthcare Facilities and Services (Private Medical Clinics or Private Dental Clinics) Regulations 2006 was amended by **P.U. (A) 150/2026, in force 2 April 2026**, revising GP consultation fees to **RM10–RM80** — the first revision in over 30 years (the prior range, RM10–RM35, traced to a 1992 MMA schedule).
+- **The Regulator Now Prices Consultations In 10-minute Bands.** Schedule 7 of the Private Healthcare Facilities and Services (Private Medical Clinics or Private Dental Clinics) Regulations 2006 was amended by **P.U. (A) 150/2026, in force 2 April 2026**, revising GP consultation fees to **RM10–RM80** — the first revision in over 30 years (the prior range, RM10–RM35, traced to a 1992 MMA schedule).
   <https://www.moh.gov.my/en/publications-and-reports/policies-act-policies-guide-lines/akta-kesihatan/senarai-akta-kesihatan/private-healthcare-facilities-and-services-private-medical-clinics-or-private-dental-clinics-amendment-of-fee-schedule-order-2026-p-u-a-150> · <https://www.malaymail.com/news/malaysia/2026/04/03/private-gps-welcome-revised-rm10rm80-consultation-fee-after-30-year-freeze/214926>
-- **The band structure used when this reform was drafted:** simple consultation **up to 10 minutes** RM30–50; intermediate **up to 20 minutes** RM51–80; complex **over 20 minutes** RM81–125. <https://ringgitplus.com/en/blog/personal-finance-news/government-to-increase-private-clinic-consultation-fees-by-year-end.html>
+- **The Band Structure Used When This Reform Was Drafted:** simple consultation **up to 10 minutes** RM30–50; intermediate **up to 20 minutes** RM51–80; complex **over 20 minutes** RM81–125. <https://ringgitplus.com/en/blog/personal-finance-news/government-to-increase-private-clinic-consultation-fees-by-year-end.html>
   > **Caveat:** I could not verify from the 2026 gazette text that the final tiers retain those exact minute thresholds. Treat **RM10–80 / 2 Apr 2026** as VERIFIED and the **minute bands as indicative**.
-- **Measured consultation time, Malaysian public primary care:** mean **18.21 minutes** consultation against 41 minutes of waiting. Malaysian Family Physician 2017;12(1):14–21. <https://e-mfp.org/wp-content/uploads/an-assessment-of-patient-waiting-and-consultation-time-in-a-primary-healthcare-clinic.pdf> · <http://mymedr.afpm.org.my/publications/51647>
+- **Measured Consultation Time, Malaysian Public Primary Care:** mean **18.21 minutes** consultation against 41 minutes of waiting. Malaysian Family Physician 2017;12(1):14–21. <https://e-mfp.org/wp-content/uploads/an-assessment-of-patient-waiting-and-consultation-time-in-a-primary-healthcare-clinic.pdf> · <http://mymedr.afpm.org.my/publications/51647>
 - A second Malaysian clinic study reports mean **10.54 minutes** (SD 8.78). <https://journal.unisza.edu.my/myjas/index.php/myjas/article/download/268/105/>
 
 ### INFERRED
@@ -128,14 +128,14 @@ No Malaysian time-and-motion study of GP documentation was found. But the workfl
 
 | Constraint                                                                                                                                                                                                                                                                                                                       | Evidence                                                                                                                                                     |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **The GP dispenses in-house.** Medicine is handed over at the clinic, commonly by non-pharmacist staff, so the drug list must be final before the patient leaves. Patient quote from a Malaysian qualitative study: _"In [GP] clinics normally they [non-pharmacist] don't explain. They just give you the medication."_         | <https://pmc.ncbi.nlm.nih.gov/articles/PMC4372008/>                                                                                                          |
-| **The MC is produced at the visit**, with days "indicated clearly".                                                                                                                                                                                                                                                              | PMCare Working Guidelines §1.15(11)                                                                                                                          |
-| **The panel claim has a 3-day clock.** _"Submit claims within 3 days of obtaining Authorization Code"_; T&C 14.1 _"within three (3) days of date of service"_; late claims _"shall not be accepted or payable"_. Manual fallback: within 30 days of end of service month, with written explanation and a per-transaction charge. | PMCare §1.16, T&C §14.1                                                                                                                                      |
-| **MMC requires contemporaneous entries** — records should be _"clear, accurate, legible, made contemporaneously, signed and dated"_ — and §1.5 forbids leaving blank spaces that would let entries be back-filled later.                                                                                                         | MMC 002/2006 §1.3, §1.5; MMC _Good Medical Practice 2019_ — VERIFIED (index): <https://mmc.gov.my/wp-content/uploads/2022/04/Good-Medical-Practice-2019.pdf> |
+| **The GP Dispenses In-House.** Medicine is handed over at the clinic, commonly by non-pharmacist staff, so the drug list must be final before the patient leaves. Patient quote from a Malaysian qualitative study: _"In [GP] clinics normally they [non-pharmacist] don't explain. They just give you the medication."_         | <https://pmc.ncbi.nlm.nih.gov/articles/PMC4372008/>                                                                                                          |
+| **The MC Is Produced At The Visit**, with days "indicated clearly".                                                                                                                                                                                                                                                              | PMCare Working Guidelines §1.15(11)                                                                                                                          |
+| **The Panel Claim Has A 3-day Clock.** _"Submit claims within 3 days of obtaining Authorization Code"_; T&C 14.1 _"within three (3) days of date of service"_; late claims _"shall not be accepted or payable"_. Manual fallback: within 30 days of end of service month, with written explanation and a per-transaction charge. | PMCare §1.16, T&C §14.1                                                                                                                                      |
+| **MMC Requires Contemporaneous Entries** — records should be _"clear, accurate, legible, made contemporaneously, signed and dated"_ — and §1.5 forbids leaving blank spaces that would let entries be back-filled later.                                                                                                         | MMC 002/2006 §1.3, §1.5; MMC _Good Medical Practice 2019_ — VERIFIED (index): <https://mmc.gov.my/wp-content/uploads/2022/04/Good-Medical-Practice-2019.pdf> |
 
 ### INFERRED
 
-- **Documentation happens in-room, during or immediately at the end of the consult** — because the prescription, the MC, and the bill all depend on it and the patient is physically waiting at the dispensing counter. What genuinely _is_ batched is **claim submission** (up to 3 days) and filing — not the clinical note.
+- **Documentation Happens In-Room, During Or Immediately At The End Of The Consult** — because the prescription, the MC, and the bill all depend on it and the patient is physically waiting at the dispensing counter. What genuinely _is_ batched is **claim submission** (up to 3 days) and filing — not the clinical note.
 - **Implication:** the review-and-approve step must live inside the consultation. A design that assumes the doctor returns to a queue of AI drafts after clinic is modelling a different market (US ambient-scribe / hospital outpatient), not a Malaysian dispensing GP.
 
 ---
@@ -144,17 +144,17 @@ No Malaysian time-and-motion study of GP documentation was found. But the workfl
 
 ### VERIFIED
 
-- **Clinic assistants, mostly uncertified.** Nationally: _"Private workforce comprised primarily doctors and noncertified nursing aides."_ Certified nurses were present in only **15.0%** (rural) and **10.1%** (urban) of private clinics. Consumer perception echoes it: _"They normally only employ people who are out from form 5 [high school leavers] to be a so called clinical nurse."_
+- **Clinic Assistants, Mostly Uncertified.** Nationally: _"Private workforce comprised primarily doctors and noncertified nursing aides."_ Certified nurses were present in only **15.0%** (rural) and **10.1%** (urban) of private clinics. Consumer perception echoes it: _"They normally only employ people who are out from form 5 [high school leavers] to be a so called clinical nurse."_
   <https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0172229> · <https://pmc.ncbi.nlm.nih.gov/articles/PMC4372008/>
-- **Medical assistants are a separate statutorily registered profession** — Medical Assistants (Registration) Act 1977 (Act 180); only registered medical assistants may be employed in government **or private** healthcare facilities, and the Act's definitions expressly cover "private clinic". <https://www.moh.gov.my/images/04-penerbitan/akta-kesihatan/medical%20assistants%20registration%20act%201977.pdf>
-  **Sector nuance that matters:** in **public** clinics medical assistants _run consultations_ — Khoo et al. found **81% of patient encounters were with medical assistants**, only 17.9% with medical officers. In **private** clinics they are far rarer, and the note's author is the doctor. CatatMD targets private, so "the doctor approves" holds — but the claim "in Malaysia the doctor writes the note" is only true in the private sector.
-- **MMC explicitly contemplates non-doctors writing in the same record** — Integrated Clinical Notes, all disciplines on one Continuation Sheet, every entry signed and traceable (§1.3); §1.10 governs handling by nursing and ancillary staff.
-- **Locums are routine** in Malaysian private GP, typically half-day or 3–4 hour sessional blocks — so the "next reader" of a note is often a different doctor. Industry source, weak: <https://weassistjobs.com/blog/part-time-doctor-jobs-malaysia.html>
-- **The MCO/TPA reads and audits the record.** PMCare T&C §10 _Provider Audit_ (clinical and procedural audits); §11 _"We reserve the right to review the above stated clinic records for verification of claims… on site review and/or submit to us copy of record"_, with on-site **GP Service Provider Audit** on ≥24 hours' notice; §15 _Queried Claims_ lets PMCare query _"Questionable or inappropriate prescription or procedure, with given diagnosis"_, with 1 day (telephone) or 7 days (letter) to respond and deductions if unanswered.
-- **MMC governs disclosure to third-party payers and MCOs** (§1.16): release only with informed, case-by-case consent; blanket employer consent _"is not to be encouraged"_.
-- **Patients can demand the record** — withholding is unethical (§1.15) — and medical reports are due within **six weeks** (§2.4).
-- **Employers, via closed panels** (PMCare closed-panel stickers shown for TNB, TM, CIMB, BSN, IWK) receive the benefit-side output, including the MC.
-- **Government scheme readers:** Skim Perubatan MADANI, run by ProtectHealth for MOH, covers **acute** primary care for the B40 group through hundreds of registered private GP clinics, with claims submitted through ProtectHealth's portal. <https://protecthealth.com.my/skimperubatanmadani/>
+- **Medical Assistants Are A Separate Statutorily Registered Profession** — Medical Assistants (Registration) Act 1977 (Act 180); only registered medical assistants may be employed in government **or private** healthcare facilities, and the Act's definitions expressly cover "private clinic". <https://www.moh.gov.my/images/04-penerbitan/akta-kesihatan/medical%20assistants%20registration%20act%201977.pdf>
+  **Sector Nuance That Matters:** in **public** clinics medical assistants _run consultations_ — Khoo et al. found **81% of patient encounters were with medical assistants**, only 17.9% with medical officers. In **private** clinics they are far rarer, and the note's author is the doctor. CatatMD targets private, so "the doctor approves" holds — but the claim "in Malaysia the doctor writes the note" is only true in the private sector.
+- **MMC Explicitly Contemplates Non-Doctors Writing In The Same Record** — Integrated Clinical Notes, all disciplines on one Continuation Sheet, every entry signed and traceable (§1.3); §1.10 governs handling by nursing and ancillary staff.
+- **Locums Are Routine** in Malaysian private GP, typically half-day or 3–4 hour sessional blocks — so the "next reader" of a note is often a different doctor. Industry source, weak: <https://weassistjobs.com/blog/part-time-doctor-jobs-malaysia.html>
+- **The MCO/TPA Reads And Audits The Record.** PMCare T&C §10 _Provider Audit_ (clinical and procedural audits); §11 _"We reserve the right to review the above stated clinic records for verification of claims… on site review and/or submit to us copy of record"_, with on-site **GP Service Provider Audit** on ≥24 hours' notice; §15 _Queried Claims_ lets PMCare query _"Questionable or inappropriate prescription or procedure, with given diagnosis"_, with 1 day (telephone) or 7 days (letter) to respond and deductions if unanswered.
+- **MMC Governs Disclosure To Third-Party Payers And MCOs** (§1.16): release only with informed, case-by-case consent; blanket employer consent _"is not to be encouraged"_.
+- **Patients Can Demand The Record** — withholding is unethical (§1.15) — and medical reports are due within **six weeks** (§2.4).
+- **Employers, Via Closed Panels** (PMCare closed-panel stickers shown for TNB, TM, CIMB, BSN, IWK) receive the benefit-side output, including the MC.
+- **Government Scheme Readers:** Skim Perubatan MADANI, run by ProtectHealth for MOH, covers **acute** primary care for the B40 group through hundreds of registered private GP clinics, with claims submitted through ProtectHealth's portal. <https://protecthealth.com.my/skimperubatanmadani/>
 
 ### INFERRED
 
@@ -181,23 +181,23 @@ The note has at least **five audiences**: (1) the same doctor at the next visit,
 
 Ordered by value per unit of effort.
 
-1. **PRD output format — keep SOAP, add the Malaysian operational block.** The structured note should carry, as first-class fields alongside SOAP: **`diagnosis`, `medicationsDispensed`, `mcDays`, `referral`, `followUp`.** _Why:_ the payer-enforced record schema (PMCare §1.9 / §1.15) plus the dispensing-doctor model make these the fields the note is actually consumed for; a SOAP-only note is incomplete against the contract the clinic signed.
-   - **If only one field is added, add `mcDays`.** It is discrete, trivially extractable, and instantly signals to a Malaysian GP that the tool understands their job.
-   - **Zero-schema-churn fallback:** render an "At a glance" strip above the SOAP card showing Diagnosis / Dispensed / MC / Follow-up, derived from the Plan.
+1. **PRD Output Format — Keep SOAP, Add The Malaysian Operational Block.** The structured note should carry, as first-class fields alongside SOAP: **`diagnosis`, `medicationsDispensed`, `mcDays`, `referral`, `followUp`.** _Why:_ the payer-enforced record schema (PMCare §1.9 / §1.15) plus the dispensing-doctor model make these the fields the note is actually consumed for; a SOAP-only note is incomplete against the contract the clinic signed.
+   - **If Only One Field Is Added, Add `mcDays`.** It is discrete, trivially extractable, and instantly signals to a Malaysian GP that the tool understands their job.
+   - **Zero-schema-churn Fallback:** render an "At a glance" strip above the SOAP card showing Diagnosis / Dispensed / MC / Follow-up, derived from the Plan.
 
-2. **PRD Goals — restate the time target quantitatively.** Change any unquantified "saves documentation time" to **"note reviewed and approved in under 60 seconds, inside a consultation the regulator prices at ≤10 minutes"**, justified by Schedule 7 banding and the ~32 patients/day private-clinic median.
+2. **PRD Goals — Restate The Time Target Quantitatively.** Change any unquantified "saves documentation time" to **"note reviewed and approved in under 60 seconds, inside a consultation the regulator prices at ≤10 minutes"**, justified by Schedule 7 banding and the ~32 patients/day private-clinic median.
 
-3. **PRD: convert a hidden assumption into a stated one.** Add: _"SOAP is used as a review scaffold. No Malaysian regulation mandates SOAP; MMC 002/2006 requires contemporaneous, signed, chronological entries, and Malaysian private GP notes today are typically free-text or handwritten."_ Add to README limitations: **no Malaysian GP has reviewed this product.** Keep this evidence limitation explicit and do not imply Malaysian clinical validation.
+3. **PRD: Convert A Hidden Assumption Into A Stated One.** Add: _"SOAP is used as a review scaffold. No Malaysian regulation mandates SOAP; MMC 002/2006 requires contemporaneous, signed, chronological entries, and Malaysian private GP notes today are typically free-text or handwritten."_ Add to README limitations: **no Malaysian GP has reviewed this product.** Keep this evidence limitation explicit and do not imply Malaysian clinical validation.
 
-4. **UI — approval is in-consult, not a draft inbox.** Design the review screen for a doctor with the patient still in the room. If a draft queue exists, it is a secondary path, never the hero flow. _(Directly contradicts the US ambient-scribe UX pattern most references will suggest.)_
+4. **UI — Approval Is In-Consult, Not A Draft Inbox.** Design the review screen for a doctor with the patient still in the room. If a draft queue exists, it is a secondary path, never the hero flow. _(Directly contradicts the US ambient-scribe UX pattern most references will suggest.)_
 
-5. **UI — per-section copy-out.** Malaysian GPs will paste into an existing clinic system (Klinify, Curo, Desk Clinic, kumoDoc, MedicalMet, EasyClinic) or write onto a card. Per-section copy buttons plus one "copy all" is a small feature with outsized credibility — and it _defends_ the "no EMR write-back" non-goal rather than merely asserting it: write-back is a per-vendor integration into a fragmented market; copy-out is the honest interim.
+5. **UI — Per-Section Copy-Out.** Malaysian GPs will paste into an existing clinic system (Klinify, Curo, Desk Clinic, kumoDoc, MedicalMet, EasyClinic) or write onto a card. Per-section copy buttons plus one "copy all" is a small feature with outsized credibility — and it _defends_ the "no EMR write-back" non-goal rather than merely asserting it: write-back is a per-vendor integration into a fragmented market; copy-out is the honest interim.
 
-6. **README/TRD — name the third audience in one line.** The note is read not only by the doctor but by a panel/MCO claims auditor with contractual on-site audit rights (PMCare T&C §10/§11) and a right to query _"questionable or inappropriate prescription or procedure, with given diagnosis"_ (§15). This is a sharp, verifiable local detail that demonstrates domain grounding, and it explains why diagnosis/treatment consistency is a design concern.
+6. **README/TRD — Name The Third Audience In One Line.** The note is read not only by the doctor but by a panel/MCO claims auditor with contractual on-site audit rights (PMCare T&C §10/§11) and a right to query _"questionable or inappropriate prescription or procedure, with given diagnosis"_ (§15). This is a sharp, verifiable local detail that demonstrates domain grounding, and it explains why diagnosis/treatment consistency is a design concern.
 
-7. **Fixtures — rewrite synthetic transcripts to Malaysian register.** Manglish code-switching, **MC** (not "sick note"), panel/company patients, medicine **dispensed at the clinic** (not a prescription taken elsewhere), NRIC, RM. Cheap and high-yield: if the fixtures read American, the whole prototype reads as a template. _(Check the current fixtures before committing to this — I did not read them.)_
+7. **Fixtures — Rewrite Synthetic Transcripts To Malaysian Register.** Manglish code-switching, **MC** (not "sick note"), panel/company patients, medicine **dispensed at the clinic** (not a prescription taken elsewhere), NRIC, RM. Cheap and high-yield: if the fixtures read American, the whole prototype reads as a template. _(Check the current fixtures before committing to this — I did not read them.)_
 
-8. **Scope — keep URTI, and justify it with the number.** One line citing NMCS 2014: URTI is the **most common private-clinic presentation at 13.1% of cases**, and **57.7%** of private URTI patients receive an antibiotic. That turns a narrow scope from "we ran out of time" into "we picked the modal Malaysian GP encounter".
+8. **Scope — Keep URTI, And Justify It With The Number.** One line citing NMCS 2014: URTI is the **most common private-clinic presentation at 13.1% of cases**, and **57.7%** of private URTI patients receive an antibiotic. That turns a narrow scope from "we ran out of time" into "we picked the modal Malaysian GP encounter".
 
 ### What This Explicitly Does Not Change
 

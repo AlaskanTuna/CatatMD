@@ -50,8 +50,8 @@ The lane is chosen by what the change is, not by how big it is.
 | **Docs Lane**   | Prose only: `docs/**` and root prose such as `README.md`. The whole diff, not part of it. | Commit straight to `main`. Every push runs `verify`, so the commit stands on its own. It does not deploy: `docs/**` is outside the deployable-paths filter in `ci.yml` (#82); keep it that way. |
 | **Branch Lane** | Everything else, including one-line code, config and workflow fixes, and any mixed diff.  | Branch, pull request, `gh pr merge --squash --delete-branch`.                                                                                                                                   |
 
-- **Markdown is not automatically docs.** `AGENTS.md`, `docs/agents/**`, `.claude/**`, `.agents/skills/**` and `.github/*.md` change how agents behave. They take the Branch Lane whatever their size.
-- **A stacked pull request is the one case where `--delete-branch` is wrong.** Deleting a branch closes every pull request based on it instead of retargeting them. Merge the child first, or merge the parent without `--delete-branch` and delete the branch once the child lands (#351, #352, #353).
+- **Markdown Is Not Automatically Docs.** `AGENTS.md`, `docs/agents/**`, `.claude/**`, `.agents/skills/**` and `.github/*.md` change how agents behave. They take the Branch Lane whatever their size.
+- **A Stacked Pull Request Is The One Case Where `--delete-branch` Is Wrong.** Deleting a branch closes every pull request based on it instead of retargeting them. Merge the child first, or merge the parent without `--delete-branch` and delete the branch once the child lands (#351, #352, #353).
 
 ## Issues
 
@@ -62,9 +62,9 @@ The lane is chosen by what the change is, not by how big it is.
 
 ## Branches And Commits
 
-- **Branch names:** `<type>/<short-topic>`, for example `fix/deid-spoken-dob` or `feat/ic-scan-intake`.
+- **Branch Names:** `<type>/<short-topic>`, for example `fix/deid-spoken-dob` or `feat/ic-scan-intake`.
 - **Commits** follow [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <imperative summary>`, sentence case, no trailing period. commitlint enforces it in the `commit-msg` hook. Types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `build`, `ci`, `chore`, `revert`.
-- **The pull request title** becomes the squash commit, so it follows the same format and ends with the issue number: `fix(deid): tokenise a date of birth said as words (#441)`.
+- **The Pull Request Title** becomes the squash commit, so it follows the same format and ends with the issue number: `fix(deid): tokenise a date of birth said as words (#441)`.
 
 ## Pull Requests
 

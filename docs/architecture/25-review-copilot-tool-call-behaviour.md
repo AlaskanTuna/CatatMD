@@ -12,7 +12,7 @@ The report was that CatatAI answers a doctor's edit request in prose instead of 
 
 Measured properly, the headline rate is **22 of 36 (61%)** locally and **26 of 36 (72%)** against production. More usefully, the misses are not one failure:
 
-| Class of miss                                             | Count (of 36) | Is it a defect?                                               |
+| Class Of Miss                                             | Count (Of 36) | Is It A Defect?                                               |
 | --------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
 | Content is already in the note, and the model says so     | 9             | **No.** A card duplicating existing wording wastes the review |
 | Replacement wording written into the answer, no tool call | 4             | **Yes.** This is the reported bug                             |
@@ -36,13 +36,13 @@ A change is an improvement only if the edit rate rises while the question rate d
 
 ## 25.4 Four Revisions Were Trialled And All Four Rejected
 
-**The result to read first is v4**, because it is the one that would have passed review. It produced the best headline rate of any arm, 26 of 34, and got there by halving the cases where the copilot correctly declines because the content is already in the note. A revision that improves the metric by removing the behaviour the metric exists to protect is the reason the acceptance table below was written down before any of this ran.
+**The Result To Read First Is v4**, because it is the one that would have passed review. It produced the best headline rate of any arm, 26 of 34, and got there by halving the cases where the copilot correctly declines because the content is already in the note. A revision that improves the metric by removing the behaviour the metric exists to protect is the reason the acceptance table below was written down before any of this ran.
 
 Rule 5 in `buildCopilotSystemPrompt` is entirely defensive: it describes the mechanism once and then polices tense, with worked examples of overclaiming and none of using the tool. Three prompt revisions and one tool-description revision followed from that reading. None shipped. **`prompt.ts` and `tools.ts` are unchanged.**
 
 Denominators differ where a turn errored, so they are given rather than assumed. The v3 and v4 runs bound each turn at 120 s (§25.6); the first three did not, which is why only they show errors.
 
-| Metric                                    | Shipped  | v1 positive trigger | v2 remove template | v3 v2 + card-claim ban | v4 tool description |
+| Metric                                    | Shipped  | v1 Positive Trigger | v2 Remove Template | v3 v2 + Card-Claim Ban | v4 Tool Description |
 | ----------------------------------------- | -------- | ------------------- | ------------------ | ---------------------- | ------------------- |
 | Edit requests producing a card            | 22/36    | 21/36               | 21/36              | 24/36                  | 26/34               |
 | Correct "already present" declines        | 9        | 11                  | 11                 | 10                     | **5**               |
@@ -55,15 +55,15 @@ Denominators differ where a turn errored, so they are given rather than assumed.
 
 The acceptance table above was **written down before v3 ran**, because at 36 edit prompts the interval on any rate is roughly plus or minus 15 points, and a criterion chosen after seeing the numbers is not a criterion. No rate improvement is claimed from this sample size. What is claimed is the count of specific text patterns, which is directly observable.
 
-**v1 tripled the failure it targeted.** Rule 5 lists `"Proposed for the plan:"` as a _correct_ phrasing for use after a tool call. The model treats it as an output template and reproduces it _instead of_ calling the tool. Emphasising the correct phrasings made the template more salient, not less.
+**v1 Tripled The Failure It Targeted.** Rule 5 lists `"Proposed for the plan:"` as a _correct_ phrasing for use after a tool call. The model treats it as an output template and reproduces it _instead of_ calling the tool. Emphasising the correct phrasings made the template more salient, not less.
 
-**v2 removed the template and introduced something worse.** The literal phrasing went to zero, but the model began asserting that a card existed: "Proposal sent to update the **objective** section. The card is waiting for your review", with no card. That is the #170 false-completion failure in a form the past-tense wording ban does not cover, and a false claim about system state is worse than a missing affordance.
+**v2 Removed The Template And Introduced Something Worse.** The literal phrasing went to zero, but the model began asserting that a card existed: "Proposal sent to update the **objective** section. The card is waiting for your review", with no card. That is the #170 false-completion failure in a form the past-tense wording ban does not cover, and a false claim about system state is worse than a missing affordance.
 
-**v3 added the missing ban and leaked the prompt.** Adding an explicit "never state that a card exists" clause did close the v2 regression to 1, and cost more than it bought: the model began deliberating about the rules in front of the doctor, emitting _"Wait, the prompt says 'Never write replacement wording into your answer...'"_ into the clinical panel. A second explicit prohibition made the instruction itself the subject of the answer.
+**v3 Added The Missing Ban And Leaked The Prompt.** Adding an explicit "never state that a card exists" clause did close the v2 regression to 1, and cost more than it bought: the model began deliberating about the rules in front of the doctor, emitting _"Wait, the prompt says 'Never write replacement wording into your answer...'"_ into the clinical panel. A second explicit prohibition made the instruction itself the subject of the answer.
 
-**v4 raised the headline rate by destroying correct behaviour.** The one lever AC4 leaves open is the tool description, which described the mechanics of `edit_note_section` but never said when to reach for it. Rewriting it to name the trigger produced the best headline figure of any arm, 26/34, and halved the correct "already present" declines from 9 to 5. Per prompt: "the plan needs the MC duration spelled out" went from 1 of 3 correct declines and no cards, to 0 of 3 declines and 2 cards. The model stopped noticing that the content was already in the note and proposed duplicates instead. A rate that rises because the system got worse at declining is not an improvement, and only the per-class breakdown shows it.
+**v4 Raised The Headline Rate By Destroying Correct Behaviour.** The one lever AC4 leaves open is the tool description, which described the mechanics of `edit_note_section` but never said when to reach for it. Rewriting it to name the trigger produced the best headline figure of any arm, 26/34, and halved the correct "already present" declines from 9 to 5. Per prompt: "the plan needs the MC duration spelled out" went from 1 of 3 correct declines and no cards, to 0 of 3 declines and 2 cards. The model stopped noticing that the content was already in the note and proposed duplicates instead. A rate that rises because the system got worse at declining is not an improvement, and only the per-class breakdown shows it.
 
-**The pattern across all four is the finding.** Each revision suppressed one prose form and produced another: template, then false card claim, then prompt leakage, then duplicate proposals. §21.3 ranks system-prompt instruction as a tier-4 control that fails silently, and four attempts is enough evidence that this defect is not addressable at that tier. The defect rate is about one edit request in nine, it is documented as a known limitation in `docs/README.md`, and the issue stays open rather than being closed with a change that measures worse.
+**The Pattern Across All Four Is The Finding.** Each revision suppressed one prose form and produced another: template, then false card claim, then prompt leakage, then duplicate proposals. §21.3 ranks system-prompt instruction as a tier-4 control that fails silently, and four attempts is enough evidence that this defect is not addressable at that tier. The defect rate is about one edit request in nine, it is documented as a known limitation in `docs/README.md`, and the issue stays open rather than being closed with a change that measures worse.
 
 ## 25.5 The Phantom-Click Diagnostic
 
@@ -75,14 +75,14 @@ Measured at **0 of 90** on the shipped prompt. It is exported so the unit pin an
 - `approve` is deliberately absent though the issue's prose names it: it is ordinary vocabulary here, including in hard rule 3, so matching it would flag the model correctly refusing to approve a note.
 - A claim that a card exists, without any of the three verbs, is not caught. This is the v2 failure class above.
 
-**A clean phantom-click count therefore cannot gate a prompt change.** v2 scored 0 of 90 here while asserting three times that a card was waiting for review, because it never used the word "click". Read on this diagnostic alone, the more dangerous of the two revisions looks like the safer one. The count is evidence about one phrasing of one failure, not about whether the model is pointing the doctor at things that are not there.
+**A Clean Phantom-Click Count Therefore Cannot Gate A Prompt Change.** v2 scored 0 of 90 here while asserting three times that a card was waiting for review, because it never used the word "click". Read on this diagnostic alone, the more dangerous of the two revisions looks like the safer one. The count is evidence about one phrasing of one failure, not about whether the model is pointing the doctor at things that are not there.
 
 ## 25.6 Evaluation Durability
 
 Two separate losses during this work, with different causes and only one shared fix:
 
-- **The scoring rule changed.** The phantom-click pattern was corrected mid-measurement, and the completed production run recorded only counts, so it could not be rescored and its phantom figure was withdrawn rather than reported.
-- **The run did not finish.** Three attempts were killed around ten minutes by the harness running them, and an end-of-run write recorded nothing at all.
+- **The Scoring Rule Changed.** The phantom-click pattern was corrected mid-measurement, and the completed production run recorded only counts, so it could not be rescored and its phantom figure was withdrawn rather than reported.
+- **The Run Did Not Finish.** Three attempts were killed around ten minutes by the harness running them, and an end-of-run write recorded nothing at all.
 
 An evaluation that spends real model calls must treat its **raw per-turn outputs as the artefact and the summary as derived**, because the scoring rule will change and the run will be interrupted, and neither is unusual enough to plan around separately. `evals/copilot-proposals.ts` therefore writes every turn to `reports/copilot-proposals-<label>.json` as it completes, resumes from that transcript, and bounds each turn with `EVAL_TURN_TIMEOUT_MS` after one turn held a stream open past ten minutes and stalled an entire invocation.
 

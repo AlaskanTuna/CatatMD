@@ -15,11 +15,11 @@ These rules hold everywhere in the repository, for every agent and every collabo
 | Log transcript bodies, note contents, or de-identification vault entries. Log IDs and event types only.                                                            | Redaction in `backend/src/lib/logger.ts`                                                               |
 | Commit real patient data, real NRICs, or anything taken from a real clinical system. Fixtures are **synthetic** and live in `backend/src/fixtures/`.               | Review, and the clinical-data guard in `.gitignore`                                                    |
 
-**Speech audio is the one accepted exception to "de-identify before egress".** Audio cannot be tokenised, so the ASR adapters in `backend/src/lib/asr/` send it to the speech provider directly. `.claude/rules/phi-egress.md` states the controls that apply instead.
+**Speech Audio Is The One Accepted Exception To "De-Identify Before Egress".** Audio cannot be tokenised, so the ASR adapters in `backend/src/lib/asr/` send it to the speech provider directly. `.claude/rules/phi-egress.md` states the controls that apply instead.
 
 ## Repository
 
-- **Do not** force-push, rewrite published history, or delete any branch other than a merged feature branch. `.claude/hooks/block-dangerous-git.mjs` enforces this.
-- **Do not** commit or push without explicit human authorization.
-- **Do not** commit a secret. `.env.example` is committed and `.env` is gitignored. Gitleaks scans staged changes in the pre-commit hook and every pull request in CI.
-- **Do not** lower the quality floor to go green. `bun run verify` fails on a new suppression, a skipped or focused test, or a new empty `catch` or `TODO` (`scripts/floor-guard.ts`). When one is truly intended, ask the human; only they add a `Floor-Guard-Allow: <reason>` trailer to the commit.
+- **Do Not** force-push, rewrite published history, or delete any branch other than a merged feature branch. `.claude/hooks/block-dangerous-git.mjs` enforces this.
+- **Do Not** commit or push without explicit human authorization.
+- **Do Not** commit a secret. `.env.example` is committed and `.env` is gitignored. Gitleaks scans staged changes in the pre-commit hook and every pull request in CI.
+- **Do Not** lower the quality floor to go green. `bun run verify` fails on a new suppression, a skipped or focused test, or a new empty `catch` or `TODO` (`scripts/floor-guard.ts`). When one is truly intended, ask the human; only they add a `Floor-Guard-Allow: <reason>` trailer to the commit.

@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# audit
+# Audit
 
 Writes consultation audit events, verifies the hash chain, serves history and notifications, and handles erasure.
 

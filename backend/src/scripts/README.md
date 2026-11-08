@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# scripts
+# Scripts
 
 Provides the backend command for ingesting clinical practice guideline documents into the retrieval corpus.
 

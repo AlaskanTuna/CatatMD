@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# analysis
+# Analysis
 
 Builds structured consultation analysis from de-identified text and folds live analysis windows.
 

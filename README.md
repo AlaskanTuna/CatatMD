@@ -41,7 +41,7 @@
 
 <!-- TABLE OF CONTENTS -->
 
-## Table of Contents
+## Table Of Contents
 
 <details>
   <summary>Expand</summary>
@@ -171,11 +171,11 @@ flowchart LR
 ```
 
 1. **Capture.** The doctor records the consultation (on-device, hosted, or ambient streaming with per-consultation consent), pastes a transcript, or uploads one.
-2. **Rules first.** A deterministic engine checks the transcript against a versioned list of danger signs before any model sees it.
-3. **De-identify.** Names, NRICs, phone numbers and other identifiers become stable tokens such as `[PATIENT_1]`, held in a request-scoped vault.
+2. **Rules First.** A deterministic engine checks the transcript against a versioned list of danger signs before any model sees it.
+3. **De-Identify.** Names, NRICs, phone numbers and other identifiers become stable tokens such as `[PATIENT_1]`, held in a request-scoped vault.
 4. **Draft.** The model returns a structured note, missing-information prompts and suggestions. Every fact must quote the transcript, and every citation must name a guideline passage it was given.
 5. **Assemble.** Rule hits and model output are joined as a union, so the model can add a red flag but never remove one. Tokens are restored to real names.
-6. **Review and approve.** The doctor edits, asks CatatAI questions, confirms a dictated prescription, and approves. Approval is terminal.
+6. **Review And Approve.** The doctor edits, asks CatatAI questions, confirms a dictated prescription, and approves. Approval is terminal.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -296,7 +296,7 @@ bun run dev                 # web on :5173, API on :3001
 
 Check the API: `curl localhost:3001/api/health`.
 
-> **Never point `.env` at a shared or production database for local work.** The test suites and every mutating control write real rows.
+> **Never Point `.env` At A Shared Or Production Database For Local Work.** The test suites and every mutating control write real rows.
 
 <a id="run-tests"></a>
 
@@ -320,17 +320,17 @@ The safety argument is not "a doctor reviews everything". Doctors do not reliabl
 
 | Property                                  | How It Is Enforced                                                                                                                              |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No identifier reaches a model**         | `LLMClient` accepts only a `Deidentified` branded string that only `deid/` can mint, and re-scans its payload before every call, failing closed |
-| **The model cannot suppress a red flag**  | The rules engine runs first, its results are never shown to the model, and assembly is a union, never a filter                                  |
-| **Citations cannot be invented**          | The request-time schema narrows each citation id to the passages retrieved, so any other reference fails validation before the doctor sees it   |
-| **Unknown is never recorded as negative** | Six explicit assertion states; a fact whose evidence does not match the transcript verbatim is forced to `NOT_ASSESSED`                         |
-| **No diagnosis is generated**             | The diagnosis field is filled only from a verbatim span where the doctor states it; the model is never asked what the diagnosis is              |
-| **Approval is a human act**               | Approval is an explicit state transition with an audit event, and terminal; a guard test fails if any other path can reach `approved`           |
-| **Nothing sensitive is logged**           | Logs and audit events carry ids and detector labels, never transcript text, note content or vault entries                                       |
+| **No Identifier Reaches A Model**         | `LLMClient` accepts only a `Deidentified` branded string that only `deid/` can mint, and re-scans its payload before every call, failing closed |
+| **The Model Cannot Suppress A Red Flag**  | The rules engine runs first, its results are never shown to the model, and assembly is a union, never a filter                                  |
+| **Citations Cannot Be Invented**          | The request-time schema narrows each citation id to the passages retrieved, so any other reference fails validation before the doctor sees it   |
+| **Unknown Is Never Recorded As Negative** | Six explicit assertion states; a fact whose evidence does not match the transcript verbatim is forced to `NOT_ASSESSED`                         |
+| **No Diagnosis Is Generated**             | The diagnosis field is filled only from a verbatim span where the doctor states it; the model is never asked what the diagnosis is              |
+| **Approval Is A Human Act**               | Approval is an explicit state transition with an audit event, and terminal; a guard test fails if any other path can reach `approved`           |
+| **Nothing Sensitive Is Logged**           | Logs and audit events carry ids and detector labels, never transcript text, note content or vault entries                                       |
 
-**The finding it was built against.** Against a live model, a one-line transcript ("cough 3 days, no fever") produced a note denying haemoptysis, chest pain and six other findings nobody raised, in **5 of 5 runs**. The model fabricates in proportion to how sparse the transcript is, which is exactly the input this product serves. The evidence check and assertion states exist because of that measurement ([`docs/architecture/21-llm-guardrail-architecture.md`](docs/architecture/21-llm-guardrail-architecture.md)).
+**The Finding It Was Built Against.** Against a live model, a one-line transcript ("cough 3 days, no fever") produced a note denying haemoptysis, chest pain and six other findings nobody raised, in **5 of 5 runs**. The model fabricates in proportion to how sparse the transcript is, which is exactly the input this product serves. The evidence check and assertion states exist because of that measurement ([`docs/architecture/21-llm-guardrail-architecture.md`](docs/architecture/21-llm-guardrail-architecture.md)).
 
-**Audio is the stated exception to "de-identify before egress".** Audio cannot be tokenised, so on-device recognition is the default, and every hosted path needs an explicit per-consultation consent. Each path, its region and its consent rule are set out in [`docs/architecture/20-asr-contract.md`](docs/architecture/20-asr-contract.md) and assessed in [`docs/DPIA.md`](docs/DPIA.md).
+**Audio Is The Stated Exception To "De-Identify Before Egress".** Audio cannot be tokenised, so on-device recognition is the default, and every hosted path needs an explicit per-consultation consent. Each path, its region and its consent rule are set out in [`docs/architecture/20-asr-contract.md`](docs/architecture/20-asr-contract.md) and assessed in [`docs/DPIA.md`](docs/DPIA.md).
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -338,13 +338,13 @@ The safety argument is not "a doctor reviews everything". Doctors do not reliabl
 
 ## Engineering Highlights
 
-- **Invariants as tests.** Twelve `no-stray-*` tests scan the source tree: one provider SDK repo-wide, one minter of the `Deidentified` brand, one path to `approved`, a fixed inventory of outbound `fetch` and `WebSocket` calls, and no audio persisted in the browser.
-- **A provider is an adapter.** Qwen, Gemini and DeepSeek sit behind one OpenAI-compatible port, so a data-residency change is configuration, not a rewrite.
-- **Hybrid retrieval over 109 guideline documents.** Postgres full-text and pgvector legs fused by reciprocal rank fusion, scoped per clinical profile, with page-level provenance and licence-aware rendering.
-- **Multilingual de-identification.** Names and identifiers spoken in English, Malay, Mandarin and Tamil, including identifiers read aloud as number words, with measured recall.
-- **A tamper-evident audit chain.** Each audit event hashes its predecessor, and patient erasure leaves tombstones rather than breaking the chain.
-- **Measured, not asserted.** Model behaviour, analysis latency and speech accuracy per language are measured by scripts in [`evals/`](evals/), and the figures in the docs cite their run.
-- **A quality floor.** `bun run verify` fails on a new lint suppression, a skipped or focused test, or an empty `catch`, unless a maintainer signs it off in the commit.
+- **Invariants As Tests.** Twelve `no-stray-*` tests scan the source tree: one provider SDK repo-wide, one minter of the `Deidentified` brand, one path to `approved`, a fixed inventory of outbound `fetch` and `WebSocket` calls, and no audio persisted in the browser.
+- **A Provider Is An Adapter.** Qwen, Gemini and DeepSeek sit behind one OpenAI-compatible port, so a data-residency change is configuration, not a rewrite.
+- **Hybrid Retrieval Over 109 Guideline Documents.** Postgres full-text and pgvector legs fused by reciprocal rank fusion, scoped per clinical profile, with page-level provenance and licence-aware rendering.
+- **Multilingual De-Identification.** Names and identifiers spoken in English, Malay, Mandarin and Tamil, including identifiers read aloud as number words, with measured recall.
+- **A Tamper-Evident Audit Chain.** Each audit event hashes its predecessor, and patient erasure leaves tombstones rather than breaking the chain.
+- **Measured, Not Asserted.** Model behaviour, analysis latency and speech accuracy per language are measured by scripts in [`evals/`](evals/), and the figures in the docs cite their run.
+- **A Quality Floor.** `bun run verify` fails on a new lint suppression, a skipped or focused test, or an empty `catch`, unless a maintainer signs it off in the commit.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -372,24 +372,24 @@ The full index is [`docs/README.md`](docs/README.md).
 
 ## Limitations
 
-- **No clinician has validated the output**, and all data is synthetic. CatatMD is a prototype, not a medical device, and is not for clinical use.
-- **Regulatory posture is conceded, not escaped.** Red flags with cited suggestions are clinical decision support, which in Malaysia is Class B medical-device territory. The architecture is designed as the compliance strategy ([`docs/PRD.md`](docs/PRD.md) section 11).
-- **De-identification is pattern-based and best-effort.** Measured gaps, such as some identifiers read aloud, are listed rather than hidden.
-- **Two hosted speech destinations leave the region**, because no in-region streaming recogniser handled Malay, English and Chinese switching with speaker separation. The transfer basis is recorded as open in [`docs/DPIA.md`](docs/DPIA.md).
-- **No EMR write-back.** Malaysian private GP systems publish no common API; PDF export is the interim.
-- **It may be slower than a handwritten line** for a three-minute consultation. The claim is documentation quality and a safety net, not time saved.
+- **No Clinician Has Validated The Output**, and all data is synthetic. CatatMD is a prototype, not a medical device, and is not for clinical use.
+- **Regulatory Posture Is Conceded, Not Escaped.** Red flags with cited suggestions are clinical decision support, which in Malaysia is Class B medical-device territory. The architecture is designed as the compliance strategy ([`docs/PRD.md`](docs/PRD.md) section 11).
+- **De-Identification Is Pattern-Based And Best-Effort.** Measured gaps, such as some identifiers read aloud, are listed rather than hidden.
+- **Two Hosted Speech Destinations Leave The Region**, because no in-region streaming recogniser handled Malay, English and Chinese switching with speaker separation. The transfer basis is recorded as open in [`docs/DPIA.md`](docs/DPIA.md).
+- **No EMR Write-Back.** Malaysian private GP systems publish no common API; PDF export is the interim.
+- **It May Be Slower Than A Handwritten Line** for a three-minute consultation. The claim is documentation quality and a safety net, not time saved.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
 <a id="challenges-and-learnings"></a>
 
-## Challenges and Learnings
+## Challenges And Learnings
 
-- **Prompts are the weakest control.** A system-prompt rule fails silently; that is how the fabricated negatives above happened. Structural constraints (enums, ID-constrained citations) and deterministic code fail loudly, so they carry the safety claims.
-- **Sparse input is the dangerous input.** The model invented the most on the shortest transcripts, the very consultations a busy GP produces.
-- **Code-switching is the norm.** Malaysian consultations mix English, Malay, Manglish, Mandarin and Tamil mid-sentence, which shaped the red-flag lexicon, the de-identification detectors and the choice of speech provider.
-- **A consent control can quietly fail open.** For three weeks a remembered device preference stood in for per-patient consent; it was caught, split back into two controls, and pinned by a test.
-- **SOAP is a scaffold, not a Malaysian norm.** No local rule mandates it, and the note payers read has fields SOAP has no home for, so the record offers both views of one note.
+- **Prompts Are The Weakest Control.** A system-prompt rule fails silently; that is how the fabricated negatives above happened. Structural constraints (enums, ID-constrained citations) and deterministic code fail loudly, so they carry the safety claims.
+- **Sparse Input Is The Dangerous Input.** The model invented the most on the shortest transcripts, the very consultations a busy GP produces.
+- **Code-Switching Is The Norm.** Malaysian consultations mix English, Malay, Manglish, Mandarin and Tamil mid-sentence, which shaped the red-flag lexicon, the de-identification detectors and the choice of speech provider.
+- **A Consent Control Can Quietly Fail Open.** For three weeks a remembered device preference stood in for per-patient consent; it was caught, split back into two controls, and pinned by a test.
+- **SOAP Is A Scaffold, Not A Malaysian Norm.** No local rule mandates it, and the note payers read has fields SOAP has no home for, so the record offers both views of one note.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 

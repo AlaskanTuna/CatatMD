@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# clinical-profiles
+# Clinical-Profiles
 
 Defines typed clinical profiles and selects the profile-specific rule and checklist content used by analysis.
 

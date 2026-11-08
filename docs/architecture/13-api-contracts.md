@@ -44,20 +44,20 @@ CAP-3's "a red flag can be acknowledged" and CAP-2's "the doctor can... note tha
 
 `analyzing` is a claim with an expiry, and the review page reads that claim rather than waiting on the response. Both halves come from the same fact: **the browser can stop listening before the API stops working.**
 
-| Piece               | Where                                        | What it does                                                                                                                         |
+| Piece               | Where                                        | What It Does                                                                                                                         |
 | ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `STALE_ANALYSIS_MS` | `shared/src/consultation.ts`, 5 minutes      | How long a claim is honoured. Shared, so the moment the client stops waiting is the moment the API starts accepting a retry          |
 | `ANALYSIS_POLL_MS`  | `shared/src/consultation.ts`, 3 seconds      | How often `GET /api/consultations/:id` is re-read while the record says `analyzing`                                                  |
 | The claim           | `backend/src/routes/consultations.ts`        | One `updateMany` whose `where` is the guard: `draft`/`awaiting_review`, or an `analyzing` row whose `updatedAt` is past the lease    |
 | The poll            | `frontend/src/routes/ConsultationReview.tsx` | `refetchInterval` on the detail query, armed by the mutation's `onError` re-read and switched off when the status settles or expires |
 
-**Why a lease.** The rollback runs in this process's `catch` only. A restart mid-run leaves `analyzing` written with nothing left to clear it, and the previous read-then-write guard then answered 409 to every retry from then on, permanently. Five minutes is chosen against the worst legitimate run: the retrieval branch is a 10s embedding call then a 90s chat call, sequential, around which sit de-identification, the rules engine, rehydration, two writes and two audit rows.
+**Why A Lease.** The rollback runs in this process's `catch` only. A restart mid-run leaves `analyzing` written with nothing left to clear it, and the previous read-then-write guard then answered 409 to every retry from then on, permanently. Five minutes is chosen against the worst legitimate run: the retrieval branch is a 10s embedding call then a 90s chat call, sequential, around which sit de-identification, the rules engine, rehydration, two writes and two audit rows.
 
-**Why `updatedAt` is the clock.** Nothing writes the consultation row between the claim and the persistence write, so while the status is `analyzing` it is when analysis started. This is a coupling, not a declaration: **adding a mid-run write means adding a real `analysisStartedAt` column**, not reading this one harder.
+**Why `updatedAt` Is The Clock.** Nothing writes the consultation row between the claim and the persistence write, so while the status is `analyzing` it is when analysis started. This is a coupling, not a declaration: **adding a mid-run write means adding a real `analysisStartedAt` column**, not reading this one harder.
 
-**Why the rollback target is derived.** A stale claim retaken by a new press arrives at the `catch` as `analyzing`, and restoring the status this handler read would wedge the row for another whole lease. The target is `awaiting_review` when an analysis is already attached and `draft` otherwise.
+**Why The Rollback Target Is Derived.** A stale claim retaken by a new press arrives at the `catch` as `analyzing`, and restoring the status this handler read would wedge the row for another whole lease. The target is `awaiting_review` when an analysis is already attached and `draft` otherwise.
 
-**What this does not change.** Analysis is still synchronous, still one JSON at the end, still inside the 120s ceiling of §6. Nothing retries autonomously: the poll re-reads a record, it never re-presses. Making the delay legible to the doctor rather than merely survivable is issue #224, and streaming `/analyze` (the `copilot` route proves the pattern works through the same rewrite) would remove the ceiling but not the reload, which is why polling came first.
+**What This Does Not Change.** Analysis is still synchronous, still one JSON at the end, still inside the 120s ceiling of §6. Nothing retries autonomously: the poll re-reads a record, it never re-presses. Making the delay legible to the doctor rather than merely survivable is issue #224, and streaming `/analyze` (the `copilot` route proves the pattern works through the same rewrite) would remove the ceiling but not the reload, which is why polling came first.
 
 ## State Machine Cross-Check
 

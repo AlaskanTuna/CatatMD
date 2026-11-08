@@ -20,9 +20,9 @@ App.tsx mounts MarketingShell for public pages and AppShell for authenticated ap
 
 ### Invariants
 
-- **Route boundary:** RequireSession wraps AppShell; the report route is protected separately and remains outside it.
-- **Tour context:** AppShell mounts DemoTourProvider, step controls, help button, and spotlight together.
-- **Responsive navigation:** SidebarIsland and MobileDock provide the shell's desktop and mobile navigation surfaces.
+- **Route Boundary:** RequireSession wraps AppShell; the report route is protected separately and remains outside it.
+- **Tour Context:** AppShell mounts DemoTourProvider, step controls, help button, and spotlight together.
+- **Responsive Navigation:** SidebarIsland and MobileDock provide the shell's desktop and mobile navigation surfaces.
 
 ### Tests
 

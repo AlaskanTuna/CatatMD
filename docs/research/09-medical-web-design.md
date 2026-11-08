@@ -4,9 +4,9 @@
 > medical sites/products actually look like in 2026, what signals trust to doctors and patients, and
 > what should CatatMD's review screen adopt? Evidence is screenshot-based (Chromium at 1440×900,
 > spot-checks at 390×844); screenshots live in `assets/09-design/`. Statements are tagged as
-> **seen** (visible in the screenshot) or **inferred** (read from CSS/docs or prior knowledge).
+> **Seen** (visible in the screenshot) or **inferred** (read from CSS/docs or prior knowledge).
 
-**Method note:** Playwright's browser was inspected via the Chrome DevTools MCP fallback (the
+**Method Note:** Playwright's browser was inspected via the Chrome DevTools MCP fallback (the
 Playwright MCP required a Chrome-channel binary that is not installed). Three sites blocked
 automated browsing entirely — Mayo Clinic (Akamai "Access Denied"), Johns Hopkins Medicine and
 Carbon Health (Cloudflare challenge), One Medical (CloudFront error) — so those are covered only
@@ -25,11 +25,11 @@ by inference from published commentary, flagged inline.
   Full-width campus photography hero with tower labels — the _building itself_ is the trust object.
   Floating quick-action card row: Find a Doctor / Make an Appointment / Health Packages.
   Sand/bronze secondary palette in the technology section; equipment glamour shots (MRI, robots).
-- **Seen (mobile):** sticky bottom bar (Location / Customer Care) in solid red, green WhatsApp FAB.
-- **Trust signals:** scale (campus, towers), technology imagery, "Best Hospital in Malaysia" title tag.
-- **Accessibility impression:** the pale-teal "LEARN MORE" button with white text visibly fails
+- **Seen (Mobile):** sticky bottom bar (Location / Customer Care) in solid red, green WhatsApp FAB.
+- **Trust Signals:** scale (campus, towers), technology imagery, "Best Hospital in Malaysia" title tag.
+- **Accessibility Impression:** the pale-teal "LEARN MORE" button with white text visibly fails
   contrast; body grey-on-white is adequate. Dense nav with small hit targets.
-- **Reads as:** competent 2018-era hospital-corporate; photography-led, not typography-led.
+- **Reads As:** competent 2018-era hospital-corporate; photography-led, not typography-led.
 
 ### Gleneagles Hospitals (IHH) — https://gleneagles.com.my/
 
@@ -39,8 +39,8 @@ by inference from published commentary, flagged inline.
   Lifestyle photography of smiling young Malaysians. Utility nav row above main nav (e-Shop,
   Find A Doctor, Request an Appointment, International Patient, Emergency Contact).
   Four-color quick-action bar (slate / maroon / orange / teal) — each action gets its own hue.
-- **Trust signals:** IHH group brand, "Empathy" copy, breadth of services; no badges in hero.
-- **Reads as:** retail healthcare — the e-Shop banner and orange swoosh push it toward commerce.
+- **Trust Signals:** IHH group brand, "Empathy" copy, breadth of services; no badges in hero.
+- **Reads As:** retail healthcare — the e-Shop banner and orange swoosh push it toward commerce.
   Multi-hue action bars are exactly what a clinical tool should _not_ do (color loses meaning).
 
 ### Prince Court Medical Centre — https://princecourt.com/
@@ -50,8 +50,8 @@ by inference from published commentary, flagged inline.
 - **Seen:** Gold/bronze + navy palette, serif logotype and serif hero greeting ("Warm greetings!"),
   full-bleed video hero, giant symptom/doctor search bar with mic icon, gold right-rail quick
   actions, ambulance/emergency phone number permanently in the top utility bar.
-- **Trust signals:** luxury-hotel language — serif, gold, concierge tone. Emergency number always visible.
-- **Reads as:** premium hospitality. Serif + gold reads "expensive," not "clinical software."
+- **Trust Signals:** luxury-hotel language — serif, gold, concierge tone. Emergency number always visible.
+- **Reads As:** premium hospitality. Serif + gold reads "expensive," not "clinical software."
 
 ### Subang Jaya Medical Centre (Ramsay Sime Darby) — https://subangjayamedicalcentre.com/
 
@@ -62,8 +62,8 @@ by inference from published commentary, flagged inline.
   International, SAMM 440 lab certification — each named in full. Serif italic "Clinical
   Excellence" headline. Quick-action cards on pale mint (Latest Promo / Find a Doctor / Health
   Checkup / Refer a Patient). WhatsApp + phone icon buttons in the header.
-- **Trust signals:** the strongest badge display of any site studied — accreditation _is_ the hero.
-- **Reads as:** the Malaysian trust formula stated explicitly: institutional badges + navy +
+- **Trust Signals:** the strongest badge display of any site studied — accreditation _is_ the hero.
+- **Reads As:** the Malaysian trust formula stated explicitly: institutional badges + navy +
   appointment CTA + WhatsApp.
 
 ### DoctorOnCall — https://www.doctoroncall.com.my/
@@ -74,7 +74,7 @@ by inference from published commentary, flagged inline.
   badges, WhatsApp number in the header, EN/MS language toggle, stat counters ("500K+ patients
   served", "8000 health articles"), maroon and navy CTAs, "Malaysia's Trusted Healthcare
   Platform" headline.
-- **Reads as:** e-commerce first, clinical second. Useful as evidence of local vernacular
+- **Reads As:** e-commerce first, clinical second. Useful as evidence of local vernacular
   (WhatsApp, bilingual, discount culture) — not as a visual model for a doctor-facing tool.
 
 ### Naluri — https://www.naluri.life/
@@ -83,10 +83,10 @@ by inference from published commentary, flagged inline.
 
 - **Seen:** Teal gradient hero, white grotesque headline, dark near-black CTA button, corporate
   logo strip as the trust block (Petronas, PwC, Prudential, AIA, Malaysia Airlines, Kraft Heinz).
-- **Reads as:** the most "modern SaaS" of the Malaysian set — B2B logo-strip trust, restrained
+- **Reads As:** the most "modern SaaS" of the Malaysian set — B2B logo-strip trust, restrained
   palette. Shows Malaysian digital health _can_ look like contemporary SaaS.
 
-**Malaysia pattern (synthesis):** trust is signalled by _institutions and access_, not by
+**Malaysia Pattern (Synthesis):** trust is signalled by _institutions and access_, not by
 minimalism — accreditation badges (SJMC), physical scale (Sunway), always-visible emergency
 phone (Prince Court), WhatsApp on every site, bilingual toggles, and appointment CTAs multiplied
 in every corner. Palettes cluster on teal/blue + one warm accent (orange/gold/red). Density is
@@ -103,17 +103,17 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 - **Seen:** White nav, one typeface, blue links, a _single_ solid-blue CTA ("Appointments"),
   dimmed full-bleed video hero with a large humanist-sans headline, underlined text links instead
   of secondary buttons, a blue pill alert ("Closures & Updates") with an "!" icon at the very top.
-- **Trust signals:** restraint itself — one CTA, one accent color, professional photography,
+- **Trust Signals:** restraint itself — one CTA, one accent color, professional photography,
   locations bar (Abu Dhabi/London/…) implying scale.
-- **Reads as:** the modern institutional benchmark: photography + one blue + underlined links.
+- **Reads As:** the modern institutional benchmark: photography + one blue + underlined links.
 
-### Mayo Clinic — https://www.mayoclinic.org/ _(blocked — Akamai "Access Denied")_
+### Mayo Clinic — https://www.mayoclinic.org/ _(Blocked — Akamai "Access Denied")_
 
 - **Inferred:** dark navy-blue (`#003DA5`-family) identity, white content pages, serif/sans mix,
   heavy information hierarchy for conditions content, "top hospital" ranking badges. Not verified
   by screenshot in this pass.
 
-### Johns Hopkins Medicine — https://www.hopkinsmedicine.org/ _(blocked — Cloudflare)_
+### Johns Hopkins Medicine — https://www.hopkinsmedicine.org/ _(Blocked — Cloudflare)_
 
 - **Inferred:** academic navy + white, dense content IA similar to Mayo. Not verified by screenshot.
 
@@ -123,27 +123,27 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 ![NHS care cards on the cough page](assets/09-design/nhs-care-cards.png)
 ![NHS mobile urgent card](assets/09-design/nhs-mobile-urgent.png)
 
-- **Seen (home):** Solid NHS-blue header, white logo block, underlined nav links, green
+- **Seen (Home):** Solid NHS-blue header, white logo block, underlined nav links, green
   action buttons with a darker bottom border (pressable affordance), blue panel overlaying
   photography, card grid with chevron affordances. One typeface (Frutiger, inferred name).
-- **Seen (cough symptom page):** the **care-card severity pattern** — a white card whose _header
+- **Seen (Cough Symptom Page):** the **care-card severity pattern** — a white card whose _header
   bar_ carries the urgency color and whose body stays black-on-white for legibility:
   - "See a GP if:" → **blue** header (non-urgent)
   - "Ask for an urgent GP appointment or get help from NHS 111 if:" → **red** header (urgent)
   - (Emergency "call 999" uses a red-bordered immediate variant — inferred from the design system.)
     Severity is carried by header color + _explicit action wording_, never by tinting the body text.
-- **Seen (mobile 390×844):** the urgent card is full-width, text unchanged, targets large. The
+- **Seen (Mobile 390×844):** the urgent card is full-width, text unchanged, targets large. The
   pattern survives small screens with zero loss.
-- **Design system evidence** — https://service-manual.nhs.uk/design-system/styles/colour :
+- **Design System Evidence** — https://service-manual.nhs.uk/design-system/styles/colour :
 
 ![NHS service manual](assets/09-design/nhs-design-system-colour.png)
 ![NHS colour palette with hexes](assets/09-design/nhs-palette.png)
 
-- **Seen (documented hexes):** red `#d5281b`, yellow `#ffeb3b`, green `#007f3b`, aqua-green
+- **Seen (Documented Hexes):** red `#d5281b`, yellow `#ffeb3b`, green `#007f3b`, aqua-green
   `#00a499`, blue `#005eb8`, dark-blue `#003087`, purple `#330072`, orange `#ed8b00`,
   warm-yellow `#ffb81c`, pale-yellow `#fff9c4`, black `#212b32`. The manual instructs using
   semantic Sass variables (e.g. `$nhsuk-error-colour`) over raw palette colors.
-- **Inferred (from the service manual's guidance pages):** WCAG 2.2 AA is the mandated bar;
+- **Inferred (From The Service Manual's Guidance Pages):** WCAG 2.2 AA is the mandated bar;
   focus states are a dedicated style (yellow fill + black bottom border); text on photos is
   banned unless on a solid panel; interactive targets ≥24×24 CSS px (WCAG 2.5.8) with NHS
   components typically far larger; error/urgent information is never conveyed by color alone.
@@ -175,9 +175,9 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
   health systems" claim, news card citing Kaiser Permanente. Below the fold: warm off-white
   (≈`#F7F5F2`) stat cards — "43% increase in ability to accommodate urgent patients" — outcome
   numbers as the trust currency.
-- **Reads as:** the premium end of the genre. Editorial warmth + enterprise numbers.
+- **Reads As:** the premium end of the genre. Editorial warmth + enterprise numbers.
 
-### Heidi Health — https://www.heidihealth.com/ (served `en-my` — has a Malaysian locale)
+### Heidi Health — https://www.heidihealth.com/ (Served `en-my` — Has A Malaysian Locale)
 
 ![Heidi hero](assets/09-design/heidi-hero.png)
 
@@ -185,8 +185,8 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
   ("_Relief_ in every visit"), butter-yellow accent (banner + "Book a demo"), dark pill primary
   CTA, product-first hero: a live query box with chips (Look up / Research / Treat / Explain /
   Compare) and an Evidence/Scribe/Dictate toggle over a soft blurred photo card.
-- **Trust signals:** the product itself demoed in the hero; "Ask AI about Heidi" row.
-- **Reads as:** friendly-consumer clinical: warm, calm, quietly confident. The serif-accent-word
+- **Trust Signals:** the product itself demoed in the hero; "Ask AI about Heidi" row.
+- **Reads As:** friendly-consumer clinical: warm, calm, quietly confident. The serif-accent-word
   - warm-neutral formula is the 2026 genre signature.
 
 ### Nabla — https://www.nabla.com/
@@ -196,7 +196,7 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 - **Seen:** Deep pine-green-tinted doctor-patient photography, centered grotesque headline with a
   mint-green highlighted line ("Elevated care."), dark green CTA, white pill secondary. Copy
   leads with "embedded, trusted, and scaled."
-- **Reads as:** green-family alternative to medical blue; calm, institutional-modern.
+- **Reads As:** green-family alternative to medical blue; calm, institutional-modern.
 
 ### Freed — https://www.getfreed.ai/
 
@@ -205,7 +205,7 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 - **Seen:** Violet accent (≈`#6C4CF1`, inferred), warm documentary video still, and — notably —
   **HIPAA Compliant + SOC 2 badges and "Loved by 26k+ clinicians" directly in the hero**,
   lavender announcement banner, white-outline secondary CTA.
-- **Reads as:** the compliance-badge-in-hero pattern translated to SaaS; the closest analogue to
+- **Reads As:** the compliance-badge-in-hero pattern translated to SaaS; the closest analogue to
   what a Malaysian clinician-facing product should do with PDPA/data-residency claims.
 
 ### Corti — https://corti.ai/
@@ -215,7 +215,7 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 - **Seen:** Monochrome + acid-green 3D render, hairline grid borders, mono-caps microcopy
   ("TRUSTED FOR MORE THAN 1 MILLION INTERACTIONS EVERY WEEK"), logo strip including NHS and
   Ramsay, "HIPAA-ready" microcopy under the CTA.
-- **Reads as:** developer-infrastructure aesthetic. Proof that "clinical" and "dev-tool cool"
+- **Reads As:** developer-infrastructure aesthetic. Proof that "clinical" and "dev-tool cool"
   are different languages — CatatMD should not sound like this.
 
 ### Suki — https://www.suki.ai/
@@ -224,9 +224,9 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 
 - **Seen:** Black top banner promoting a **KLAS validation report**, yellow CTA, oversized
   grotesque white headline over documentary clinical video, quote-bar layout.
-- **Reads as:** enterprise sales-led; third-party validation (KLAS) as the trust object.
+- **Reads As:** enterprise sales-led; third-party validation (KLAS) as the trust object.
 
-### Consumer-Modern Clinics _(One Medical, Carbon Health, Tia, Ro — all bot-blocked)_
+### Consumer-Modern Clinics _(One Medical, Carbon Health, Tia, Ro — All Bot-Blocked)_
 
 - **Inferred:** the consumer-clinic wave popularised warm neutrals, serif accents, and
   photography of real people over stock scrubs — the same moves Heidi/Abridge now use. Their
@@ -238,27 +238,27 @@ high; whitespace is not treated as a virtue. Nothing observed had a dark mode.
 
 What modern-and-trustworthy converges on — across Cleveland, NHS, Abridge, Heidi, Nabla, Freed:
 
-1. **One accent color, used scarcely.** The accent marks the single primary action; everything
+1. **One Accent Color, Used Scarcely.** The accent marks the single primary action; everything
    else is neutral. (Cleveland's one blue CTA; Abridge's one vermilion button; Heidi's one dark pill.)
-2. **Warm neutrals are replacing clinical white-and-blue** in the clinician-SaaS genre: cream,
+2. **Warm Neutrals Are Replacing Clinical White-And-Blue** in the clinician-SaaS genre: cream,
    off-white, warm grey grounds with near-black ink (Heidi, Abridge). Institutions keep blue;
    products have moved past it.
-3. **Serif is an accent, not a body face.** A single italic serif word inside a grotesque headline
+3. **Serif Is An Accent, Not A Body Face.** A single italic serif word inside a grotesque headline
    (Heidi) or serif reserved for "excellence" claims (SJMC, Prince Court). Body text is always a
    humanist/neutral sans.
-4. **Trust is explicit, not atmospheric:** compliance badges in the hero (Freed), accreditation
+4. **Trust Is Explicit, Not Atmospheric:** compliance badges in the hero (Freed), accreditation
    seals as hero content (SJMC), third-party validation reports (Suki), outcome numbers (Abridge),
    named logo strips (Naluri, Corti). Restraint alone (Cleveland) works only when the brand is
    already famous.
-5. **Severity has one grammar:** neutral body + colored header/edge + explicit action verb
+5. **Severity Has One Grammar:** neutral body + colored header/edge + explicit action verb
    (NHS care cards). Nobody who is serious tints whole passages red.
-6. **Photography of real people** (patients, clinicians mid-consult) beats illustration and
+6. **Photography Of Real People** (patients, clinicians mid-consult) beats illustration and
    iconography everywhere in this space; illustration reads consumer-app, 3D renders read dev-tool.
-7. **What reads dated in 2026:** multi-color quick-action bars (Gleneagles), pale-tint buttons
+7. **What Reads Dated In 2026:** multi-color quick-action bars (Gleneagles), pale-tint buttons
    with white text (Sunway), promo popups and coupon UI (DoctorOnCall), equipment glamour shots,
    carousels, more than two typefaces, WhatsApp FABs on a professional tool.
 
-**Malaysia vs overseas:** Malaysian sites over-signal (badges + phone numbers + WhatsApp +
+**Malaysia vs Overseas:** Malaysian sites over-signal (badges + phone numbers + WhatsApp +
 multiple CTAs + density) because their audience is patients making a high-cost purchase decision;
 Western clinician products under-signal visually and over-signal _institutionally_ (compliance
 badges, validation reports, outcome stats). CatatMD's audience is Malaysian _doctors_: it should
@@ -268,7 +268,7 @@ neutrals, generous legibility).
 
 ---
 
-## 5. Recommended Direction for CatatMD
+## 5. Recommended Direction For CatatMD
 
 ### Palette Family
 
@@ -279,7 +279,7 @@ neutrals, generous legibility).
 | Primary accent | Deep clinical teal-green             | `#0F6B5C` (hover `#0A5347`)         | Reads medical in both Malaysian (teal heritage: Sunway/Gleneagles/Naluri) and Western (Nabla) registers; distinct from severity colors |
 | Accent usage   | Approve action, active states, links | —                                   | One accent, scarcity rule; the Approve button is the only large filled element on the review screen                                    |
 
-### Severity System (Aligned to Emergency / Urgent / Advisory)
+### Severity System (Aligned To Emergency / Urgent / Advisory)
 
 Adopt the NHS care-card grammar: **white card, colored header/left edge, black body text, explicit
 action wording, plus an icon + label so color is never the only channel** (WCAG 1.4.1).
@@ -299,11 +299,11 @@ prompt, not a warning.
 - **Body/UI:** one humanist sans with a large x-height and real tabular figures — Inter,
   Source Sans 3, or Public Sans (CMS uses the USWDS family; NHS uses Frutiger). 16px minimum
   body, 14px floor for metadata. Line-height ≥1.5 for note text.
-- **Optional accent:** a serif (e.g. Source Serif 4) _only_ for the marketing/login headline —
+- **Optional Accent:** a serif (e.g. Source Serif 4) _only_ for the marketing/login headline —
   one italic accent word maximum, Heidi-style. Never inside the app.
-- **No display fonts, no more than two families total.**
+- **No Display Fonts, No More Than Two Families Total.**
 
-### Review-Screen Layout and Density
+### Review-Screen Layout And Density
 
 - Two-pane: SOAP note as the dominant column (≈62%), right rail stacking red flags (always
   first, emergency on top), missing-info gaps, then cited suggestions. Severity must be visible
@@ -350,25 +350,25 @@ prompt, not a warning.
 This research should seed a future `docs/DESIGN.md` (not created here) as CatatMD's visual spec.
 The load-bearing decisions it should carry:
 
-1. **Warm-neutral ground + single deep teal-green accent** — positions CatatMD with the 2026
+1. **Warm-neutral Ground + Single Deep Teal-Green Accent** — positions CatatMD with the 2026
    clinician-SaaS genre (Heidi/Abridge/Nabla) and away from both hospital-corporate blue and
    chatbot purple; the accent's scarcity is what makes the Approve button unmistakable.
-2. **NHS care-card grammar for the three severities** (colored header/edge + icon + explicit
+2. **NHS Care-Card Grammar For The Three Severities** (colored header/edge + icon + explicit
    action wording on a white card, with AA-corrected hexes) — borrowed from the only
    design system in this study with published, WCAG-audited severity conventions for exactly
    our clinical triage levels.
-3. **Green is reserved for nothing; the accent is reserved for Approve** — a severity palette
+3. **Green Is Reserved For Nothing; The Accent Is Reserved For Approve** — a severity palette
    (red/amber/blue) that never collides with the action palette, so a doctor's eye can resolve
    "danger vs do" preattentively.
-4. **One humanist sans in-app; serif only as a marketing accent** — legibility under 30–60 s
+4. **One Humanist Sans In-App; Serif Only As A Marketing Accent** — legibility under 30–60 s
    time pressure beats brand expressiveness inside the tool.
 5. **Trust is stated, not implied: a credential row (PHI gate, data residency, doctor-in-control)
    on the login/marketing surface** — the SJMC/Freed badge instinct, which matches how Malaysian
    healthcare audiences actually read trustworthiness.
-6. **Severity-first right rail ordered emergency → urgent → advisory, visible without scrolling**
+6. **Severity-first Right Rail Ordered Emergency → Urgent → Advisory, Visible Without Scrolling**
    — layout enforces the same "deterministic rules first" hierarchy as the backend.
-7. **Citations surface as guideline-ID chips** — making the ID-constrained citation contract
+7. **Citations Surface As Guideline-ID Chips** — making the ID-constrained citation contract
    visible in the UI, which doubles as a differentiator against free-text AI tools.
-8. **Accessibility encoded as component defaults** (focus ring, target size, live regions,
+8. **Accessibility Encoded As Component Defaults** (focus ring, target size, live regions,
    reduced motion), following the NHS/CMS position that WCAG in healthcare is a build-time
    system property — with the ten-point checklist above as the QA gate for UI diffs.
