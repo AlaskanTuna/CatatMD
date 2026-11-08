@@ -12,6 +12,7 @@ Components and helpers for reviewing consultation output before approval.
 - [ChecklistPanel.tsx](ChecklistPanel.tsx), [SafetyCards.tsx](SafetyCards.tsx), and [LivePrompter.tsx](LivePrompter.tsx) present assertions, red flags, gaps, and live prompts.
 - [TranscriptCorrections.tsx](TranscriptCorrections.tsx) presents transcript corrections.
 - [PrescriptionBlock.tsx](PrescriptionBlock.tsx) and [PrescriptionTheatre.tsx](PrescriptionTheatre.tsx) support dictated and edited prescriptions.
+- [prescription/](prescription/) holds the theatre's parts: `use-prescription-dictation.ts` (the recording state machine), `use-prescription-draft.ts` (draft lines), and the dictation header, lines table and line row components.
 - [ApproveBar.tsx](ApproveBar.tsx), [ConsultationReport.tsx](ConsultationReport.tsx), and [ScoreCard.tsx](ScoreCard.tsx) render approval and report views.
 
 ### Used By

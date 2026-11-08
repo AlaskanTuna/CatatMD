@@ -6,6 +6,7 @@ import { cn } from '../lib/cn.js'
 import { Button } from '../ui/Button.js'
 import { InfoTip } from '../ui/InfoTip.js'
 import { ConsentGate } from './ConsentGate.js'
+import { createChunkedRecorder } from './chunked-recorder.js'
 import {
   belowHardwareFloor,
   DICTATION_AUDIO_CONSTRAINTS,
@@ -647,19 +648,12 @@ export function AudioCapture({
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: DICTATION_AUDIO_CONSTRAINTS,
       })
-      const media = new MediaRecorder(stream)
-      chunks.current = []
-      media.ondataavailable = (event) => chunks.current.push(event.data)
-      media.onstop = () => {
-        // Released explicitly. A live microphone track outliving the recording
-        // leaves the browser's recording indicator on, which in a consulting
-        // room reads as "still listening".
-        for (const track of stream.getTracks()) track.stop()
+      const media = createChunkedRecorder(stream, chunks, (stopped) => {
         // Dropped as the tracks stop, so the meter unmounts with the recording
         // rather than holding a reference to ended tracks.
         setLiveStream(null)
-        void transcribe(new Blob(chunks.current, { type: media.mimeType }))
-      }
+        void transcribe(new Blob(chunks.current, { type: stopped.mimeType }))
+      })
       media.start()
       recorder.current = media
       setLiveStream(stream)
