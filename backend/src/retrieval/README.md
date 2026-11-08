@@ -19,7 +19,7 @@ Ranks guideline chunks with lexical and semantic search and returns validated ch
 
 ## Used By
 
-- routes/consultations.ts retrieves chunks for the analysis flow.
+- consultations/analysis.ts retrieves chunks for the analysis flow.
 - bench/workflow.ts runs the same retrieval step in local measurements.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

@@ -21,7 +21,7 @@ Builds structured consultation analysis from de-identified text and folds live a
 
 ## Used By
 
-- routes/consultations.ts coordinates the analysis pipeline.
+- consultations/analysis.ts (runAnalysis) coordinates the analysis pipeline; routes/consultations.ts calls it.
 - bench/workflow.ts measures the pipeline; suggestions/safety.ts uses the diagnostic-language guard.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

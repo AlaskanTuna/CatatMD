@@ -2,6 +2,7 @@
 paths:
   - 'backend/src/redflags/**'
   - 'backend/src/routes/consultations.ts'
+  - 'backend/src/consultations/**'
   - 'backend/src/guidelines/**'
   - 'backend/src/clinical-versions/**'
   - 'shared/src/**'
@@ -14,7 +15,7 @@ These rules preserve deterministic red-flag handling, constrained citations, and
 ## Clinical Safety Invariants
 
 - **The model may never suppress a deterministic red flag.** `mergeRedFlags` (`backend/src/redflags/evaluate.ts`) is a pure `ruleFlags.concat(modelCandidates)`. Adding a filter, dedupe, sort, or severity comparison to it breaks the safety invariant and the tests in `backend/src/redflags/evaluate.test.ts` that pin it.
-- Rule evaluation runs on the raw transcript **before** the LLM calls, never on model output. Keep that ordering in `backend/src/routes/consultations.ts`.
+- Rule evaluation runs on the raw transcript **before** the LLM calls, never on model output. Keep that ordering in `runAnalysis` (`backend/src/consultations/analysis.ts`).
 - `makeSuggestionsAndRedFlagsSchema` pins model red flags to `source: z.literal('model')` with `ruleId` omitted, so a model response structurally cannot impersonate a rule hit.
 - **Citations are ID-constrained.** `corpusIdsFor()` (`backend/src/guidelines/documents.ts`) feeds `z.enum(corpusIds)`, so a hallucinated or free-text reference fails schema validation before it reaches a route. Never widen `guidelineId` to a plain string.
 - `serialiseCorpusForPrompt` sends only `id`, `title`, and `summary` to the model. Do not add `url`, `sourceLicence`, or `verbatimAllowed`.

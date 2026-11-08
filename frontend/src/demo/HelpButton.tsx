@@ -94,7 +94,7 @@ export function HelpButton() {
             established, the review copilot, and the approval gate.
           </p>
 
-          {/* The three facts a clinician or an evaluator would otherwise have to
+          {/* The three facts a clinician or any other viewer would otherwise have to
               take on trust, stated before they agree to anything. */}
           <ul className="mt-4 flex flex-col gap-2 text-sm text-ink-muted">
             <li className="flex gap-2">

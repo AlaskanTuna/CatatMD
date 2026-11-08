@@ -150,7 +150,7 @@ export function ConsultationReview() {
    * Demo Mode's consultation is not stored, so there is nothing to fetch for it
    * (issue #80). It renders through this component rather than through a
    * demo-only screen deliberately: a second renderer would drift, and the claim
-   * the tour makes is that an evaluator is looking at the real review surface.
+   * the tour makes is that the viewer is looking at the real review surface.
    */
   const tour = useDemoTour()
   const isEphemeral = id === DEMO_CONSULTATION_ID

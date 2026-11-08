@@ -73,7 +73,7 @@ Merging them into one "Centor threshold" chunk would manufacture a consensus tha
 | Definition   | `backend/src/calculators/sore-throat-score.ts` | NAG 2024 §A10's Modified Centor, items and points only, stamped `SORE_THROAT_SCORE_VERSION`; no threshold. Listed in `VERSIONED_DATA_FILES` |
 | Suggestions  | `backend/src/calculators/prefill.ts`           | Pure. Its own sentence reader, not the red-flag engine's; `suggestion: null` wherever nothing was plainly established                       |
 | When offered | `scoresFor(transcript, profileId)`             | The `adult-acute-urti` profile, and a sentence plainly reporting a sore throat                                                              |
-| Analysis     | `routes/consultations.ts`                      | Run on the raw transcript in-process beside the rules, never sent to a model; `scores` omitted when empty                                   |
+| Analysis     | `consultations/analysis.ts`                    | Run on the raw transcript in-process beside the rules, never sent to a model; `scores` omitted when empty                                   |
 | Stamp        | `clinical-versions/index.ts`                   | `soreThroatScore` in `ACTIVE_CLINICAL_VERSIONS`                                                                                             |
 | Review page  | `frontend/src/review/ScoreCard.tsx`            | Nothing pre-selected; a suggestion shows its sentence and a Use button; answers in component state only; hidden in print                    |
 | Preview stub | `frontend/src/preview/backend.ts`              | Runs the real `scoresFor`, as it runs the real red-flag engine                                                                              |

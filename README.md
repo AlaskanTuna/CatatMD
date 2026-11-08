@@ -23,6 +23,7 @@
     <br />
   </p>
 
+[![Release][release-badge]][release-url]
 [![TypeScript][typescript-badge]][typescript-url]
 [![Bun][bun-badge]][bun-url]
 [![React][react-badge]][react-url]
@@ -483,6 +484,8 @@ Guideline sources keep their own licences, set out in [`docs/architecture/11-gui
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
+[release-badge]: https://img.shields.io/github/v/release/AlaskanTuna/CatatMD?style=for-the-badge
+[release-url]: https://github.com/AlaskanTuna/CatatMD/releases
 [typescript-badge]: https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white
 [typescript-url]: https://www.typescriptlang.org/
 [bun-badge]: https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white

@@ -6,7 +6,7 @@ import { Wordmark } from '../ui/Wordmark.js'
 import { SiteFooter } from './SiteFooter.js'
 
 /**
- * The public shell: everything an evaluator sees before signing in.
+ * The public shell: everything a visitor sees before signing in.
  *
  * Its one structural idea is the footer, and that now belongs to both shells,
  * so it lives in `SiteFooter`. What is left here is the top bar and the layer

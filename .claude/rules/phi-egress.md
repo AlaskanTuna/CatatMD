@@ -8,6 +8,7 @@ paths:
   - 'backend/src/lib/logger.ts'
   - 'backend/src/routes/asr.ts'
   - 'backend/src/routes/consultations.ts'
+  - 'backend/src/consultations/**'
   - 'backend/src/draft-turns/**'
   - 'backend/src/transcript-cleanup/**'
   - 'backend/src/middleware/**'
