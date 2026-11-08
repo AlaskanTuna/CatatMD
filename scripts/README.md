@@ -23,6 +23,12 @@ The exact override trailer is Floor-Guard-Allow: <reason>. It changes diff viola
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
+## Diagrams
+
+[diagrams/render.mjs](diagrams/render.mjs) rebuilds one documentation diagram from its Archify source in `docs/assets/diagrams/src/`, as a light and dark SVG pair in the design-system palette. It needs Archify, `playwright-core` and a Chromium outside the repository; [the diagrams README](../docs/assets/diagrams/README.md) explains the rest.
+
+<p align="right"><a href="#readme-top">&uarr;</a></p>
+
 ## Product Walkthrough Video
 
 The [demo/](demo/) directory contains tooling for producing the product walkthrough video. It is not application runtime code.
