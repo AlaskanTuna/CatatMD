@@ -1,7 +1,7 @@
 import type { DraftTurn, TextRange } from '@shared/types'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { useState } from 'react'
+import { type ComponentProps, useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CapturePanel } from './CapturePanel.js'
@@ -519,6 +519,27 @@ describe('hosted draft-turn labelling', () => {
  * direction that must be impossible.
  */
 
+/** Owns the capture mode the way the review route does, so a mode switch re-renders the panel. */
+function Harness({
+  initialMode,
+  onCapture,
+}: {
+  initialMode: 'ambient' | 'manual'
+  onCapture: ComponentProps<typeof CapturePanel>['onCapture']
+}) {
+  const [mode, setMode] = useState(initialMode)
+  return (
+    <CapturePanel
+      captureMode={mode}
+      onCaptureModeChange={setMode}
+      onCaptureBusyChange={vi.fn()}
+      onCapture={onCapture}
+      saving={false}
+      error={null}
+    />
+  )
+}
+
 describe('recording provenance', () => {
   /**
    * The transcript the route actually submits. Awaited, because `mutate()`
@@ -542,24 +563,10 @@ describe('recording provenance', () => {
   }
 
   function open(captureMode: 'ambient' | 'manual' = 'manual') {
-    function Harness() {
-      const [mode, setMode] = useState(captureMode)
-      return (
-        <CapturePanel
-          captureMode={mode}
-          onCaptureModeChange={setMode}
-          onCaptureBusyChange={vi.fn()}
-          onCapture={captured}
-          saving={false}
-          error={null}
-        />
-      )
-    }
-
     render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter>
-          <Harness />
+          <Harness initialMode={captureMode} onCapture={captured} />
         </MemoryRouter>
       </QueryClientProvider>,
     )

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.5/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -11,6 +11,9 @@
       "!**/dist",
       "!**/node_modules",
       "!graphify-out",
+      "!**/*.md",
+      "!**/*.yml",
+      "!**/*.yaml",
       "!docs/assets/diagrams/*.svg",
       "!prisma/migrations",
       "!.claude/skills",
