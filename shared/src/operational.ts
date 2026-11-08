@@ -5,14 +5,14 @@ import { ClinicalAssertionSchema, LlmClinicalAssertionSchema } from './assertion
 
 /**
  * The payer-enforced record schema — condition → treatment → itemised
- * medication dispensed → MC days → referral (docs/prd.md §1). Two of those
+ * medication dispensed → MC days → referral (docs/PRD.md §1). Two of those
  * fields have no home in SOAP, so a SOAP-only note is incomplete against the
  * contract the clinic signed.
  *
  * Every field here is extraction, never generation. `diagnosis` carries the
  * stricter constraint: it records only an impression the doctor stated, and
  * absent that span it resolves to `NOT_ASSESSED`. The system may not produce a
- * diagnosis the doctor did not say (docs/prd.md §10).
+ * diagnosis the doctor did not say (docs/PRD.md §10).
  */
 const buildOperationalBlock = <T extends z.ZodType>(field: T) =>
   z.object({
@@ -27,7 +27,7 @@ const buildOperationalBlock = <T extends z.ZodType>(field: T) =>
      *
      * Ten dispensed items is far beyond any single GP consultation.
      *
-     * Lowered from twenty on 14/08/26 (GitHub issue #96, docs/trd.md §6).
+     * Lowered from twenty on 14/08/26 (GitHub issue #96, docs/TRD.md §6).
      * Gemini expands a bounded array into `maxItems` copies of the item schema
      * before measuring it against its own schema budget, so twenty assertion
      * objects pushed `clinical_facts` past that budget and every request

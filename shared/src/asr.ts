@@ -16,7 +16,7 @@ export const HostedAsrSegmentSchema = z.object({
 
 /**
  * What `POST /api/asr/transcriptions` returns. `segments` is empty on today's
- * path: the provider does not honour `verbose_json` (docs/trd.md §20.3,
+ * path: the provider does not honour `verbose_json` (docs/TRD.md §20.3,
  * finding 5), and the frontend's `usable()` gate already falls back to plain
  * prose on an empty array. The field stays so provider-side segments can start
  * flowing without a contract change.

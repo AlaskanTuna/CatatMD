@@ -16,7 +16,7 @@ declare global {
  *
  * Mounted per protected path prefix in `app.ts` rather than globally, so
  * `/api/health` and `/api/auth/**` stay reachable without a session
- * (docs/trd.md §14).
+ * (docs/TRD.md §14).
  *
  * On success it exposes only `doctorId` — the downstream route never sees the
  * user record, so an email or name cannot drift into a response or a log line.

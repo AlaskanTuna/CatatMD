@@ -6,7 +6,7 @@ import { FIXTURES } from '../backend/src/fixtures/index.js'
  *
  * Everything goes through the HTTP API rather than direct database writes. The
  * consultation lifecycle carries invariants that live in the routes, not the
- * schema: the append-only audit trail and its hash chain (docs/trd.md §15), the
+ * schema: the append-only audit trail and its hash chain (docs/TRD.md §15), the
  * analysis version stamp, and the approval state transition. Inserting rows by
  * hand would produce a database that looks right and an audit log that does not
  * describe it.

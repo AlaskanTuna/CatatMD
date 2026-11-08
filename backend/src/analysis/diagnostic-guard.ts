@@ -1,7 +1,7 @@
 import type { InformationGap, SoapNote } from '@shared/types'
 
 /**
- * Tier-3 guard (docs/trd.md §21.3) for docs/prd.md §10: the SOAP assessment
+ * Tier-3 guard (docs/TRD.md §21.3) for docs/PRD.md §10: the SOAP assessment
  * and gap text must never state or imply a diagnosis. The structured
  * `operational.diagnosis` field is the only place a diagnosis may appear,
  * and it is bound by the evidence check (§21.4), not by this pattern match.

@@ -1,11 +1,11 @@
 /**
  * Malaysian name cues and a given-name deny-list.
  *
- * docs/trd.md §9: a gazetteer is the **only** measure available in this window
+ * docs/TRD.md §9: a gazetteer is the **only** measure available in this window
  * that raises name recall without a model, and the published evidence says an
  * ML NER would miss unmarked Malay names disproportionately anyway. It is a
  * second recall pass for names carrying no particle or honorific cue — not a
- * claim of completeness. docs/prd.md §12 states the recall limitation plainly.
+ * claim of completeness. docs/PRD.md §12 states the recall limitation plainly.
  */
 
 import { MEDICATION_LEXICON } from '../medications/lexicon.js'

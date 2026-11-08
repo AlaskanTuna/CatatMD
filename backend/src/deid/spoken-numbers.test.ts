@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { scanSpokenNumbers, spokenDigitRuns } from './spoken-numbers.js'
 
 /*
- * The scanner on its own (#435, docs/trd.md §9, "Spoken Digit Runs"). What the
+ * The scanner on its own (#435, docs/TRD.md §9, "Spoken Digit Runs"). What the
  * detector does with a run is pinned in `deid.test.ts`; these pin what a run is.
  */
 const digitsOf = (text: string) => spokenDigitRuns(text).map((run) => run.digits)

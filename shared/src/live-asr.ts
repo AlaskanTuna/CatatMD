@@ -15,7 +15,7 @@ import { InterpretedLanguageSchema } from './transcript.js'
  * surfaces as the mint failing closed, never as audio reaching another region.
  *
  * None of the four is Malaysia or Singapore. That is a real cost, recorded in
- * docs/dpia.md rather than softened here.
+ * docs/DPIA.md rather than softened here.
  */
 export const LiveAsrRegionSchema = z.enum(['us', 'eu', 'jp', 'in'])
 
@@ -81,7 +81,7 @@ export const LiveSessionConfigSchema = z.object({
    * Languages to bias toward, not restrict to. The set is constrained and
    * excludes Indonesian, because Malay is tagged Indonesian often enough to
    * matter and every vendor supporting code-switching advises naming the
-   * languages expected (issue #218, docs/trd.md 20.7.1).
+   * languages expected (issue #218, docs/TRD.md 20.7.1).
    */
   languageHints: z
     .array(z.string().regex(/^[a-z]{2,3}$/))
@@ -109,7 +109,7 @@ export const LiveSessionConfigSchema = z.object({
      * Clinical vocabulary to prime recognition toward, in the language of the
      * consultation (issue #307).
      *
-     * **This is the accuracy layer, not a refinement.** docs/trd.md 20.7.1
+     * **This is the accuracy layer, not a refinement.** docs/TRD.md 20.7.1
      * measured the same Malay clip going from "Dr. Sayyabah Taksudali Maharaj"
      * with no context to one word wrong with a clinical Malay vocabulary that
      * contained none of the sentence's content words. The effect is domain and
@@ -128,7 +128,7 @@ export const LiveSessionConfigSchema = z.object({
   }),
   /**
    * Two-way translation between English and one other language, asked of the
-   * recogniser in the socket's first frame (docs/trd.md §20.12).
+   * recogniser in the socket's first frame (docs/TRD.md §20.12).
    *
    * Closed literals and a closed enum only, because this crosses the audio
    * egress like everything else here. Absent on every config except the
@@ -168,7 +168,7 @@ export const LiveAsrConfigSchema = z.object({
   availableTranslations: z.array(InterpretedLanguageSchema).optional(),
   /**
    * Whether this deployment can refine an untranslated ambient transcript after
-   * Stop (#436, docs/trd.md §20.14).
+   * Stop (#436, docs/TRD.md §20.14).
    *
    * Set only on the untranslated ambient config, and only when the API holds a
    * batch key, so the dictation and translated configs are byte-identical to
@@ -206,7 +206,7 @@ export const LiveSessionRequestSchema = z
     consent: z.boolean().optional(),
     mode: LiveAsrModeSchema.default('ambient'),
     /**
-     * Pair this language with English in both directions (docs/trd.md §20.12).
+     * Pair this language with English in both directions (docs/TRD.md §20.12).
      * Ambient only: dictation is one doctor reading out a prescription, and the
      * second refine refuses the pair rather than quietly dropping the field.
      */

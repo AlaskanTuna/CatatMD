@@ -72,7 +72,7 @@ describe('asrContextTerms', () => {
   })
 
   it('names the Malay symptom vocabulary the measurement turned on', () => {
-    // docs/trd.md 20.7.1: a clinical Malay vocabulary carried the same clip
+    // docs/TRD.md 20.7.1: a clinical Malay vocabulary carried the same clip
     // from "Dr. Sayyabah Taksudali Maharaj" to one word wrong. These are the
     // words that consultation is about.
     expect(asrContextTerms()).toEqual(
@@ -143,7 +143,7 @@ describe('dictationContextTerms', () => {
   })
 
   it('carries no symptom register, which is the wrong domain for a sig', () => {
-    // docs/trd.md 20.7.1 measured a wrong-domain context scoring worse than no
+    // docs/TRD.md 20.7.1 measured a wrong-domain context scoring worse than no
     // context at all. A dictated prescription is fifteen seconds of drug audio,
     // so the sixty-odd Malay symptom terms ambient sends would be exactly that
     // effect, and `CONFUSABLE_TARGETS` is symptom vocabulary too.

@@ -6,7 +6,7 @@ import { prisma } from '../backend/src/lib/prisma.js'
  * Seeds the accounts the demo depends on:
  *
  *  - two doctors, whose separate consultations are what the ownership-isolation
- *    step of the Demo Script actually observes (docs/prd.md §14, step 11)
+ *    step of the Demo Script actually observes (docs/PRD.md §14, step 11)
  *  - the shared guest account behind "Sign in as guest" (#29), only when
  *    credentials are configured
  *

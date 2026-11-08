@@ -55,7 +55,7 @@ State these when relevant rather than rediscovering them.
 
 - Never weaken or delete a test to make a suite pass. If a test blocks a change, that is a finding for the human, not a cleanup.
 - Never write a test that reaches the network or a live database.
-- Never run `git add`, `git commit`, or `git push`. Gate 2 belongs to the human.
+- Never run `git add`, `git commit`, or `git push`. Shipping belongs to the human.
 - Never claim a suite passes without having run it and seen the output.
 
 ## Output Format

@@ -18,7 +18,7 @@ import type { ClinicalArtefactVersion } from './types.js'
 export type { ClinicalArtefactVersion } from './types.js'
 
 /**
- * The clinical content active for this build (docs/trd.md §15). Every
+ * The clinical content active for this build (docs/TRD.md §15). Every
  * completed analysis is stamped with this object, so a past note can be traced
  * back to the exact rule list, checklist and corpus that produced it.
  *
@@ -29,7 +29,7 @@ export type { ClinicalArtefactVersion } from './types.js'
  *
  * `medicationLexicon` is registered ahead of any consumer, and **no consumer
  * exists today**. Nothing in the analysis pipeline reads it: it belongs to
- * dictated prescription capture (docs/decisions.md D-001), which will run on
+ * dictated prescription capture (docs/DECISIONS.md D-001), which will run on
  * its own route once #312 and #313 land. It is stamped here anyway because
  * this registry is the one home a version constant may have, and the
  * alternative is a clinical artefact whose version nothing records. Until

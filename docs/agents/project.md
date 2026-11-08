@@ -18,7 +18,7 @@ Three tiers: React SPA, Express API, Postgres. The API is the only component tha
 | **Deterministic red flags first** | `backend/src/redflags/`                             | A rules engine over a versioned trigger list runs first; the LLM pass may only _add_ candidates for review, never suppress a rule hit.                                                 |
 | **ID-constrained citations**      | `backend/src/guidelines/`, `backend/src/retrieval/` | The model may cite only guideline IDs it was given; free-text references fail at parse time, so a hallucinated reference is structurally impossible.                                   |
 
-Implementation detail lives in `docs/trd.md`.
+Implementation detail lives in `docs/TRD.md`.
 
 ## Repo Layout
 

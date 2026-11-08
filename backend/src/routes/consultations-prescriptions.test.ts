@@ -3,7 +3,7 @@ import { PrescriptionParseResponseSchema } from '@shared/types'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
- * Route tests for dictated prescription capture (#312, `docs/decisions.md`
+ * Route tests for dictated prescription capture (#312, `docs/DECISIONS.md`
  * D-001).
  *
  * Four properties carry this feature: parsing **stores nothing**, it runs **no
@@ -219,7 +219,7 @@ describe('POST /api/consultations/:id/prescriptions/parse', () => {
   })
 
   it('parses the rojak form to the same values', async () => {
-    // docs/trd.md section 20.1: Malaysian consultations are Malay-dominant with
+    // docs/TRD.md section 20.1: Malaysian consultations are Malay-dominant with
     // English switches, and "medical vocabulary is English". The dosing is the
     // half that is not.
     const response = await parse({

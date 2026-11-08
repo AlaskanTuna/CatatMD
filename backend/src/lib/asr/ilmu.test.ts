@@ -51,7 +51,7 @@ beforeEach(() => {
   testEnv.ILMU_API_KEY = 'test-key'
 })
 
-describe('transcribeWithIlmu, the wire shape (docs/trd.md §20.3 finding 5)', () => {
+describe('transcribeWithIlmu, the wire shape (docs/TRD.md §20.3 finding 5)', () => {
   it("maps today's actual response: text plus usage.seconds, no segments", async () => {
     upstream.mockResolvedValueOnce(
       jsonResponse({ text: 'batuk sudah tiga hari', usage: { type: 'duration', seconds: 99.2 } }),
@@ -173,7 +173,7 @@ describe('transcribeWithIlmu, the outbound request', () => {
     expect(form.get('model')).toBe('ilmu-asr-v4.2')
     expect(form.get('response_format')).toBe('verbose_json')
     expect(form.get('temperature')).toBe('0')
-    // No language hint in v1: measure before hinting (docs/trd.md §20.3).
+    // No language hint in v1: measure before hinting (docs/TRD.md §20.3).
     expect(form.get('language')).toBeNull()
   })
 

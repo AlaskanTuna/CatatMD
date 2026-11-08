@@ -12,7 +12,7 @@ import { TRANSCRIPT_CLEANUP_SYSTEM_PROMPT } from './prompt.js'
  *
  * Layer 1 primes the recogniser (`lib/asr/vocabulary.ts`), layer 2 is the
  * measured 11-entry confusable table (`redflags/mishears.ts`), and this is
- * layer 3, for the mishears neither can reach. docs/trd.md §20.10 records
+ * layer 3, for the mishears neither can reach. docs/TRD.md §20.10 records
  * "batuk" returning as "betul" on this provider, a pair no confusable table can
  * claim without raising a cough flag on every sentence agreeing with the doctor.
  *
@@ -21,7 +21,7 @@ import { TRANSCRIPT_CLEANUP_SYSTEM_PROMPT } from './prompt.js'
  * on Korean-English clinical ASR, which is why layer 2 ships unconditionally and
  * this runs after it and may only add.
  *
- * **Off by default.** docs/trd.md §20.9: "the model pass earns its place only if
+ * **Off by default.** docs/TRD.md §20.9: "the model pass earns its place only if
  * it finds correct corrections the table does not." `TRANSCRIPT_CLEANUP` gates
  * it and defaults to `off`; `evals/transcript-cleanup.ts` is what produces the
  * number that would justify turning it on.

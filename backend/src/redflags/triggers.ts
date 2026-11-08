@@ -6,14 +6,14 @@ import { type Expansion, expandMishears, isRecorded, originalSpan } from './mish
 import type { RedFlagTrigger } from './types.js'
 
 /**
- * docs/trd.md §10 "What Stays Undecided": no clinician has validated this
- * list. It is sourced from the Malaysian corpus named in docs/trd.md §11
+ * docs/TRD.md §10 "What Stays Undecided": no clinician has validated this
+ * list. It is sourced from the Malaysian corpus named in docs/TRD.md §11
  * (MOH NAG 4th ed. 2024, Abdullah et al. 2024, Ooi et al. 2022) rather than
  * NICE, whose licence forbids AI use. Where those sources restate Centor /
- * McIsaac, this list expresses them in our own words per docs/trd.md §10.
+ * McIsaac, this list expresses them in our own words per docs/TRD.md §10.
  *
  * Bumped whenever a trigger is added, removed, or its matcher, severity or
- * cited guidance changes. Recorded with every analysis (docs/trd.md §15).
+ * cited guidance changes. Recorded with every analysis (docs/TRD.md §15).
  * **v11 adds a conditional-advice suppression to the span-returning paths
  * and changes no trigger, no severity, no label and no cited guidance.** A
  * doctor's closing safety-netting advice is a statement, so `asserts()`
@@ -95,7 +95,7 @@ const UTI_PROFILES: readonly ProfileId[] = ['adult-acute-uncomplicated-uti']
 /**
  * Malay negators, minus constructions that mention rather than deny.
  * "tak apa"/"takpe" is the idiom "never mind"; "tak tahu"/"tak pasti" is
- * uncertainty, and unknown is never negative (docs/prd.md §10); "tak berapa"/
+ * uncertainty, and unknown is never negative (docs/PRD.md §10); "tak berapa"/
  * "tak banyak" is a hedge ("not very"), which confirms presence; "tak ada
  * apa-apa" is the minimizer that precedes a disclosure; a "tak" right after
  * "ada" or "ke" is the question particle ("ada tak sakit dada?"), not a
@@ -593,7 +593,7 @@ export const REDFLAG_TRIGGERS: readonly RedFlagTrigger[] = [
         /darah\s+dalam\s+kahak/i,
         /ludah\s+(?:ber)?darah/i,
         // The devoiced forms both measured ASR arms produce for "batuk"
-        // ("patut", "patuk"; docs/trd.md §20.3), appended AFTER the originals
+        // ("patut", "patuk"; docs/TRD.md §20.3), appended AFTER the originals
         // rather than widened into them: findSpan gives each pattern one exec
         // per turn, so a widened pattern whose leftmost match landed on a
         // negated everyday "tak patut ... berdarah" would spend that one
@@ -683,7 +683,7 @@ export const REDFLAG_TRIGGERS: readonly RedFlagTrigger[] = [
         /na[fp]as\s+pendek/i,
         /\btercungap/i,
         /\btermengah/i,
-        // "sempuk", the measured devoiced form of "semput" (docs/trd.md
+        // "sempuk", the measured devoiced form of "semput" (docs/TRD.md
         // §20.3), appended after the originals for the same one-exec reason
         // as the patu[kt] patterns in haemoptysis; not a Malay word, so no
         // innocent reading needs bounding.
@@ -844,9 +844,9 @@ export const REDFLAG_TRIGGERS: readonly RedFlagTrigger[] = [
   {
     /**
      * No numeric vital-sign cutoff (SpO2 / RR / HR / BP) attributable to
-     * docs/trd.md §11's corpus was located — NAG 2024, Abdullah et al. 2024,
+     * docs/TRD.md §11's corpus was located — NAG 2024, Abdullah et al. 2024,
      * and Ooi et al. 2022 do not publish one for this scope, and no clinician
-     * is available to validate an invented number (docs/trd.md §10, Q7).
+     * is available to validate an invented number (docs/TRD.md §10, Q7).
      * Rather than invent a threshold, this trigger matches the clinician's
      * own stated severity assessment of a vital sign in the transcript.
      */
@@ -871,9 +871,9 @@ export const REDFLAG_TRIGGERS: readonly RedFlagTrigger[] = [
         /tekanan\s+darah\D{0,20}(?:sangat\s+rendah|rendah\s+sangat|jatuh)/i,
       ]),
     clinicalSource:
-      'No Malaysian-sourced numeric vital-sign threshold found in the docs/trd.md §11 corpus ' +
+      'No Malaysian-sourced numeric vital-sign threshold found in the docs/TRD.md §11 corpus ' +
       "(NAG 2024, Abdullah et al. 2024, Ooi et al. 2022); this trigger matches the clinician's " +
-      'own stated severity assessment rather than an invented cutoff — see docs/trd.md §10 ' +
+      'own stated severity assessment rather than an invented cutoff — see docs/TRD.md §10 ' +
       '"What Stays Undecided".',
     // No corpus chunk states a numeric vital-sign threshold, so this fires
     // on the clinician's own words and cites nothing.

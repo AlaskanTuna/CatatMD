@@ -16,7 +16,7 @@ const transcript = (...turns: TranscriptTurn[]): Transcript => ({
 })
 
 // One transcript per trigger, each containing exactly that trigger's evidence.
-// 100%-detection is the acceptance criterion (docs/trd.md §10) — a missed
+// 100%-detection is the acceptance criterion (docs/TRD.md §10) — a missed
 // trigger here is a patient-safety regression, not a test failure to triage.
 const TRIGGER_FIXTURES: Record<string, Transcript> = {
   haemoptysis: transcript(turn('patient', "I've been coughing up blood since this morning.")),

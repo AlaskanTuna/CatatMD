@@ -6,7 +6,7 @@ import { z } from 'zod'
  * `RETENTION_DEFAULT_YEARS` is a **configurable default reflecting the common
  * clinical-records retention convention, which the clinic data controller must
  * review and adopt or override.** It is not a legal determination and not a
- * statutory requirement; `docs/dpia.md` states that the period must be verified
+ * statutory requirement; `docs/DPIA.md` states that the period must be verified
  * against Malaysian legal and professional-recordkeeping advice, and nothing
  * here substitutes for that.
  *

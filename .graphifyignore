@@ -2,8 +2,8 @@
 # Use docs/* (not docs/) so the ! lines below can re-include specific files.
 docs/*
 !docs/README.md
-!docs/prd.md
-!docs/trd.md
+!docs/PRD.md
+!docs/TRD.md
 .claude/
 .codex/
 .agents/

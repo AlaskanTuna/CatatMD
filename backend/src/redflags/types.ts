@@ -14,7 +14,7 @@ export interface RedFlagTrigger {
   severity: 'emergency' | 'urgent' | 'advisory'
   /** Returns the matched verbatim transcript span, or null if it did not fire. */
   matcher: (transcript: Transcript) => string | null
-  /** Citation for where this trigger comes from (docs/trd.md §10, Q7). */
+  /** Citation for where this trigger comes from (docs/TRD.md §10, Q7). */
   clinicalSource: string
   /**
    * Document references (`doc:...`) `clinicalSource` refers to, so the prose

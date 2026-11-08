@@ -45,7 +45,7 @@ export const MAX_LIVE_CYCLES = 200
 export const LIVE_DELTA_LOOKBACK_SEGMENTS = 1
 
 /**
- * Floor on the gap between model-backed cycles (docs/trd.md §20.7). It is a
+ * Floor on the gap between model-backed cycles (docs/TRD.md §20.7). It is a
  * minimum interval, not a timer: a cycle also waits for the previous one to
  * return, so the real cadence is the slower of this and provider latency.
  */
@@ -55,7 +55,7 @@ export const LIVE_ANALYSIS_INTERVAL_MS = 12_000
  * The previous cycle's result, handed back unchanged by the client.
  *
  * **There is deliberately no field here carrying the running transcript.**
- * docs/trd.md §20.8 adopts the fold over re-extraction, and expressing it in
+ * docs/TRD.md §20.8 adopts the fold over re-extraction, and expressing it in
  * the type rather than in a convention is what stops a later caller quietly
  * resending a growing transcript to buy accuracy.
  *
@@ -75,7 +75,7 @@ export const LiveAnalysisResponseSchema = z.object({
   /**
    * Derived by `deriveGaps` over the merged facts, never asked of the model.
    * Live or not, absence detection stays an enumeration over assertion states
-   * (docs/trd.md §20.8.1: judges score 0.50 to 0.63 at spotting what is
+   * (docs/TRD.md §20.8.1: judges score 0.50 to 0.63 at spotting what is
    * missing, which is guessing).
    */
   gaps: z.array(InformationGapSchema),
@@ -86,7 +86,7 @@ export const LiveAnalysisResponseSchema = z.object({
 /**
  * The deterministic pane. Separate from the response above because the
  * cadences differ by roughly 40x: rules run on every closed segment and must
- * feel immediate, while the model fold is allowed to lag (docs/trd.md §20.8.1).
+ * feel immediate, while the model fold is allowed to lag (docs/TRD.md §20.8.1).
  */
 export const LiveFlagsResponseSchema = z.object({
   redFlags: z.array(RedFlagSchema),

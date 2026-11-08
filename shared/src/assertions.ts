@@ -4,9 +4,9 @@ import { z } from 'zod'
 
 /**
  * Six explicit states, so a fact the consultation never established can never
- * be represented as denied. See docs/prd.md §10 (Unknown ≠ Negative) — the
+ * be represented as denied. See docs/PRD.md §10 (Unknown ≠ Negative) — the
  * absolute half of that rule, measured failing in 5 of 5 runs without it
- * (docs/trd.md §21.1).
+ * (docs/TRD.md §21.1).
  */
 export const AssertionStateSchema = z.enum([
   'PRESENT',
@@ -38,7 +38,7 @@ const ClinicalAssertionShape = z.object({
  * decoding an optional property is simply absent from `required`, and the model
  * takes that permission every time: measured against qwen-flash on a 3,085-word
  * consultation, **0 of 18** `PRESENT`/`DENIED` assertions carried a span. The
- * evidence check (docs/trd.md §21.4) then downgraded every one of them, so a
+ * evidence check (docs/TRD.md §21.4) then downgraded every one of them, so a
  * thorough consultation produced a note asserting nothing and 23 documentation
  * gaps. The safety property held; the product did not.
  *
@@ -46,7 +46,7 @@ const ClinicalAssertionShape = z.object({
  * verbatim** on the same transcript, with `diagnosis` correctly `PRESENT`.
  *
  * The empty string is permitted so `NOT_ASSESSED` stays the cheapest path
- * (docs/trd.md §3, ratification condition 1): a field the transcript never
+ * (docs/TRD.md §3, ratification condition 1): a field the transcript never
  * touched costs `"value":"","evidence":""` and nothing more. The condition
  * forbids a field being implicitly required to be *filled*, which this respects
  * — it requires only that the key be present.
@@ -82,7 +82,7 @@ export const LlmClinicalAssertionSchema = z.object({
  * 'NOT_ASSESSED' }` is a complete, valid assertion costing no further tokens,
  * and nothing here implicitly requires a field to be filled.
  *
- * The span requirement binds `state`, not `value` (docs/trd.md §21.4):
+ * The span requirement binds `state`, not `value` (docs/TRD.md §21.4):
  * `value` may carry a normalised concept label. Scoping it to vocabulary
  * instead would force `NOT_ASSESSED` onto legitimate paraphrase.
  */
@@ -95,14 +95,14 @@ export const ClinicalAssertionSchema = ClinicalAssertionShape.refine(
 )
 
 /**
- * A fixed key set, not a model-chosen one. docs/prd.md §10 requires that a
+ * A fixed key set, not a model-chosen one. docs/PRD.md §10 requires that a
  * field the transcript never touches is never defaulted to `DENIED` *or
  * silently omitted* — only a fixed key set can guarantee the second half, and
  * it is what lets gaps be derived deterministically in code (a Tier-2 control)
  * rather than asked of the model.
  *
- * Keys are taken verbatim from the completeness checklist in docs/prd.md §9
- * (CAP-2). docs/trd.md §12 deferred this shape; this is it. One key list feeds
+ * Keys are taken verbatim from the completeness checklist in docs/PRD.md §9
+ * (CAP-2). docs/TRD.md §12 deferred this shape; this is it. One key list feeds
  * both the permissive decoding schema and the strict persistence schema, so
  * the two cannot drift.
  */

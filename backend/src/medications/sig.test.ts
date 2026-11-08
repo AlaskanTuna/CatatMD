@@ -4,7 +4,7 @@ import { parseSig, parseSigWithSpan, type Sig } from './sig.js'
 /**
  * Rojak is the register, not an edge case (issue #311).
  *
- * `docs/trd.md` §20.1 is titled "Model Selection For Malaysian Code-Switched
+ * `docs/TRD.md` §20.1 is titled "Model Selection For Malaysian Code-Switched
  * Speech" and §20.3 measures a Malay-dominant consultation with mid-sentence
  * English switches. A doctor is at least as likely to say "makan tiga kali
  * sehari" as "TDS", so the two fixtures below are the same prescription and

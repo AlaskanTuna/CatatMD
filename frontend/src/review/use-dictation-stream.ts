@@ -16,7 +16,7 @@ import { api } from '../lib/api.js'
  * that this one does not replace.
  *
  * **It opens the second surface on the ambient audio egress, not a third
- * egress** (`docs/trd.md` §20.10, sign-off extended 10/09/26). Same vendor,
+ * egress** (`docs/TRD.md` §20.10, sign-off extended 10/09/26). Same vendor,
  * transport, region and minting route as ambient capture; what differs is the
  * recognition config the API hands back for `mode: 'dictation'` and the
  * five-minute session cap it mints with.

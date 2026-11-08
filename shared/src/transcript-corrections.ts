@@ -9,7 +9,7 @@ import { MAX_TRANSCRIPT_TURNS, MAX_TURN_CHARACTERS } from './transcript.js'
  *
  * Both words travel. The doctor is choosing between them, so a payload carrying
  * only `suggested` would ask them to approve a replacement without showing what
- * it displaces, and `docs/trd.md` §20.7 admits this feature only as "a proposal
+ * it displaces, and `docs/TRD.md` §20.7 admits this feature only as "a proposal
  * on screen, never an automatic edit".
  *
  * `start` is a character offset into the turn's stored text, so the client can
@@ -52,7 +52,7 @@ export const MishearProposalSchema = z.object({
  * Reported rather than inferred from an empty array, because "the pass found
  * nothing" and "the pass never ran" are different facts and a doctor reading a
  * correction surface should not have them collapsed. `disabled` is the default
- * posture: `docs/trd.md` §20.9 requires the model pass to earn its place
+ * posture: `docs/TRD.md` §20.9 requires the model pass to earn its place
  * against the free deterministic table before it is turned on.
  */
 export const TranscriptCleanupStatusSchema = z.enum(['ok', 'failed', 'disabled'])

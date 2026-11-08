@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `cdd436e3`
+- Built from commit: `0d49e312`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -605,7 +605,7 @@ Nodes (19): BENCH_TRANSCRIPT, TURNS, elapsedMs(), fail(), main(), median(), pars
 
 ### Community 95 - "lint-staged"
 Cohesion: 0.29
-Nodes (6): lint-staged, AGENTS.md, biome.json, commitlint.config.js, {docs,.github}/**/*.{md,yml,yaml}, {shared,backend,frontend,evals}/**/*.{ts,tsx,js,json}
+Nodes (6): lint-staged, AGENTS.md, biome.json, commitlint.config.js, {docs,.github}/**/*.{md,yml,yaml}, {shared,backend,frontend,evals,scripts}/**/*.{ts,tsx,js,json}
 
 ### Community 96 - "lines.ts"
 Cohesion: 0.16
@@ -1000,7 +1000,7 @@ Nodes (3): Migration Flow, CaptureMode, NoteTemplate
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `cn` to `react-router-dom`, `CapturePanel.test.tsx`, `AudioSettingsDialog.tsx`, `use-transcript-audio.ts`, `theme.tsx`, `20.10 Ambient Capture On Soniox, Browser-Direct, Under An API-Minted Key`, `frontend/package.json`, `api.ts`, `AudioCapture.tsx`, `ProposalCard.test.tsx`, `LiveConversation.tsx`, `CapturePanel.tsx`, `ref_ui_button_js`, `CatatAI.tsx`, `use-live-panes.ts`, `DemoTour.tsx`, `use-copilot.ts`, `ConsultationReview.tsx`, `PrescriptionTheatre.tsx`, `PatientList.tsx`, `MedicalRecordNoteEditor.tsx`, `DemoTour.test.tsx`, `@testing-library/react`, `use-dictation-stream.ts`, `AmbientCapture.tsx`, `ChromeCluster.tsx`, `CursorGlow.tsx`, `../review/SafetyCards.js`, `use-segment-recorder.test.ts`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
+  _High betweenness centrality (0.042) - this node is a cross-community bridge._
 - **Why does `cn()` connect `cn` to `react-router-dom`, `ConsultationReview.tsx`, `api.ts`, `AudioCapture.tsx`, `PrescriptionTheatre.tsx`, `AudioSettingsDialog.tsx`, `../review/SafetyCards.js`, `ConsultationList.test.tsx`, `LiveConversation.tsx`, `CapturePanel.tsx`, `MedicalRecordNoteEditor.tsx`, `CatatAI.tsx`, `ref_ui_button_js`, `use-live-panes.ts`?**
   _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **Why does `20. ASR Contract — On-Device Default, Hosted By Exception` connect `20. ASR Contract — On-Device Default, Hosted By Exception` to `20.14 Refinement After Stop: Batch `scribe_v2`, Browser-Direct, Under An API-Minted Token`, `Per-Module Dtype On WebGPU (Issue #144)`, `20.13 Evaluated 15/10/26: ElevenLabs Scribe v2 Realtime As A Soniox Replacement`, `Consultation`, `20.12 Two-Way Translation On Ambient Capture`, `20.2 Draft Speaker Labels: Measured, Gated, Not Diarisation`, `20.4 The Consent Gate (Resolves §19 Row 18)`, `TRD`, `20.3 Measured Finding: Hosted `ilmu-asr-v4.2` Against The Shipped Local Path`, `20.6 Capture Constraints: Dictation DSP Off (Addendum To §20.3)`, `20.10 Ambient Capture On Soniox, Browser-Direct, Under An API-Minted Key`, `20.9 Ambient Capture On ILMU, And The Mechanism Behind 20.8's Post-Correction Row`, `20.7 Live Ambient Capture: Mechanism, Models, And The Accuracy Chain`, `deriveGaps`, `Spoken Digit Runs`?**

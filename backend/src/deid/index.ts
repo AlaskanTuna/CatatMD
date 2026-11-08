@@ -75,7 +75,7 @@ export class DeidentificationError extends Error {
  *
  * Fail-closed by contract: this throws rather than returning a partial result
  * if any detector step fails internally, because a caller that received partial
- * output could fall through to sending original text (docs/trd.md §9).
+ * output could fall through to sending original text (docs/TRD.md §9).
  *
  * `markDeidentified` is called here and nowhere else — this function is the
  * only place in the codebase that mints the branded type.
@@ -124,7 +124,7 @@ export function deidentify(
 /**
  * Serialises a transcript as speaker-labelled turns and de-identifies the whole
  * thing against **one** vault, so the same person carries the same token across
- * every turn rather than a new one per turn (docs/trd.md §9, §12).
+ * every turn rather than a new one per turn (docs/TRD.md §9, §12).
  */
 export function deidentifyTranscript(transcript: Transcript): DeidentificationResult {
   return deidentify(serialiseTranscript(transcript))
@@ -142,7 +142,7 @@ export function serialiseTranscript(transcript: Transcript): string {
 }
 
 /**
- * The egress guard (docs/trd.md §19 row 2).
+ * The egress guard (docs/TRD.md §19 row 2).
  *
  * Re-runs detection on a payload that is *about* to leave the process and
  * throws if anything fires. Already-minted tokens are stripped first so the
@@ -150,7 +150,7 @@ export function serialiseTranscript(transcript: Transcript): string {
  *
  * This is a second, independent check rather than a duplicate of the first: it
  * is what catches a `Deidentified` value minted outside `deid/` — the
- * enforcement gap docs/trd.md §5 records, where the type system guarantees the
+ * enforcement gap docs/TRD.md §5 records, where the type system guarantees the
  * *shape* of what reaches `LLMClient` but not its *provenance*.
  */
 /**
@@ -205,7 +205,7 @@ export function assertNoIdentifiers(
   if (leaked.length === 0) return
 
   // Labels only. Never the matched values — an exception message is a log line
-  // waiting to happen (docs/trd.md §4, §15; healthcare-phi-compliance).
+  // waiting to happen (docs/TRD.md §4, §15; healthcare-phi-compliance).
   const labels = [...new Set(leaked.map((m) => m.label))].sort().join(', ')
   throw new DeidentificationError(
     `Egress blocked for operation "${operation}": payload still carries ${labels}`,

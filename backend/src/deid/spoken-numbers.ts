@@ -1,5 +1,5 @@
 /**
- * Number words, read as the digits they spell (#435, docs/trd.md §9, "Spoken
+ * Number words, read as the digits they spell (#435, docs/TRD.md §9, "Spoken
  * Digit Runs").
  *
  * Every other number detector reads ASCII digits, and batch transcription

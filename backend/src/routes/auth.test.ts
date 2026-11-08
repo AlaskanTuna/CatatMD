@@ -114,7 +114,7 @@ describe('route protection (issue #14)', () => {
   })
 })
 
-describe('security headers (docs/trd.md §16)', () => {
+describe('security headers (docs/TRD.md §16)', () => {
   it('applies helmet', async () => {
     const res = await fetch(`${origin}/api/health`)
 
@@ -124,7 +124,7 @@ describe('security headers (docs/trd.md §16)', () => {
   })
 })
 
-describe('sign-up (docs/trd.md §14, §19 row 4)', () => {
+describe('sign-up (docs/TRD.md §14, §19 row 4)', () => {
   it('is mounted and reachable — open self-service sign-up is in scope', async () => {
     const res = await fetch(`${origin}/api/auth/sign-up/email`, {
       method: 'POST',

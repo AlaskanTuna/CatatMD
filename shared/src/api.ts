@@ -7,7 +7,7 @@ import { MedicalRecordNoteSchema, SoapNoteSchema } from './note.js'
 import { PatientNameSchema, PatientSchema } from './patient.js'
 import { MAX_PRESCRIPTIONS } from './transcript.js'
 
-// ─── API contracts (docs/trd.md §13) ─────────────────────────────────────────
+// ─── API contracts (docs/TRD.md §13) ─────────────────────────────────────────
 
 /*
  * `title` is the one clinical field this projection carries, and the widening

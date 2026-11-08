@@ -88,7 +88,7 @@ export async function* runCopilotTurn(options: {
     tools: signed ? [] : COPILOT_TOOLS,
     /*
      * Forced only when the doctor asked (#185). Four prompt and tool-description
-     * revisions each traded one prose failure for another (docs/trd.md §25), so
+     * revisions each traded one prose failure for another (docs/TRD.md §25), so
      * the model is not asked to judge this better; the doctor's press decides
      * that a card is wanted, and the card is still only a proposal.
      */

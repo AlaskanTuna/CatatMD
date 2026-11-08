@@ -47,7 +47,7 @@ Clinical: `Consultation` and `AuditEvent`.
 - `AuditEvent` is append-only. No update path, no delete path.
 - Erasure is a tombstone, not a row delete. `eraseConsultation()` (`backend/src/audit/erasure.ts`) nulls `Consultation.transcript`, `analysis`, and `editedNote` and sets `erasedAt`. Any new PHI-bearing column must state in the PR which of those three erasure targets it joins, and if it is a fourth, `eraseConsultation` must be updated in the same change.
 - `Consultation.status` is `draft | analyzing | awaiting_review | approved`. Approval is an explicit doctor action, never a default.
-- Never invent a retention period. It is an owner-assigned decision, deliberately open in `docs/dpia.md` under "Open Retention Decision". A TTL, a cron, or a default expiry in a migration is out of bounds without human sign-off.
+- Never invent a retention period. It is an owner-assigned decision, deliberately open in `docs/DPIA.md` under "Open Retention Decision". A TTL, a cron, or a default expiry in a migration is out of bounds without human sign-off.
 
 ## Migration Discipline
 
@@ -61,7 +61,7 @@ Clinical: `Consultation` and `AuditEvent`.
 
 - Never run `prisma migrate deploy` or `prisma migrate reset` without an explicit instruction naming the environment. `db:migrate:deploy` targets production.
 - Never run `prisma db push`. This project uses migrations.
-- Never run `git add`, `git commit`, or `git push`. Gate 2 belongs to the human.
+- Never run `git add`, `git commit`, or `git push`. Shipping belongs to the human.
 - Never write a real NRIC or real patient data into a seed or fixture. Everything is synthetic.
 - Never print a connection string, a password, or the contents of `.env`.
 

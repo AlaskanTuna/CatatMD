@@ -574,7 +574,7 @@ describe('credential containment (the logger.leak.test.ts pattern)', () => {
 })
 
 /*
- * Two-way translation on ambient capture (#392, docs/trd.md §20.12). Same
+ * Two-way translation on ambient capture (#392, docs/TRD.md §20.12). Same
  * socket, key type and cap as ambient; what moves is the recognition config
  * the first frame carries, and one boolean on the audit row.
  */

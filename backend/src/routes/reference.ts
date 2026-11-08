@@ -4,7 +4,7 @@ import { FIXTURES } from '../fixtures/index.js'
 import { prisma } from '../lib/prisma.js'
 
 /**
- * Read-only reference surfaces (docs/trd.md §13). Fixtures are a compile-time
+ * Read-only reference surfaces (docs/TRD.md §13). Fixtures are a compile-time
  * constant already validated in `fixtures/corpus.ts`. Documents are loaded from
  * the database and parsed on the way out.
  *

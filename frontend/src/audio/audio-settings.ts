@@ -4,7 +4,7 @@
  * **Nothing here is consent.** These settings say *how* and *where* capture
  * happens on this machine; whether a given patient's audio may be sent is asked
  * per consultation by `audio/ConsentGate.tsx`, is never remembered, and never
- * reads from this module (docs/trd.md section 20.4). The distinction is the
+ * reads from this module (docs/TRD.md section 20.4). The distinction is the
  * whole reason the two live apart: a persisted setting that also implied
  * permission would be a privacy control that fails open, silently applying to
  * every patient after the one who agreed. That is precisely what #228 did to
@@ -37,7 +37,7 @@ export type AudioSettings = {
   engine: TranscriptionEngine
   /**
    * Whether an untranslated ambient transcript is refined after Stop (#436,
-   * docs/trd.md §20.14), when the API offers it. A device preference, not
+   * docs/TRD.md §20.14), when the API offers it. A device preference, not
    * consent: refinement runs only while this consultation's tick is held, and
    * this switch can only ever turn the second upload off.
    */

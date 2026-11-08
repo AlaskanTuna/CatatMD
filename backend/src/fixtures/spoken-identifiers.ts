@@ -1,5 +1,5 @@
 /**
- * Identifiers as batch `scribe_v2` actually wrote them (#435, `docs/trd.md` §9,
+ * Identifiers as batch `scribe_v2` actually wrote them (#435, `docs/TRD.md` §9,
  * "Spoken Digit Runs").
  *
  * Measured 15/10/26. The synthetic line "Nombor kad pengenalan saya
