@@ -221,7 +221,7 @@ export function Login() {
             </button>
 
             <p className="mt-8 text-xs text-ink-muted">
-              By signing in you accept that this is an evaluation prototype.{' '}
+              By signing in you accept that this is a research prototype.{' '}
               <Link to="/privacy" className="underline underline-offset-2 hover:text-ink">
                 Privacy and Data Protection
               </Link>
