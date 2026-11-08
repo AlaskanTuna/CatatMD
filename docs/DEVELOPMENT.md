@@ -235,7 +235,7 @@ Other measurement harnesses are separate from `bun run evals` and the test suite
 
 ## Code Conventions
 
-- Parse HTTP, LLM, and environment boundaries with Zod schemas. Keep shared contracts in `shared/src/index.ts` and derive TypeScript types with `z.infer`.
+- Parse HTTP, LLM, and environment boundaries with Zod schemas. Keep shared contracts in `shared/src/` (exported from `index.ts`) and derive TypeScript types with `z.infer`.
 - Do not use `any`. Accept `unknown` at untrusted boundaries and narrow it with validation.
 - Keep strict TypeScript checks enabled. The root config rejects unchecked indexed access, unused locals and parameters, and implicit overrides.
 - Use `camelCase` for values and functions, `PascalCase` for React components and types, and uppercase names for environment variables and pinned constants.
@@ -249,12 +249,12 @@ Other measurement harnesses are separate from `bun run evals` and the test suite
 ### A New API Route
 
 - Add the handler under `backend/src/routes/` and mount it in `backend/src/app.ts`. Add session or rate-limit middleware there when the route needs it.
-- Put request and response contracts in `shared/src/index.ts`, then use them in the route and `frontend/src/lib/api.ts`.
+- Put request and response contracts in `shared/src/` (exported from `index.ts`), then use them in the route and `frontend/src/lib/api.ts`.
 - Add backend route tests beside the route. Add a matching handler in `frontend/src/preview/backend.ts` and cover it in `frontend/src/preview/stub.test.ts`; an unhandled preview route returns 501.
 
 ### A New Shared Schema
 
-- Add the Zod schema and inferred type in `shared/src/index.ts`. Do not hand-write a parallel type.
+- Add the Zod schema and inferred type in `shared/src/` (exported from `index.ts`). Do not hand-write a parallel type.
 - Add or extend tests in `shared/src/` and export the contract from the shared module.
 - Build shared before checking consumers so `shared/dist/` contains the exported declaration and JavaScript.
 

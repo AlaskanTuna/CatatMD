@@ -217,7 +217,7 @@ When a transcript describes a presentation outside the clinical scope (a chest i
 
 ## 8. Primary Flow
 
-Steps 1–7 are numbered against `Consultation.status` (`shared/src/index.ts`). Step 0 precedes the lifecycle entirely — it is a first-run gate, not a status transition.
+Steps 1–7 are numbered against `Consultation.status` (`shared/src/` (exported from `index.ts`)). Step 0 precedes the lifecycle entirely — it is a first-run gate, not a status transition.
 
 0. **First run only:** the doctor acknowledges a one-screen product-use notice: not for clinical use, all data simulated, and every output requires their review and approval. One button, shown once. This is a **risk control traceable to the Intended Purpose statement** (Section 11), not a settings step, which is why it exists in a product that otherwise has no onboarding (Section 6).
 1. Doctor selects a bundled synthetic fixture, pastes transcript text, uploads a transcript file, or captures a live consultation via audio (Q1). **Audio is offered only where the device can carry it:** a zero-network capability check runs when the doctor opens a new consultation and decides whether to offer the audio path at all, and the real verdict is measured on the first transcribed chunk (`docs/TRD.md` §20). Transcription runs **on the doctor's device by default**; the hosted in-region alternative is reachable only by an explicit, recorded, per-consultation act, and a device that cannot transcribe locally degrades to **paste, never to the cloud**. A `Consultation` is created with status **`draft`** once a `Transcript` exists, regardless of path, and the transcript records which path produced it (`docs/TRD.md` §3).

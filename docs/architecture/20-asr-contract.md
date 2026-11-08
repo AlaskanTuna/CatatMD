@@ -1094,7 +1094,7 @@ Four properties hold it in place.
 | Piece                                     | Where                                       | What it is                                                                                                                                          |
 | ----------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `parsePrescriptionLines(text, profileId)` | `backend/src/medications/lines.ts`          | Pure. Cuts the dictation into clauses, places each on a line, then fills shared fields. No model, no I/O                                            |
-| `PrescriptionLineSchema`                  | `shared/src/index.ts`                       | `{ start, end, candidates, exact, sig, shared }`. An empty `candidates` is a line nobody named                                                      |
+| `PrescriptionLineSchema`                  | `shared/src/medications.ts`                 | `{ start, end, candidates, exact, sig, shared }`. An empty `candidates` is a line nobody named                                                      |
 | `lines`, `generics`                       | `PrescriptionParseResponseSchema`           | Both `nullish` for deploy skew. `sig`, `sigReadTo` and `candidates` stay for an older SPA                                                           |
 | `readFrom`, `doseAt`, `claims`            | `parseSigWithSpan`                          | Where the first sig field and the dose start, and every stretch a field was read from, so an unknown word before or beside a dose can be told apart |
 | `rowsFrom`, `lineKeys`, `toConfirm`       | `frontend/src/review/prescription-draft.ts` | Pure. The parse plus the doctor's edits make the table; ticked rows make the save                                                                   |
@@ -2051,7 +2051,7 @@ Read 15/10/26, unverified by us.
 
 ### What It Would Have Cost To Adopt
 
-- **The code hard-wires Soniox.** `provider: z.literal('soniox')` and the websocket URL check in `shared/src/index.ts`, the CSP in `vercel.json`, and `no-stray-websocket.test.ts`.
+- **The code hard-wires Soniox.** `provider: z.literal('soniox')` and the websocket URL check in `shared/src/` (exported from `index.ts`), the CSP in `vercel.json`, and `no-stray-websocket.test.ts`.
 - **There is no ASR port in code,** despite §20's description.
 - **A second vendor is a new audio egress,** needing the owner's sign-off under §20.10.
 
@@ -2181,7 +2181,7 @@ Each is a named constant, **provisional until the measurement gate**.
 
 | Constant                        | Value                                          | File                                      |
 | ------------------------------- | ---------------------------------------------- | ----------------------------------------- |
-| `MAX_BATCH_RECORDING_SECONDS`   | 1860                                           | `shared/src/index.ts`                     |
+| `MAX_BATCH_RECORDING_SECONDS`   | 1860                                           | `shared/src/batch-asr.ts`                 |
 | Upload timeout                  | `min(240 s, max(60 s, 30 s + 15 s x minutes))` | `frontend/src/audio/live/batch-tokens.ts` |
 | `MIN_REFINED_UNIT_RATIO`        | 0.8                                            | `frontend/src/audio/live/batch-tokens.ts` |
 | `MAX_REFINED_TAIL_SHORTFALL_MS` | 5000                                           | `frontend/src/audio/live/batch-tokens.ts` |

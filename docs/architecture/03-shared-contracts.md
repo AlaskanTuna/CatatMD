@@ -4,7 +4,7 @@ Part of the [Technical Reference](../TRD.md).
 
 **Status: `Built`**
 
-All schemas live in `shared/src/index.ts`. Types are inferred (`z.infer`), never hand-written.
+All schemas live in `shared/src/` (exported from `index.ts`). Types are inferred (`z.infer`), never hand-written.
 
 ## Transcript
 

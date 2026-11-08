@@ -91,7 +91,7 @@ From the other side, varying only `gaps.maxItems` in `note_and_gaps`, the 686 B 
 - **"Not a JSON Schema keyword" is true as written and misleading in effect.** No keyword is rejected. One keyword's _value_ is the multiplier that decides the outcome, so a reader who rules out keywords rules out the cause.
 - **"The remaining difference is scale" is right about the budget and wrong about its units.** What is capped is post-expansion property count. Bytes and depth co-vary with it, which is why they looked causal.
 
-**Fix:** `medicationsDispensed` is bounded at 10 rather than 20 (`shared/src/index.ts`). That bound already existed as a runaway-decoding guard, and its own comment already argued twenty was far beyond any single GP consultation, so this tightens a Tier 1 control (§21.3) rather than weakening one, and it applies to every provider rather than special-casing Gemini. Pinned by a test in `shared/src/index.test.ts`.
+**Fix:** `medicationsDispensed` is bounded at 10 rather than 20 (`shared/src/` (exported from `index.ts`)). That bound already existed as a runaway-decoding guard, and its own comment already argued twenty was far beyond any single GP consultation, so this tightens a Tier 1 control (§21.3) rather than weakening one, and it applies to every provider rather than special-casing Gemini. Pinned by a test in `shared/src/index.test.ts`.
 
 **Verified through the real pipeline**, which is the standard §21.2 sets rather than a toy probe: `analyseNote` and `generateSuggestions` both complete on `gemini-3.5-flash-lite` against a synthetic fixture, returning all 34 checklist fields, a four-section SOAP note, gaps, and corpus-constrained citations. Qwen re-verified unchanged on `qwen3.7-flash`.
 

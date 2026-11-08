@@ -6,7 +6,7 @@ Part of the [Technical Reference](../TRD.md).
 
 ## Response Schemas In `@shared/types`
 
-All of these were proposed here first, under this document's Q17 mandate ("the TRD proposes, the human ratifies"), and have since been ratified and built. They now live in `shared/src/index.ts`.
+All of these were proposed here first, under this document's Q17 mandate ("the TRD proposes, the human ratifies"), and have since been ratified and built. They now live in `shared/src/` (exported from `index.ts`).
 
 | Schema                       | Shape                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -46,8 +46,8 @@ CAP-3's "a red flag can be acknowledged" and CAP-2's "the doctor can... note tha
 
 | Piece               | Where                                        | What it does                                                                                                                         |
 | ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `STALE_ANALYSIS_MS` | `shared/src/index.ts`, 5 minutes             | How long a claim is honoured. Shared, so the moment the client stops waiting is the moment the API starts accepting a retry          |
-| `ANALYSIS_POLL_MS`  | `shared/src/index.ts`, 3 seconds             | How often `GET /api/consultations/:id` is re-read while the record says `analyzing`                                                  |
+| `STALE_ANALYSIS_MS` | `shared/src/consultation.ts`, 5 minutes      | How long a claim is honoured. Shared, so the moment the client stops waiting is the moment the API starts accepting a retry          |
+| `ANALYSIS_POLL_MS`  | `shared/src/consultation.ts`, 3 seconds      | How often `GET /api/consultations/:id` is re-read while the record says `analyzing`                                                  |
 | The claim           | `backend/src/routes/consultations.ts`        | One `updateMany` whose `where` is the guard: `draft`/`awaiting_review`, or an `analyzing` row whose `updatedAt` is past the lease    |
 | The poll            | `frontend/src/routes/ConsultationReview.tsx` | `refetchInterval` on the detail query, armed by the mutation's `onError` re-read and switched off when the status settles or expires |
 
