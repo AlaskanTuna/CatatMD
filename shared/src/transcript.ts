@@ -62,7 +62,7 @@ export const TextRangeSchema = z.object({
  * static recognition config that crosses the audio egress, so a caller chooses
  * which language and never what is sent for it. Urdu and Bengali were measured
  * on this vendor; Mandarin and Tamil were added unmeasured on the owner's
- * grant (docs/decisions.md D-008, docs/trd.md §20.12).
+ * grant (docs/decisions/ D-008, docs/TRD.md §20.12).
  */
 export const InterpretedLanguageSchema = z.enum(['ur', 'bn', 'zh', 'ta'])
 
@@ -108,7 +108,7 @@ export const TranscriptTurnSchema = z
     endSeconds: z.number().nonnegative().optional(),
     /**
      * The same turn in the consultation's other language, when it was captured
-     * through two-way machine translation (docs/trd.md §20.12).
+     * through two-way machine translation (docs/TRD.md §20.12).
      *
      * **`text` above is always Latin script, the English or Malay the
      * recogniser left untranslated, and nothing that reaches a model reads
@@ -165,7 +165,7 @@ export const TranscriptTurnSchema = z
  * even now that hosted transcription passes through it, because nothing ties a
  * relayed recording to the consultation later submitted with this field. It is
  * an honest provenance record for a cooperating client, never a security
- * control. See docs/trd.md §3.
+ * control. See docs/TRD.md §3.
  *
  * Two values mean audio left the doctor's device, by different routes:
  *
@@ -173,7 +173,7 @@ export const TranscriptTurnSchema = z
  *   `POST /api/asr/transcriptions`, which relays it to the provider (#154).
  * - `asr_live`: ambient capture streams the consultation from the browser
  *   straight to the provider, under a short-lived key the API minted
- *   (docs/trd.md §20.10). The API never holds this audio, so the server-side
+ *   (docs/TRD.md §20.10). The API never holds this audio, so the server-side
  *   half of the record is the minted session rather than the audio itself.
  *
  * Both egresses are server-observed and audited at the point the API can see
@@ -224,7 +224,7 @@ export const TranscriptSchema = z.object({
   labelsReviewed: z.boolean().optional(),
   /**
    * Whether any pass of this consultation went through two-way machine
-   * translation, and with which languages (docs/trd.md §20.12).
+   * translation, and with which languages (docs/TRD.md §20.12).
    *
    * **Provenance for the doctor, not a control.** It tells the review page that
    * some English on screen is a machine translation, and it outlives the
@@ -246,7 +246,7 @@ export const TranscriptSchema = z.object({
   /**
    * Whether this consultation's recording was uploaded for refinement after
    * Stop, and whether the refined transcript is the one used (#436,
-   * docs/trd.md §20.14).
+   * docs/TRD.md §20.14).
    *
    * **Present whenever an upload started, including one that was refused.** A
    * refined transcript the client did not use still sent the whole recording

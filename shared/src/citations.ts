@@ -47,7 +47,7 @@ export type EvidenceLink = z.infer<typeof EvidenceLinkSchema>
  * `verbatimAllowed` is legally load-bearing, not metadata: MOH NAG 2024 is
  * all-rights-reserved and may be summarised and linked but never quoted, while
  * the two CC-licensed sources may be. A `quote` on a chunk that forbids one is
- * a corpus-authoring defect and fails here (docs/trd.md §11).
+ * a corpus-authoring defect and fails here (docs/TRD.md §11).
  */
 export const GuidelineChunkSchema = z
   .object({

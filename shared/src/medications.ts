@@ -36,7 +36,7 @@ export const SIG_FOOD_TIMINGS = ['before', 'after', 'with'] as const
 export type SigFoodTiming = (typeof SIG_FOOD_TIMINGS)[number]
 
 /**
- * One medication the doctor dictated and then confirmed (`docs/decisions.md`
+ * One medication the doctor dictated and then confirmed (`docs/decisions/`
  * D-001).
  *
  * **Doctor-authored, and separate from `medicationsDispensed` for that reason.**

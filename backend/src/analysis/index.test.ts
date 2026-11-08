@@ -125,7 +125,7 @@ describe('analyseNote', () => {
     expect(result.note.subjective).toContain('Presenting Complaint\nCough and sore throat.')
   })
 
-  describe('the split operation (docs/trd.md §12, §19 row 19)', () => {
+  describe('the split operation (docs/TRD.md §12, §19 row 19)', () => {
     it('issues both halves, so neither the checklist nor the note can be silently dropped', async () => {
       const { text: content } = deidentify('Doctor: what brings you in today?')
       const spy = stubSplit(
@@ -179,7 +179,7 @@ describe('analyseNote', () => {
     })
   })
 
-  describe('the haemoptysis test (docs/prd.md §10, docs/trd.md §21.1)', () => {
+  describe('the haemoptysis test (docs/PRD.md §10, docs/TRD.md §21.1)', () => {
     it('never lets a fabricated haemoptysis negative survive analysis', async () => {
       const fixture = fixtureById('urti-gap-heavy')
       const { text: content } = deidentifyTranscript(fixture.transcript)
@@ -194,7 +194,7 @@ describe('analyseNote', () => {
               evidence: 'throat also quite sakit',
             },
             fever: { state: 'PRESENT', value: 'fever', evidence: '38.2 degrees' },
-            // Reproduces docs/trd.md §21.1: the model asserts a negative for a
+            // Reproduces docs/TRD.md §21.1: the model asserts a negative for a
             // topic the transcript never raises, with no supporting span.
             haemoptysis: { state: 'DENIED', value: 'no haemoptysis', evidence: '' },
           },
@@ -227,7 +227,7 @@ describe('analyseNote', () => {
     })
   })
 
-  describe('the diagnosis test (docs/prd.md §10, docs/trd.md §3)', () => {
+  describe('the diagnosis test (docs/PRD.md §10, docs/TRD.md §3)', () => {
     it('resolves an inferred diagnosis with no supporting doctor statement to NOT_ASSESSED', async () => {
       const fixture = fixtureById('urti-diagnosis-not-assessed')
       const { text: content } = deidentifyTranscript(fixture.transcript)

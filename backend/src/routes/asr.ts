@@ -76,7 +76,7 @@ const acquireRelaySlot = inFlightGate({
 /**
  * Feature gate ahead of the body parser: a deployment without an ILMU key
  * answers 503 without first buffering up to 25 MB it will not use. Fails
- * closed and visibly rather than silently (docs/trd.md §20).
+ * closed and visibly rather than silently (docs/TRD.md §20).
  */
 function requireIlmuConfigured(_req: Request, _res: Response, next: NextFunction) {
   if (!env.ILMU_API_KEY) {
@@ -273,7 +273,7 @@ asrRouter.get('/live-sessions/config', requireSonioxConfigured, (req, res) => {
         : translatedAmbientConfig(translation.data),
     availableTranslations: mode.data === 'ambient' ? [...InterpretedLanguageSchema.options] : [],
     // Refinement after Stop is granted for untranslated ambient only (#436,
-    // docs/trd.md §20.14), so every other config stays byte-identical. Absent,
+    // docs/TRD.md §20.14), so every other config stays byte-identical. Absent,
     // rather than false, keeps it so.
     ...(mode.data === 'ambient' && translation.data === undefined && env.ELEVENLABS_API_KEY
       ? { batchRefinement: true }
@@ -394,7 +394,7 @@ asrRouter.post('/live-sessions', requireSonioxConfigured, async (req, res) => {
         consentAsserted: mode === 'ambient' && parsed.data.consent === true,
         // Deliberately nothing about translation. With two languages on offer,
         // even "translated" says where a patient is likely from, and this trail
-        // outlives erasure (docs/trd.md §20.12).
+        // outlives erasure (docs/TRD.md §20.12).
       },
     })
 
@@ -438,7 +438,7 @@ asrRouter.post('/live-sessions', requireSonioxConfigured, async (req, res) => {
  * Feature gate for refinement after Stop, mirroring `requireSonioxConfigured`:
  * a deployment without the batch key answers 503 before minting anything, and
  * the SPA keeps the live transcript. Production is inert until the account
- * holder sets the key (docs/trd.md §20.14).
+ * holder sets the key (docs/TRD.md §20.14).
  */
 function requireElevenLabsConfigured(_req: Request, _res: Response, next: NextFunction) {
   if (!env.ELEVENLABS_API_KEY) {
@@ -475,7 +475,7 @@ const BATCH_FAILURE_RESPONSES: Record<
 
 /*
  * Mints the single-use token that uploads one finished ambient recording for
- * refinement after Stop (#436, docs/trd.md §20.14).
+ * refinement after Stop (#436, docs/TRD.md §20.14).
  *
  * **This route never receives audio**, for the reason the live mint gives and
  * one of its own: a relay through `/api/*` would meet Vercel's 120 s
@@ -667,7 +667,7 @@ asrRouter.post('/refinement-check', (req, res) => {
 })
 
 /*
- * The labelling pass that follows a hosted relay (docs/trd.md §20.3): the
+ * The labelling pass that follows a hosted relay (docs/TRD.md §20.3): the
  * relay's flat prose comes back here as text, is de-identified, and the LLM
  * drafts Doctor / Patient turns that the client shows for review. Nothing is
  * stored, exactly like the relay above; the consultation, if submitted,

@@ -12,7 +12,7 @@ export { buildEvidenceLinks, type EvidenceLink } from './note.js'
 export type { NoteAndGapsResult } from './types.js'
 
 /**
- * Operation 1 (docs/trd.md §12): the structured half of an analysis. It runs
+ * Operation 1 (docs/TRD.md §12): the structured half of an analysis. It runs
  * as two concurrent calls, `clinical_facts` and `note_and_gaps`, both reading
  * the same de-identified transcript. There is still no extract-then-generate
  * pipeline; the note is written from the transcript, not from the assertions,

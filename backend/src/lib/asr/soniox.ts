@@ -12,7 +12,7 @@ import { asrContextTerms, dictationContextTerms } from './vocabulary.js'
 
 /**
  * The only module that may talk to Soniox, and the second audio egress in the
- * system (docs/trd.md §20.10, issue #268).
+ * system (docs/TRD.md §20.10, issue #268).
  *
  * **It never sees audio.** Ambient capture streams from the browser straight to
  * the provider, because a WebSocket cannot pass through the Vercel rewrite that
@@ -115,7 +115,7 @@ export const TEMPORARY_KEY_TTL_SECONDS = 30
  * 06/09/26 it was measured opening a second, so the caps below bound each
  * stream while the number of streams a key can start inside its window is
  * unbounded. `TEMPORARY_KEY_TTL_SECONDS` is what narrows that window and is the
- * reason it is short. Recorded in docs/trd.md §20.10.
+ * reason it is short. Recorded in docs/TRD.md §20.10.
  */
 export const MAX_SESSION_DURATION_SECONDS: Record<LiveAsrMode, number> = {
   ambient: 1_800,
@@ -129,7 +129,7 @@ export const MAX_SESSION_DURATION_SECONDS: Record<LiveAsrMode, number> = {
  * Indonesian is excluded because Malay was tagged Indonesian on three of four
  * measured clips (issue #218), and every vendor supporting code-switching
  * advises naming the languages expected. Tamil is listed by this vendor and is
- * unmeasured here, which docs/trd.md §20.10 says plainly rather than claiming.
+ * unmeasured here, which docs/TRD.md §20.10 says plainly rather than claiming.
  */
 const LANGUAGE_HINTS = ['ms', 'en', 'zh', 'ta'] as const
 
@@ -322,7 +322,7 @@ type TranslatedSettings = Omit<ModeSettings, 'terms'> & {
 
 /**
  * Ambient capture translated both ways between English and one other language
- * (docs/trd.md §20.12, #392).
+ * (docs/TRD.md §20.12, #392).
  *
  * **Static and written out per language, for every reason `MODE_SETTINGS`
  * gives.** All of it crosses the audio egress in the first frame, and the

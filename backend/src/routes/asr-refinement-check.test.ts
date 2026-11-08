@@ -7,7 +7,7 @@ import {
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
- * Route-level tests for the refinement red-flag check (#436, docs/trd.md
+ * Route-level tests for the refinement red-flag check (#436, docs/TRD.md
  * §20.14).
  *
  * The client keeps the live transcript whenever the refined one would lose a

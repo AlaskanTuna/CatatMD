@@ -3,7 +3,7 @@ import { REDFLAG_TRIGGERS } from './triggers.js'
 import type { RedFlagTrigger } from './types.js'
 
 /**
- * Pure function over the transcript directly (docs/trd.md §10, Engine
+ * Pure function over the transcript directly (docs/TRD.md §10, Engine
  * Posture): no I/O, no LLM call, no database access, no clock, no
  * randomness. Runs independently of, and is never gated by, the model call.
  */
@@ -29,7 +29,7 @@ export function evaluateRedFlags(
 }
 
 /**
- * The zero-suppression invariant (docs/trd.md §10): a union, never a filter.
+ * The zero-suppression invariant (docs/TRD.md §10): a union, never a filter.
  * `modelCandidates` runs after and is never shown `ruleFlags`, so nothing
  * here — or upstream of here — can drop, downgrade, or reorder a rule hit.
  */

@@ -209,7 +209,7 @@ function sectionForFieldId(fieldId: string): ChecklistSection {
  * The 29-field checklist plus the operational block, shown rather than
  * summarised.
  *
- * This panel is the visible half of `docs/prd.md` §10. The fixed key set exists
+ * This panel is the visible half of `docs/PRD.md` §10. The fixed key set exists
  * so a field the consultation never touched surfaces as *unestablished* rather
  * than vanishing, and that guarantee is worth nothing if the UI renders only
  * the fields that came back filled. So every key is listed, including and

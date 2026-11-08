@@ -31,7 +31,7 @@ export const CopilotTurnSchema = z.object({
 })
 
 /**
- * Bounded for the same reason `medicationsDispensed` is (docs/trd.md §21.3):
+ * Bounded for the same reason `medicationsDispensed` is (docs/TRD.md §21.3):
  * an unbounded history is a runaway prompt, and the digest already carries the
  * consultation state, so old turns are conversational context rather than the
  * record. The oldest turns are dropped, never summarised, because a summary of

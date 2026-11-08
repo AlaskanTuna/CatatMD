@@ -4,7 +4,7 @@ import type { AsrRelayFailureReason } from '../../audit/index.js'
 import { env } from '../../config/env.js'
 
 /**
- * The one audio egress in the system (docs/trd.md §20, issue #154), and the
+ * The one audio egress in the system (docs/TRD.md §20, issue #154), and the
  * only module that may talk to the ASR provider.
  *
  * Native fetch and FormData, deliberately not the OpenAI SDK even though the
@@ -30,7 +30,7 @@ export class IlmuRelayError extends Error {
  * ILMU's wire shape, quarantined here the way each LLM adapter quarantines its
  * provider's. The API currently returns only `{text, usage}` and does not
  * honour `verbose_json`; `duration` and `segments` are documented fields it may
- * start returning later (docs/trd.md §20.3, finding 5), so they parse when
+ * start returning later (docs/TRD.md §20.3, finding 5), so they parse when
  * present, and unknown keys are stripped rather than rejected.
  */
 const IlmuWireSchema = z.object({
@@ -52,7 +52,7 @@ const REASON_BY_STATUS: Record<number, AsrRelayFailureReason> = {
 
 /**
  * Twice the measured worst case with two orders of magnitude to spare: 99.2 s
- * of audio transcribed in 2.5 s (docs/trd.md §20.3), so a minute of waiting
+ * of audio transcribed in 2.5 s (docs/TRD.md §20.3), so a minute of waiting
  * means the provider is down, not slow. No retries: the doctor is standing at
  * the Record tab, and the honest failure mode is degrading to paste.
  */

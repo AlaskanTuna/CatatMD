@@ -1,5 +1,5 @@
 /**
- * docs/trd.md §15 (Clinical Content Versioning). The stamp every versioned
+ * docs/TRD.md §15 (Clinical Content Versioning). The stamp every versioned
  * clinical artefact carries: the red-flag trigger list, the gap checklist, and
  * the guideline corpus.
  *

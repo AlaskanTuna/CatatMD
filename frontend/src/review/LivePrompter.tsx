@@ -137,7 +137,7 @@ export function LivePrompter({
         {live.answered.length > 0 && (
           /* Answered prompts are moved, never deleted. A gap the doctor has
              just covered disappearing from under their eye reads as the list
-             losing track of the conversation (docs/trd.md §20.8.1). */
+             losing track of the conversation (docs/TRD.md §20.8.1). */
           <p className="mt-3 text-2xs text-ink-muted">{live.answered.length} covered so far</p>
         )}
       </div>

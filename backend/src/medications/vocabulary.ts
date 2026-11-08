@@ -9,7 +9,7 @@
  * its source byte for byte identical; `safety.test.ts` covers every unit
  * branch to keep it that way.
  *
- * Dosing is bilingual and drug names are not. `docs/trd.md` §20.1 records the
+ * Dosing is bilingual and drug names are not. `docs/TRD.md` §20.1 records the
  * reason: Malaysian consultations are Malay-dominant with English switches,
  * but "medical vocabulary is English". A doctor says "makan tiga kali sehari"
  * and still says "amoxicillin".

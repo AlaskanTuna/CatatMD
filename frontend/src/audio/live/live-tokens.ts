@@ -160,7 +160,7 @@ const MID_WORD_CONTIGUITY_MS = 200
  * **No measurement in this repo backs this number.** Nothing here has scored
  * Soniox's confidence against a ground-truth transcript in any language, so
  * this is a starting value chosen to mark the visibly shaky words in the
- * captures seen so far and nothing more. docs/trd.md §20.10 already records the
+ * captures seen so far and nothing more. docs/TRD.md §20.10 already records the
  * provider as unmeasured; this is one more inference on the same pile, and it
  * is stated rather than softened.
  *

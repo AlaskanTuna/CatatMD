@@ -3,7 +3,7 @@ import { type LiveToken, speakerNumber, tokensToSegments, tokensToText } from '.
 
 /*
  * What a refined transcript becomes, and what it must pass before it replaces
- * the live one (#436, docs/trd.md §20.14). Pure and DOM-free, like
+ * the live one (#436, docs/TRD.md §20.14). Pure and DOM-free, like
  * `live-tokens.ts` beside it.
  *
  * **One role mechanism.** The vendor's words are mapped onto the live path's

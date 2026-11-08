@@ -17,7 +17,7 @@ export function clientKey(req: Request): string {
 }
 
 /**
- * Per-IP limiter for `POST /api/consultations/:id/analyze` (docs/trd.md §16) —
+ * Per-IP limiter for `POST /api/consultations/:id/analyze` (docs/TRD.md §16) —
  * the only route that spends an LLM call, so the only one where a loop is
  * expensive rather than merely noisy.
  *
@@ -263,7 +263,7 @@ export const draftTurnsRateLimit = rateLimit({
  * Five a minute, matching the ambient mint, because one consultation needs one
  * refinement: the number bounds retries by a human hand, not throughput. It is
  * the only per-caller control on this path, and it matters more here than on
- * the live mint, because the token binds no duration (docs/trd.md §20.14): what
+ * the live mint, because the token binds no duration (docs/TRD.md §20.14): what
  * one upload costs is however long the recording is, up to the vendor's own
  * limits. The vendor credit quota on the key is the only spend bound beyond
  * this, and `.claude/rules/security.md` states the missing global cap as a gap.

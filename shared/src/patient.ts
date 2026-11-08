@@ -19,7 +19,7 @@ import { z } from 'zod'
  *
  * **It makes de-identification exact rather than probabilistic.** Detection in
  * `backend/src/deid/` is pattern- and gazetteer-based, and is documented as
- * best-effort in `docs/prd.md` §12. A registered patient supplies a known
+ * best-effort in `docs/PRD.md` §12. A registered patient supplies a known
  * identifier list for the consultation, so the vault can be seeded with real
  * values and the detectors demoted to a backstop for whatever was never
  * registered — a spouse named in passing, a number read aloud.

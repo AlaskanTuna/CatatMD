@@ -6,7 +6,7 @@ import type { TokenVault } from './types.js'
  * Created once per analyse request alongside the tokenised text. **Never a
  * module-level singleton, never attached to a `Consultation` row, never
  * serialised, never logged.** It is discarded when the request handler returns
- * (docs/trd.md §9).
+ * (docs/TRD.md §9).
  *
  * The class holds no static state, so two concurrent requests cannot see each
  * other's entries — the property that makes "request-scoped" true rather than
@@ -45,7 +45,7 @@ export class RequestTokenVault implements TokenVault {
   /**
    * Re-inserts original spans into model output before it reaches the doctor.
    * The model may echo a token back verbatim, so every string field on the
-   * response path passes through here (docs/trd.md §9).
+   * response path passes through here (docs/TRD.md §9).
    */
   rehydrate(text: string): string {
     let out = text

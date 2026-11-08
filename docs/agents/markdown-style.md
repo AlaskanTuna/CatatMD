@@ -13,9 +13,9 @@ How every Markdown file in the repository is written. The README has stricter ru
 
 ## README Versus TRD
 
-`README.md` and `docs/trd.md` may both describe architecture. They differ in depth and audience, not in subject.
+`README.md` and `docs/TRD.md` may both describe architecture. They differ in depth and audience, not in subject.
 
-|              | `README.md`                                                               | `docs/trd.md`                                                            |
+|              | `README.md`                                                               | `docs/TRD.md`                                                            |
 | ------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | **Audience** | Anyone landing on the repository: reviewers, recruiters, collaborators    | Developers implementing against it                                       |
 | **Depth**    | The what, how and why, at a glance                                        | The canonical implementation-level reference                             |

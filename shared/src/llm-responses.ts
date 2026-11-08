@@ -6,14 +6,14 @@ import { MedicalRecordNoteSchema } from './note.js'
 import { LlmOperationalBlockSchema } from './operational.js'
 import { RedFlagSchema } from './red-flags.js'
 
-// ─── LLM response contracts (docs/trd.md §12) ────────────────────────────────
+// ─── LLM response contracts (docs/TRD.md §12) ────────────────────────────────
 
 /**
  * Operation 1a. The 34-assertion checklist (29 clinical fields plus the five
  * operational ones) and nothing else. The prompt never asks for a diagnosis,
  * differential, or impression, only for the diagnosis the doctor stated.
  *
- * Split out from `note_and_gaps` on 13/08/26 (docs/trd.md §19 row 19). One
+ * Split out from `note_and_gaps` on 13/08/26 (docs/TRD.md §19 row 19). One
  * combined response averaged 3,337 completion tokens and ranged over 533 of
  * them, and it is that variance rather than the mean that pushed runs past the
  * provider's reliable ceiling and past CAP-1's 30s budget: 2 of 8 measured runs
@@ -31,7 +31,7 @@ export const ClinicalFactsResponseSchema = z.object({
  * Operation 1b. The generated-prose half, run concurrently with 1a against the
  * same transcript. It carries no dependency on the facts call: the note is
  * written from the transcript rather than composed from the assertions
- * (docs/trd.md §12), so ordering the two would only cost wall-clock.
+ * (docs/TRD.md §12), so ordering the two would only cost wall-clock.
  */
 export const NoteAndGapsResponseSchema = z.object({
   note: MedicalRecordNoteSchema,
@@ -57,7 +57,7 @@ export const NoteAndGapsResponseSchema = z.object({
  * because it must stay a real judgement about the presentation. It is an
  * explicit signal rather than an inference from an empty `suggestions` array,
  * since that inference would conflate "out of scope, suggestions suppressed"
- * with "in scope, nothing to suggest" (docs/trd.md §19 row 7), and the review
+ * with "in scope, nothing to suggest" (docs/TRD.md §19 row 7), and the review
  * page renders those two, plus "nothing was retrieved", as three distinct
  * sentences. Deriving it from an empty corpus instead would collapse the
  * distinction the UI exists to make.

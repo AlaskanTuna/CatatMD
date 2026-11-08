@@ -1,7 +1,7 @@
 import type { MishearProposal, Transcript } from '@shared/types'
 
 /**
- * Measured Malay ASR confusables (docs/trd.md §20.3, issue #193).
+ * Measured Malay ASR confusables (docs/TRD.md §20.3, issue #193).
  *
  * Both ASR arms that have been measured harden the first consonant of Malay
  * clinical words: "batuk" comes back as "patut", "demam" as "teman", "denggi"

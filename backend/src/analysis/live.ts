@@ -11,7 +11,7 @@ import { buildClinicalFactsSystemPrompt } from './prompt.js'
  * It is `analyseNote`'s extraction half, pointed at one window instead of a
  * whole consultation. Two things it deliberately does **not** do:
  *
- * - It does not write a note. docs/trd.md §20.8.1 measures every
+ * - It does not write a note. docs/TRD.md §20.8.1 measures every
  *   extract-then-write variant as less grounded than writing from the
  *   transcript (0.971 against 0.914 to 0.946), and a note folded from a
  *   previous note is that shape by another route. The note is written once, at

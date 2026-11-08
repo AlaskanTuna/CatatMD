@@ -57,7 +57,7 @@ async function requestRetention(init?: RequestInit): Promise<RetentionPolicy> {
  * The theme control is right here instead, in the chrome, where it already was.
  *
  * What the page does carry is erasure, which is not a convenience feature.
- * `docs/dpia.md` lists the data-subject erasure right under "Retention,
+ * `docs/DPIA.md` lists the data-subject erasure right under "Retention,
  * Deletion, And Access Requests" as designed but unimplemented; this is the
  * implementation.
  */

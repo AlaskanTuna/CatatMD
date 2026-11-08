@@ -1,5 +1,5 @@
 -- A new consultation opens in ambient capture rather than press-to-record
--- (#378, docs/decisions.md D-007).
+-- (#378, docs/DECISIONS.md D-007).
 --
 -- SET DEFAULT and nothing else, deliberately. Existing rows keep the mode they
 -- were created with, including the ones 20260907000000_add_note_template

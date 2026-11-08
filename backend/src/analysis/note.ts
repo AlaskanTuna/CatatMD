@@ -8,10 +8,10 @@ import type {
 /**
  * Issue #5 — maps each supported clinical fact to the verbatim transcript
  * span behind it, keyed by field id. This is a by-product of the evidence
- * check (docs/trd.md §21.4): every link here already carries a span the
+ * check (docs/TRD.md §21.4): every link here already carries a span the
  * check matched against the de-identified transcript, so there is no
  * separate "note statement" to trace — the note itself is generated prose
- * (§12), not composed from these facts. Data only; docs/trd.md §21.4's Open
+ * (§12), not composed from these facts. Data only; docs/TRD.md §21.4's Open
  * item (§19 row 17) scopes surfacing this as clickable UI out for now.
  */
 export interface EvidenceLink {

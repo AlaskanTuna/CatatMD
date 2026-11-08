@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { ReconstructionError, reconstructTurns } from './reconstruction.js'
 
 /**
- * Pure tests for the verbatim guard (#189, docs/trd.md §20.5). No mocks: the
+ * Pure tests for the verbatim guard (#189, docs/TRD.md §20.5). No mocks: the
  * model's turns are accepted only as boundaries and speaker labels, and every
  * turn's shipped text is re-sliced from the input rather than taken from the
  * model, so these tests exercise `reconstructTurns` directly against

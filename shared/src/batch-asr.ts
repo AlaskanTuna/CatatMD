@@ -7,7 +7,7 @@ import { MAX_TURN_CHARACTERS } from './transcript.js'
 
 /**
  * The one address the browser may upload a finished ambient recording to, for
- * re-transcription after Stop (#436, docs/trd.md §20.14).
+ * re-transcription after Stop (#436, docs/TRD.md §20.14).
  *
  * **A literal, compared exactly.** It is the third audio egress, and the
  * second the API never sees, so the same belt-and-braces as
@@ -23,7 +23,7 @@ export const BATCH_ASR_UPLOAD_URL = 'https://api.elevenlabs.io/v1/speech-to-text
  *
  * The ambient session cap is 1800 s, and the minute above it is slack for the
  * recorder's last chunk and the stop drain. **Provisional until the
- * measurement gate** (docs/trd.md §20.14): the batch evaluation only ran files
+ * measurement gate** (docs/TRD.md §20.14): the batch evaluation only ran files
  * of at most 40 s, so nothing has yet measured a recording this long.
  */
 export const MAX_BATCH_RECORDING_SECONDS = 1_860
@@ -44,7 +44,7 @@ const BatchKeytermSchema = z
  * **Literals throughout, and `.strict()`, and both are the control.** The SPA
  * parses what our own API sends against this, so even a compromised or
  * misconfigured API cannot have it ask for `scribe_v2_medical`, which the
- * evaluation measured merging voices (docs/trd.md §20.13), or for speaker
+ * evaluation measured merging voices (docs/TRD.md §20.13), or for speaker
  * roles, which would be a second role mechanism beside `voteRolesBySpeaker`.
  * The keyterms are the ambient vocabulary, bounded the way the vendor bounds
  * them. Nothing here is derived from a request, for the reason

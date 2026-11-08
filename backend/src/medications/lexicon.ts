@@ -5,7 +5,7 @@ import type { ClinicalArtefactVersion } from '../clinical-versions/types.js'
  * Generic drug names for the two clinical profiles, used to offer spelling
  * candidates for names the recogniser garbled.
  *
- * **This is a spelling aid, not a formulary** (`docs/decisions.md` D-001).
+ * **This is a spelling aid, not a formulary** (`docs/DECISIONS.md` D-001).
  * Four keys, and no fifth: no dose, no indication, no interaction, no
  * recommendation. The ingested CPG chunks draw the same line for themselves.
  *

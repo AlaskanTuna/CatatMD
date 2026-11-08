@@ -73,7 +73,7 @@ export const ConsultationAnalysisSchema = z.object({
   /**
    * The reviewed checklist, surfaced rather than discarded.
    *
-   * `docs/prd.md` §10 requires that a field the consultation never touched
+   * `docs/PRD.md` §10 requires that a field the consultation never touched
    * reads as unestablished rather than as absent, and Demo Script step 5 asks
    * an evaluator to see exactly that. Both are unsatisfiable if the facts stay
    * inside the analysis pipeline: a UI cannot render a `NOT_ASSESSED` it was
@@ -90,7 +90,7 @@ export const ConsultationAnalysisSchema = z.object({
   /**
    * Each established checklist field paired with the verbatim transcript span
    * behind it, so a doctor can check what the system read rather than trusting
-   * it (GitHub issue #10, docs/trd.md §19 row 17).
+   * it (GitHub issue #10, docs/TRD.md §19 row 17).
    *
    * **These trace checklist fields, never note sentences.** The note is
    * generated prose from a separate model call (§12) and is not composed from
@@ -115,7 +115,7 @@ export const ConsultationAnalysisSchema = z.object({
    * The model already produces this and `makeSuggestionsAndRedFlagsSchema`
    * documents why it exists: an empty `suggestions` array conflates "out of
    * scope, suggestions suppressed" with "in scope, nothing to suggest"
-   * (docs/trd.md §19 row 7). That reasoning only pays off if the distinction
+   * (docs/TRD.md §19 row 7). That reasoning only pays off if the distinction
    * survives to the UI, and until now it was dropped when the analysis was
    * assembled, leaving the review screen to hedge with "this **may be** outside
    * the corpus's scope" about something the system already knew.

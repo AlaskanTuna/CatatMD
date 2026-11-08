@@ -22,7 +22,7 @@ import { TARGET_SAMPLE_RATE } from './protocol.js'
 /**
  * `whisper-small` on WASM against a browser on a thin machine is a plausible
  * out-of-memory kill in the middle of a consultation, which is a far worse
- * failure than not offering the feature (docs/prd.md §12).
+ * failure than not offering the feature (docs/PRD.md §12).
  *
  * So the floor is a default, not a lock: a doctor who knows their machine can
  * proceed. Both signals are advisory. `deviceMemory` is coarse and Chromium
@@ -62,7 +62,7 @@ export async function toMono16k(blob: Blob): Promise<Float32Array> {
 /**
  * Dictation constraints, not the defaults: the browser's voice-call DSP
  * attenuates exactly the low-energy consonant bursts that separate b/p and
- * d/t, the devoicing family docs/trd.md §20.3 measured on both ASR arms
+ * d/t, the devoicing family docs/TRD.md §20.3 measured on both ASR arms
  * ("patut" for "batuk"), and echo cancellation has no far end to cancel here.
  * Gain control stays on because two speakers sit at different distances from
  * one microphone, and a quiet track costs more than gain pumping. Values are
@@ -86,7 +86,7 @@ export const DICTATION_AUDIO_CONSTRAINTS: MediaTrackConstraints = {
  *
  * A budget on silence rather than on the whole job, because a
  * consultation-length recording legitimately transcribes for many minutes
- * (docs/trd.md section 20.1 measures a real-time factor of 1.5 to 3.0) and a
+ * (docs/TRD.md section 20.1 measures a real-time factor of 1.5 to 3.0) and a
  * total deadline would abort exactly the recordings most expensive to lose.
  * The floor is set by ONNX session creation, which blocks the worker thread
  * on a roughly 240 MB decoder and is legitimately silent throughout.
