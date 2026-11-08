@@ -20,7 +20,7 @@ Generates model suggestion and red-flag candidates, then filters unsafe or unsup
 
 ## Used By
 
-- routes/consultations.ts displays generated suggestions and merges model red-flag candidates with deterministic flags.
+- consultations/analysis.ts generates suggestions and merges model red-flag candidates with deterministic flags.
 - analysis/diagnostic-guard.ts and audit/index.ts import safety helpers or types.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

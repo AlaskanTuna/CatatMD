@@ -2,8 +2,8 @@ import { ArrowRight, FileLock2, Stethoscope, UserCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 /**
- * The only brand-register surface in the product, and the first thing an
- * evaluator sees.
+ * The only brand-register surface in the product, and the first thing a
+ * visitor sees.
  *
  * The research (`docs/research/09-medical-web-design.md`) is
  * specific about what belongs here: Malaysian clinical audiences expect

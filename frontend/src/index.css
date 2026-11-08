@@ -311,7 +311,7 @@
    *
    * `scrollbar-width: thin` is the standard property and is all Firefox needs;
    * the `::-webkit-scrollbar` block is what Chromium reads. Both are declared
-   * because neither alone covers the browsers this is judged in.
+   * because neither alone covers the browsers CatatMD supports.
    *
    * The track is transparent rather than tinted, so the bar sits on whatever
    * surface it happens to overlay (ground, card, or the sunken transcript

@@ -75,7 +75,7 @@ export const ConsultationAnalysisSchema = z.object({
    *
    * `docs/PRD.md` §10 requires that a field the consultation never touched
    * reads as unestablished rather than as absent, and Demo Script step 5 asks
-   * an evaluator to see exactly that. Both are unsatisfiable if the facts stay
+   * the viewer to see exactly that. Both are unsatisfiable if the facts stay
    * inside the analysis pipeline: a UI cannot render a `NOT_ASSESSED` it was
    * never sent, and "we checked 29 fields" is not a claim a reviewer can
    * verify from four paragraphs of prose.

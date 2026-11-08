@@ -19,7 +19,7 @@ Prefills the sore-throat score from transcript evidence and returns the score fo
 
 ## Used By
 
-- routes/consultations.ts requests profile-specific scores.
+- consultations/analysis.ts requests profile-specific scores.
 - clinical-versions/index.ts includes the score version in the active registry.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

@@ -53,7 +53,7 @@ const MAX_RETRIES = 0
  * JSON-schema structured output.
  *
  * Keeping them behind one adapter is what makes the provider swappable, which
- * is the architectural answer to the brief's data-residency requirement.
+ * is the architectural answer to the data-residency requirement (docs/DPIA.md).
  */
 export class OpenAICompatibleClient implements LLMClient {
   private readonly client: OpenAI

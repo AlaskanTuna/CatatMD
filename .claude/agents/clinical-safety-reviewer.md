@@ -1,6 +1,6 @@
 ---
 name: clinical-safety-reviewer
-description: Use PROACTIVELY whenever a diff touches backend/src/redflags/, backend/src/guidelines/, backend/src/analysis/, backend/src/suggestions/, backend/src/clinical-profiles/, backend/src/clinical-versions/, or the approve state transition in backend/src/routes/consultations.ts. Verifies that the model can never suppress a rule hit, that citations stay ID-constrained, and that nothing reads as a diagnosis. Read-only.
+description: Use PROACTIVELY whenever a diff touches backend/src/redflags/, backend/src/guidelines/, backend/src/analysis/, backend/src/suggestions/, backend/src/clinical-profiles/, backend/src/clinical-versions/, backend/src/consultations/, or the approve state transition in backend/src/routes/consultations.ts. Verifies that the model can never suppress a rule hit, that citations stay ID-constrained, and that nothing reads as a diagnosis. Read-only.
 tools: Read, Grep, Glob, Bash
 model: opus
 effort: high
@@ -24,7 +24,7 @@ The system does not diagnose and does not replace clinical judgement. The doctor
 
 - `mergeRedFlags` (`backend/src/redflags/evaluate.ts`) is a pure `ruleFlags.concat(modelCandidates)`. Adding a filter, dedupe, sort, or severity comparison breaks the safety invariant and the tests in `backend/src/redflags/evaluate.test.ts` that pin it. This is a BLOCKER and it needs explicit human sign-off, not a review comment.
 - The LLM may only add candidates for the doctor to review. It may never suppress, downgrade, or reorder a deterministic hit.
-- Rule evaluation runs on the raw transcript before the LLM calls, never on model output. Check that ordering is intact in `backend/src/routes/consultations.ts`.
+- Rule evaluation runs on the raw transcript before the LLM calls, never on model output. Check that ordering is intact in `runAnalysis` (`backend/src/consultations/analysis.ts`).
 - `makeSuggestionsAndRedFlagsSchema` pins model red flags to `source: z.literal('model')` with `ruleId` omitted, so a model response structurally cannot impersonate a rule hit. Never accept a change that lets a model set `source: 'rule'` or supply a `ruleId`.
 - The engine stays a pure function library: no I/O, no clock, no LLM, no side effects. 12 triggers live in `backend/src/redflags/triggers.ts` across `REDFLAG_TRIGGERS` and `UTI_REDFLAG_TRIGGERS`, merged as `ALL_REDFLAG_TRIGGERS`.
 - A new or widened trigger needs a test that pins the positive case AND a test that pins the case it must not fire on. The repo has precedent for both: `cd74caa` pinned fail-open behaviour on interleaved turns, `d61d5ad` stopped a trigger firing on the doctor's own screening question.

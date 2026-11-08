@@ -30,7 +30,7 @@ export function DemoStepBar() {
        * The demo's central claim is that it runs the real pipeline rather than
        * a canned script. If the live analysis fails and prepared consultations
        * are shown in its place without saying so, the demo asserts something
-       * false at the exact moment an evaluator is judging that claim. Stated
+       * false at the exact moment a viewer is relying on that claim. Stated
        * plainly and without alarm: the walkthrough still works, and what is on
        * screen is still real output from the real pipeline, just produced
        * earlier rather than now.

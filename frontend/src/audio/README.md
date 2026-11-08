@@ -20,7 +20,7 @@ This module owns the browser audio session from consent through transcript assem
 
 ### Used By
 
-routes/CapturePanel.tsx selects the capture surface. review/PrescriptionTheatre.tsx reuses the worker and streaming dictation helpers.
+routes/CapturePanel.tsx selects the capture surface. review/prescription/use-prescription-dictation.ts reuses the worker and streaming dictation helpers for the prescription theatre.
 
 ### Invariants
 

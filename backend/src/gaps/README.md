@@ -19,7 +19,7 @@ Derives missing-information prompts from the clinical checklist and records wher
 
 ## Used By
 
-- routes/consultations.ts derives and returns gaps.
+- consultations/analysis.ts derives gaps; consultations/detail.ts and routes/consultations.ts return them.
 - clinical-profiles/index.ts imports checklist entries for profile selection.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

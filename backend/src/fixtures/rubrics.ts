@@ -1,6 +1,6 @@
 /**
  * Per-fixture grading rubric. Fixtures are gradeable encounters, not clean
- * showcase transcripts (docs/PRD.md §14) — each entry states what correct
+ * demonstration transcripts (docs/PRD.md §14) — each entry states what correct
  * behaviour looks like for that case, so QA grades against a stated rubric
  * rather than a snapshot of whatever the system happens to produce.
  *

@@ -46,8 +46,8 @@ export const DEMO_CONSULTATION_ID = 'demo-ephemeral'
  * **The seeded walk survives as a fallback, and it announces itself.** If the
  * live analysis fails, the tour walks the demo account's stored consultations
  * instead, and says so on screen. Silently substituting prepared output would
- * have the demo assert it is running the real pipeline at the exact moment an
- * evaluator is judging that claim, which is a worse failure than a visible
+ * have the demo assert it is running the real pipeline at the exact moment a
+ * viewer is relying on that claim, which is a worse failure than a visible
  * degradation.
  */
 
