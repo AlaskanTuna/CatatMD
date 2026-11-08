@@ -64,4 +64,3 @@ Pure function library, zero side effects (no I/O, no LLM call, no database acces
 The concrete trigger content, the actual list of clinical triggers, their thresholds, and each `clinicalSource` citation, is not specified here. Q7 records that no clinician is available to draft or validate it; inventing specific clinical thresholds without that review would itself violate the no-invention rule this document runs on. Sourcing the initial list from the §11 corpus, **MOH NAG 2024, the 2024 Malaysian sore-throat Delphi consensus, and Ooi et al. 2022**, is implementation work against this contract, not a further TRD design decision. NICE is **not** a permitted source here for the same licence reason that excludes it from the corpus (§11); the Centor and McIsaac criteria themselves are clinical algorithms whose criteria are restated in the Malaysian sources, so they are expressed in our own words and attributed to those sources.
 
 ---
-

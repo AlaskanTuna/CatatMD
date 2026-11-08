@@ -1,10 +1,10 @@
 # D-002: Retire The Curated Guideline Corpus For Retrieval-Only Citation
 
-|                |                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| **Date**       | 2026-09-09                                                                                             |
-| **Status**     | Adopted                                                                                                |
-| **Issues**     | #250 (open)                                                                                            |
+|                |                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| **Date**       | 2026-09-09                                                                                           |
+| **Status**     | Adopted                                                                                              |
+| **Issues**     | #250 (open)                                                                                          |
 | **Supersedes** | The hand-written `guideline-corpus-v4` chunk set that anchored `../TRD.md` Section 11 since issue #8 |
 
 ## Decision

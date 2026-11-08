@@ -1,17 +1,17 @@
 # D-009: Which Language Takes Which Capture Path, And What Is Not Supported
 
-|            |                                                                         |
-| ---------- | ----------------------------------------------------------------------- |
-| **Date**   | 2026-10-07                                                              |
-| **Status** | Adopted                                                                 |
-| **Issues** | #218, #418                                                              |
+|            |                                                                       |
+| ---------- | --------------------------------------------------------------------- |
+| **Date**   | 2026-10-07                                                            |
+| **Status** | Adopted                                                               |
+| **Issues** | #218, #418                                                            |
 | **Builds** | §20.10 "Measured 07/10/26" in `../TRD.md`, which supplies the numbers |
 
 ## Decision
 
 Each language goes to the path below, and Cantonese is stated as not supported on the Record tab rather than left to fail quietly.
 
-| Language               | Path                                                    | Measured on that path (synthetic voices, `../TRD.md` §20.10)            |
+| Language               | Path                                                    | Measured on that path (synthetic voices, `../TRD.md` §20.10)              |
 | ---------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
 | English, Manglish      | Ambient Auto-Detect, or on-device press-to-record       | English measured elsewhere (§20.1); not re-run here                       |
 | Malay                  | Ambient Auto-Detect, or the ILMU relay                  | 9.4% WER                                                                  |

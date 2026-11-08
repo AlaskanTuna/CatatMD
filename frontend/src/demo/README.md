@@ -1,4 +1,5 @@
 <a id="readme-top"></a>
+
 # Guided Demo Tour
 
 The tour module provides an in-product walkthrough of the consultation workflow.

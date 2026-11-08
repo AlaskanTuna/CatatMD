@@ -56,4 +56,3 @@ That path puts identifiable data back onto a path the MVP deliberately keeps cle
 FHIR is the recommended future target, not a claim that any current clinic system can receive it. Each clinic integration must first demonstrate its supported FHIR version, profiles, endpoint behaviour, identity mapping, and receiving-record workflow against synthetic data before any real note is sent.
 
 ---
-

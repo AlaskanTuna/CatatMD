@@ -4,34 +4,34 @@ Every document in this repository, organised by the question it answers. Start w
 
 ## Start Here
 
-| You Are                         | Read, In Order                                                                                                                                 |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Trying the product**          | [`USER-GUIDE.md`](USER-GUIDE.md), then the [live demo](https://catatmd.vercel.app)                                                             |
-| **Reviewing the engineering**   | [`../README.md`](../README.md), [`OVERVIEW.md`](OVERVIEW.md), [`TRD.md`](TRD.md), [`decisions/`](decisions/)                                   |
-| **Setting up to develop**       | [`GETTING-STARTED.md`](GETTING-STARTED.md), [`DEVELOPMENT.md`](DEVELOPMENT.md), [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)     |
-| **Operating the deployment**    | [`operations/`](operations/)                                                                                                                   |
-| **Assessing privacy or safety** | [`DPIA.md`](DPIA.md), [`architecture/09-de-identification-pipeline.md`](architecture/), [`../docs/agents/invariants.md`](agents/invariants.md) |
-| **An AI coding agent**          | [`../AGENTS.md`](../AGENTS.md), then [`agents/documents.md`](agents/documents.md)                                                              |
+| You Are                         | Read, In Order                                                                                                                                                         |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Trying the product**          | [`USER-GUIDE.md`](USER-GUIDE.md), then the [live demo](https://catatmd.vercel.app)                                                                                     |
+| **Reviewing the engineering**   | [`../README.md`](../README.md), [`OVERVIEW.md`](OVERVIEW.md), [`TRD.md`](TRD.md), [`decisions/`](decisions/)                                                           |
+| **Setting up to develop**       | [`GETTING-STARTED.md`](GETTING-STARTED.md), [`DEVELOPMENT.md`](DEVELOPMENT.md), [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)                             |
+| **Operating the deployment**    | [`operations/`](operations/)                                                                                                                                           |
+| **Assessing privacy or safety** | [`DPIA.md`](DPIA.md), [`architecture/09-de-identification-pipeline.md`](architecture/09-de-identification-pipeline.md), [`agents/invariants.md`](agents/invariants.md) |
+| **An AI coding agent**          | [`../AGENTS.md`](../AGENTS.md), then [`agents/documents.md`](agents/documents.md)                                                                                      |
 
 ## By Question
 
-| Question                                                         | Answer Lives In                                                                                                                      |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **What** is CatatMD, and what does it do?                        | [`OVERVIEW.md`](OVERVIEW.md), [`PRD.md`](PRD.md) sections 6 to 9                                                                     |
-| **What** does a term mean?                                       | [`GLOSSARY.md`](GLOSSARY.md)                                                                                                         |
-| **Who** is it for, and who built it?                             | [`PRD.md`](PRD.md), [`PRODUCT.md`](PRODUCT.md), the Team section of [`../README.md`](../README.md#team)                              |
-| **Why** does it exist, and why this design?                      | [`PRD.md`](PRD.md) section 1, [`decisions/`](decisions/), [`research/`](research/)                                                   |
-| **Why** is a given rule enforced?                                | [`agents/invariants.md`](agents/invariants.md), [`TRD.md`](TRD.md)                                                                   |
-| **Where** does each piece of code live?                          | [`../README.md`](../README.md#project-structure), each module's own `README.md`, [`architecture/02-*`](architecture/)                |
-| **Where** does patient data go, and in which region?             | [`DPIA.md`](DPIA.md), [`architecture/20-asr-contract.md`](architecture/), [`operations/environments.md`](operations/environments.md) |
-| **When** does a consultation change state?                       | [`GLOSSARY.md`](GLOSSARY.md#consultation-lifecycle), [`architecture/13-*`](architecture/)                                            |
-| **When** does a change deploy?                                   | [`operations/deployment.md`](operations/deployment.md)                                                                               |
-| **How** do I use it as a doctor?                                 | [`USER-GUIDE.md`](USER-GUIDE.md)                                                                                                     |
-| **How** do I run it locally?                                     | [`GETTING-STARTED.md`](GETTING-STARTED.md)                                                                                           |
-| **How** do I change, test and ship code?                         | [`DEVELOPMENT.md`](DEVELOPMENT.md), [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)                                       |
-| **How** does each pipeline work, and what are its contracts?     | [`TRD.md`](TRD.md) and [`architecture/`](architecture/)                                                                              |
-| **How** do I deploy, migrate, monitor or respond to an incident? | [`operations/`](operations/)                                                                                                         |
-| **How** should the UI look and behave?                           | [`DESIGN.md`](DESIGN.md), [`PRODUCT.md`](PRODUCT.md)                                                                                 |
+| Question                                                         | Answer Lives In                                                                                                                                                                                                         |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **What** is CatatMD, and what does it do?                        | [`OVERVIEW.md`](OVERVIEW.md), [`PRD.md`](PRD.md) sections 6 to 9                                                                                                                                                        |
+| **What** does a term mean?                                       | [`GLOSSARY.md`](GLOSSARY.md)                                                                                                                                                                                            |
+| **Who** is it for, and who built it?                             | [`PRD.md`](PRD.md), [`PRODUCT.md`](PRODUCT.md), the Team section of [`../README.md`](../README.md#team)                                                                                                                 |
+| **Why** does it exist, and why this design?                      | [`PRD.md`](PRD.md) section 1, [`decisions/`](decisions/), [`research/`](research/)                                                                                                                                      |
+| **Why** is a given rule enforced?                                | [`agents/invariants.md`](agents/invariants.md), [`TRD.md`](TRD.md)                                                                                                                                                      |
+| **Where** does each piece of code live?                          | [`../README.md`](../README.md#project-structure), each module's own `README.md`, [`architecture/02-system-context-and-component-responsibilities.md`](architecture/02-system-context-and-component-responsibilities.md) |
+| **Where** does patient data go, and in which region?             | [`DPIA.md`](DPIA.md), [`architecture/20-asr-contract.md`](architecture/20-asr-contract.md), [`operations/environments.md`](operations/environments.md)                                                                  |
+| **When** does a consultation change state?                       | [`GLOSSARY.md`](GLOSSARY.md#consultation-lifecycle), [`architecture/13-api-contracts.md`](architecture/13-api-contracts.md)                                                                                             |
+| **When** does a change deploy?                                   | [`operations/deployment.md`](operations/deployment.md)                                                                                                                                                                  |
+| **How** do I use it as a doctor?                                 | [`USER-GUIDE.md`](USER-GUIDE.md)                                                                                                                                                                                        |
+| **How** do I run it locally?                                     | [`GETTING-STARTED.md`](GETTING-STARTED.md)                                                                                                                                                                              |
+| **How** do I change, test and ship code?                         | [`DEVELOPMENT.md`](DEVELOPMENT.md), [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)                                                                                                                          |
+| **How** does each pipeline work, and what are its contracts?     | [`TRD.md`](TRD.md) and [`architecture/`](architecture/)                                                                                                                                                                 |
+| **How** do I deploy, migrate, monitor or respond to an incident? | [`operations/`](operations/)                                                                                                                                                                                            |
+| **How** should the UI look and behave?                           | [`DESIGN.md`](DESIGN.md), [`PRODUCT.md`](PRODUCT.md)                                                                                                                                                                    |
 
 ## Every Document
 

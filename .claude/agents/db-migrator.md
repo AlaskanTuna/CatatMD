@@ -61,7 +61,7 @@ Clinical: `Consultation` and `AuditEvent`.
 
 - Never run `prisma migrate deploy` or `prisma migrate reset` without an explicit instruction naming the environment. `db:migrate:deploy` targets production.
 - Never run `prisma db push`. This project uses migrations.
-- Never run `git add`, `git commit`, or `git push`. Gate 2 belongs to the human.
+- Never run `git add`, `git commit`, or `git push`. Shipping belongs to the human.
 - Never write a real NRIC or real patient data into a seed or fixture. Everything is synthetic.
 - Never print a connection string, a password, or the contents of `.env`.
 

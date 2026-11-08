@@ -5,7 +5,7 @@
 | **Date**       | 2026-09-09                                                    |
 | **Status**     | Adopted. Amended 2026-09-10 three times, and 2026-10-06 twice |
 | **Issues**     | #310, #311, #312, #313, #355, #356, #357, #363                |
-| **Supersedes** | Nothing. Clarifies `../PRD.md` Section 6                    |
+| **Supersedes** | Nothing. Clarifies `../PRD.md` Section 6                      |
 
 ## Decision
 
@@ -21,10 +21,10 @@ Section 11's intended-purpose statement already describes exactly this, and is *
 
 **"Prescribing" was carrying two meanings in one word**, and the two halves of the document disagreed about which it meant.
 
-| Where          | What It Said                                                    | Reading                                                                           |
-| -------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Section 11     | "not intended to recommend or select treatment"                 | Unambiguous, and untouched here                                                   |
-| Section 6      | "Diagnosis, triage decisions, prescribing"                      | Ambiguous, and read literally it forbade transcribing a sentence the doctor spoke |
+| Where        | What It Said                                                    | Reading                                                                           |
+| ------------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Section 11   | "not intended to recommend or select treatment"                 | Unambiguous, and untouched here                                                   |
+| Section 6    | "Diagnosis, triage decisions, prescribing"                      | Ambiguous, and read literally it forbade transcribing a sentence the doctor spoke |
 | `../DPIA.md` | "does not diagnose, prescribe, or approve a note automatically" | The word "automatically" was already doing the work                               |
 
 **The literal reading was already untrue in the shipped product.** `medicationsDispensed` in the operational block (Section 9, CAP-1) has been populated by extraction since that block shipped: drugs the doctor named, each carrying a verbatim transcript span, resolving to `NOT_ASSESSED` when the doctor said nothing. This decision does not widen scope so much as make the written boundary match behaviour that already exists and was already reviewed.
@@ -41,10 +41,10 @@ Section 11's intended-purpose statement already describes exactly this, and is *
 
 |                            |                                                                                                                                                                                                                                               |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **What is added**          | Streaming recognition on the same Soniox socket ambient capture uses, browser-direct, US region (`../TRD.md` §20.10, issues #356 and #357)                                                                                                       |
+| **What is added**          | Streaming recognition on the same Soniox socket ambient capture uses, browser-direct, US region (`../TRD.md` §20.10, issues #356 and #357)                                                                                                    |
 | **What stays the default** | On-device Whisper. A doctor who changes nothing sends no audio anywhere, and no consent tick is offered on that path. **Superseded the same day, see the next amendment**                                                                     |
 | **What stays the floor**   | On-device is also the fallback. Key unset, consent withheld, socket dropped, or hardware below the floor all land back on it or on typing, never silently on the cloud. **The hardware clause narrowed the same day, see the next amendment** |
-| **What gates it**          | The two-control consent rule in `../../.claude/rules/security.md`, unchanged and now binding on the review page: a standing device preference plus a per-consultation tick that dies with the component                                             |
+| **What gates it**          | The two-control consent rule in `../../.claude/rules/security.md`, unchanged and now binding on the review page: a standing device preference plus a per-consultation tick that dies with the component                                       |
 | **Who authorised it**      | @Andersonnn7788, 2026-09-10, scoped to prescription dictation on the review page and nothing else                                                                                                                                             |
 
 **Why the original wording was right when it was written.** #313 chose on-device deliberately, reasoning that the review page had no consent surface and that rebuilding one in a third place was worse than removing the question. That reasoning is not overturned so much as paid for: the gate is now built there rather than avoided. What forced the question is measurement in `../TRD.md` §20: on the 83.4 s reference recording the WebGPU path stamped a real-time factor of 0.89, against 2.14 for the WASM q8 baseline, and §20.1 puts browser WASM generally at 1.5 to 3.0. Anything at or above 1.0 cannot keep pace with speech. Words appearing as the doctor speaks was therefore never reachable on the fallback path most clinic hardware runs, and only marginally reachable on the best of them.

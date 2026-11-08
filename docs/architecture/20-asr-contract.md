@@ -42,7 +42,7 @@ The resolution is not "audio never leaves the device" as an absolute, because §
 
 > **On-device is the default and the floor. Hosted is only ever entered by an explicit, recorded, per-consultation act. Failure degrades to paste, never to the cloud.**
 
-**Two surfaces are stated exceptions to the first sentence, and only the first sentence.** Prescription dictation defaults to streaming from 10/09/26 (§20.10, `docs/DECISIONS.md` D-001), and from 21/09/26 a new consultation opens in ambient capture (D-007, #378).
+**Two surfaces are stated exceptions to the first sentence, and only the first sentence.** Prescription dictation defaults to streaming from 10/09/26 (§20.10, `docs/decisions/` D-001), and from 21/09/26 a new consultation opens in ambient capture (D-007, #378).
 
 Failure degrades away from the cloud on both, but their floors differ and the difference is the part worth reading.
 
@@ -57,7 +57,7 @@ This is the direct analogue of `DEID_FAIL_CLOSED` (§7), and it is stated here i
 
 | Behaviour on a device that cannot transcribe locally     | Verdict                                                                                                                     |
 | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Fall back to paste, tell the doctor why                  | **The specified behaviour.** The privacy control fails **closed**, the cheap path out is the private one                   |
+| Fall back to paste, tell the doctor why                  | **The specified behaviour.** The privacy control fails **closed**, the cheap path out is the private one                    |
 | Silently switch to hosted ASR because the device is slow | **Rejected.** A privacy control that fails **open** under load, degrading precisely when the doctor is least able to notice |
 
 The second option is the one a performance-minded implementation reaches for by default, which is why it is written down as rejected rather than left to judgement. Convenience may never be the trigger that moves patient audio off the device; only the doctor, per consultation, may be.
@@ -66,7 +66,7 @@ The second option is the one a performance-minded implementation reaches for by 
 
 Capture Mode belongs to the consultation, not the browser. The hero's **Consultation Settings** dialog owns the Ambient / Press To Record choice alongside the clinical-note layout; the device-scoped Audio dialog retains only microphone, noise handling, gain, and manual transcription-engine preferences. A legacy `mode` key in local storage is ignored.
 
-**A new consultation opens in Ambient** (`docs/DECISIONS.md` D-007). Three things follow, and the second is the one that is easy to get wrong.
+**A new consultation opens in Ambient** (`docs/decisions/` D-007). Three things follow, and the second is the one that is easy to get wrong.
 
 - **The value is written, not merely defaulted.** The column defaults to `ambient` and `POST /api/consultations` writes it too, because the migration is applied by hand while the API deploys on a merge (§17), so neither ordering may decide where a doctor lands.
 - **Only where nothing contradicts it.** A create carrying a transcript takes the mode that transcript's `source` implies: `asr_live` did stream and stays `ambient`, everything else is written `manual`. An unconditional `ambient` would stamp every pasted, uploaded and fixture-seeded consultation with a claim that audio reached the provider, and the mode locks the moment a transcript exists, so it could never be corrected.
@@ -97,7 +97,7 @@ Transcription is specified as a **port with two adapters**, deliberately mirrori
 
 | Adapter      | Implementation                                                                                              | Status                                                                                                                         | Where audio goes                                                                                  |
 | ------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `asr_local`  | `whisper-small` via `@huggingface/transformers` v4, chunked in a **Web Worker**                             | **`Built`** (issue #2)                                                                                                         | Nowhere, browser memory only                                                                     |
+| `asr_local`  | `whisper-small` via `@huggingface/transformers` v4, chunked in a **Web Worker**                             | **`Built`** (issue #2)                                                                                                         | Nowhere, browser memory only                                                                      |
 | `asr_hosted` | `ilmu-asr-v4.2` via the authenticated relay `POST /api/asr/transcriptions` (#154)                           | **`Built`** server-side; the consent UI that invokes it is #155                                                                | ILMU, processed in Malaysia, transiting our API on Render Singapore in request-scoped memory only |
 | `asr_live`   | `stt-rt-v5` on a socket the **browser** holds, opened with a key `POST /api/asr/live-sessions` mints (#268) | **`Building`** (§20.10). The audio never enters the API, so the server-side record is the minted session rather than the bytes |
 
@@ -181,8 +181,8 @@ The probe's job is to decide **whether to offer audio on this device at all**, n
 
 **Design constraint that shapes the whole thing:** a probe that downloads 240 MB before reporting "your device is too slow" punishes exactly the user it exists to protect. The free stage exists to gate the expensive one.
 
-| Stage                                           | What it measures                                                                                       | Cost                 | What it decides                                              |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------- | ------------------------------------------------------------ |
+| Stage                                          | What it measures                                                                                       | Cost                 | What it decides                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------- | ------------------------------------------------------------ |
 | **1, Triage**, on opening "New consultation"   | `navigator.hardwareConcurrency`, `navigator.deviceMemory`, and a ~200 ms synthetic WASM microbenchmark | Zero network, ~0.5 s | Three bands: clearly capable / clearly incapable / uncertain |
 | **2, Verdict**, on the first transcribed chunk | Real-time factor (RTF) measured on work actually done                                                  | The chunk itself     | Can **overturn** Stage 1 in either direction                 |
 
@@ -231,14 +231,14 @@ True streaming is an optimisation available later, not the starting point. State
 
 ## Model, Delivery, And Runtime: Resolved 13/08/26 (§19 Row 13, Closed)
 
-| Decision           | Value                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Decision           | Value                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Model              | **`whisper-small`** (~240 MB), revised upward from `whisper-base` on 13/08/26 by measurement, see §20.1. `base` is **not** fit for Malaysian code-switched speech. **Not** `large-v3-turbo`, ≈560 MB+ on first load                                                                                                                                                                     |
-| Delivery           | Fetched from the Hugging Face CDN on first use, then cached in the browser. Never bundled into the frontend build                                                                                                                                                                                                                                                                         |
-| Execution provider | **WASM is first-class, not a fallback.** Through transformers.js v3.0.2, WASM beat WebGPU on `whisper-base` on an M2 (4.9–5.9 s vs 9.5–9.6 s for 60 s audio). v4's runtime may have flipped this; measure, do not assume                                                                                                                                                                  |
-| Platform           | **Desktop Chromium only**, stated explicitly. Documented crashes exist on Android Chrome and iOS                                                                                                                                                                                                                                                                                          |
+| Delivery           | Fetched from the Hugging Face CDN on first use, then cached in the browser. Never bundled into the frontend build                                                                                                                                                                                                                                                                       |
+| Execution provider | **WASM is first-class, not a fallback.** Through transformers.js v3.0.2, WASM beat WebGPU on `whisper-base` on an M2 (4.9–5.9 s vs 9.5–9.6 s for 60 s audio). v4's runtime may have flipped this; measure, do not assume                                                                                                                                                                |
+| Platform           | **Desktop Chromium only**, stated explicitly. Documented crashes exist on Android Chrome and iOS                                                                                                                                                                                                                                                                                        |
 | `language`         | **Always hard-coded to `'en'`.** Never auto-detected, and never set from a locale picker or a patient's recorded language, §20.1 finding 2. The risk is not that auto-detect translates (that claim was measured and withdrawn, finding 3); it is that auto-detect could _select_ a non-English language on code-switched audio, which is the regime finding 2 measured as catastrophic |
-| Version pinning    | Pin the exact model × dtype × device combination and test it before shipping; a known open issue collapses all segments into one under v4 + WebGPU + fp16 + timestamped turbo                                                                                                                                                                                                             |
+| Version pinning    | Pin the exact model × dtype × device combination and test it before shipping; a known open issue collapses all segments into one under v4 + WebGPU + fp16 + timestamped turbo                                                                                                                                                                                                           |
 
 **Never promise real-time.** Measured figures and their hardware caveats are in §20.1; the short version is that `whisper-small` ranges from comfortably faster than real time on a modern multi-core machine to **several times slower than real time** on a modest clinic PC, and the clinic's hardware is not ours to choose. Design consequences: transcribe in chunks in a Web Worker during the consultation, probe real-time factor on the first chunk and warn early if the device cannot keep up, show real progress, and keep the paste-a-transcript path as the primary route (`docs/PRD.md` §14).
 
@@ -314,8 +314,8 @@ This is a genuine architectural gap, stated as one. Every control in this system
 
 | Failure                        | Mechanism                                                                                                                                               | Why No Downstream Control Catches It                                                                                                    |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **Whisper hallucination**      | ~1% of transcriptions contain entire fabricated phrases, correlated with long non-vocal spans; ~40% judged capable of harm (Koenecke et al., FAccT '24) | A hallucinated span **passes** the §21.4 evidence check, the evidence genuinely is in the transcript. The transcript is what is wrong  |
-| **Wrong-language declaration** | **Measured, §20.1.** Declaring a language the audio is not in produces a fluent repetition loop, not an error, on both `base` and `small`              | Grammatical, plausible output in the declared language, bearing no relation to what was said. Indistinguishable downstream              |
+| **Whisper hallucination**      | ~1% of transcriptions contain entire fabricated phrases, correlated with long non-vocal spans; ~40% judged capable of harm (Koenecke et al., FAccT '24) | A hallucinated span **passes** the §21.4 evidence check, the evidence genuinely is in the transcript. The transcript is what is wrong   |
+| **Wrong-language declaration** | **Measured, §20.1.** Declaring a language the audio is not in produces a fluent repetition loop, not an error, on both `base` and `small`               | Grammatical, plausible output in the declared language, bearing no relation to what was said. Indistinguishable downstream              |
 | **Semantic substitution**      | **Measured, §20.1.** `whisper-base` rendered "auntie" as "until" and dropped "pasar malam" entirely                                                     | The transcript is well-formed English. A substituted content word is a fact the doctor never said, and it carries a valid evidence span |
 
 Mitigations available in this window: pass `language` and **never pass one the audio is not in**; VAD-trim long silences before transcription; surface a low-confidence indicator on ASR output so the doctor is cued to check the **transcript**, not only the note; and keep pasted text as the primary demo path. None of these closes the gap, they bound it. The same law fires at both layers: **silence → fabrication at the ASR layer, sparse text → fabrication at the LLM layer** (§21.1).
@@ -334,7 +334,7 @@ Measured **13/08/26** on a 49.7 s Manglish sample (casual conversation, Malay an
 | "lang chai"         | **"language"**        | "Lang Jai"         | "lang chai"       |
 | `lah` / `ah` / `eh` | mostly lost           | preserved          | preserved         |
 | Wall clock          | 7.2 s (**RTF 0.146**) | 13.9 s (RTF 0.279) | **2.8 s**         |
-| Determinism         |,                     |,                  | byte-identical ×3 |
+| Determinism         | ,                     | ,                  | byte-identical ×3 |
 
 **Three findings, in order of consequence.**
 
@@ -960,7 +960,7 @@ On that last row the research is unusually decisive. Language-model correction o
 | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **De-identification before egress**                   | See above. The category does not do this                                                                                                                                                                                                                             |
 | **Deterministic red flags the model cannot suppress** | No industry equivalent was found. The only randomised trial names **negation-detection failure as a counted error class**: "denies chest pain" recorded as chest pain. That is precisely the failure a rules-first engine prevents and a model-mediated one produces |
-| **Live safety and information panes**                 | No reviewed system generates these panes live. This differs from shipped practice and adds an implementation risk.                                                                                                                              |
+| **Live safety and information panes**                 | No reviewed system generates these panes live. This differs from shipped practice and adds an implementation risk.                                                                                                                                                   |
 
 ### Where This Design Is Behind
 
@@ -978,12 +978,12 @@ These findings bound what the evidence supports; they do not describe implementa
 
 | Finding                                               | Number                                                                                                                                                       | Consequence here                                                                                                                                                         |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Omission is the dominant failure, not fabrication** | 18% of notes carried accidental omissions against 11.5% hallucinations, n=356                                                                                | The missing-information panel addresses the most common documented failure mode.                            |
+| **Omission is the dominant failure, not fabrication** | 18% of notes carried accidental omissions against 11.5% hallucinations, n=356                                                                                | The missing-information panel addresses the most common documented failure mode.                                                                                         |
 | **A minority of notes carry serious risk**            | 5.3% of notes contained an error posing serious or imminent risk                                                                                             | The single best citation for why approval must be an explicit clinician act and never a default                                                                          |
-| **Time savings are not established**               | In the only randomised trial the market-leading scribe showed no significant reduction in documentation time. Burnout and task load improved in both arms    | The trial found no significant reduction in documentation time; burnout and task load improved in both arms.                                                                                                                          |
-| **Documenting is not acting**                         | Across 20,302 notes, AI-scribed notes recorded significantly more symptoms yet the clinician was **less** likely to intervene                                | A caution for systems that surface red flags: surfacing is not the outcome; acting is                                                        |
+| **Time savings are not established**                  | In the only randomised trial the market-leading scribe showed no significant reduction in documentation time. Burnout and task load improved in both arms    | The trial found no significant reduction in documentation time; burnout and task load improved in both arms.                                                             |
+| **Documenting is not acting**                         | Across 20,302 notes, AI-scribed notes recorded significantly more symptoms yet the clinician was **less** likely to intervene                                | A caution for systems that surface red flags: surfacing is not the outcome; acting is                                                                                    |
 | **Speech recognition hallucination tracks silence**   | Roughly 1% of segments in one corpus, rising with non-vocal duration, and 38% of those carried explicit harm                                                 | The patients who pause are the elderly, the breathless, the distressed and anyone speaking through an interpreter. This is a fairness argument, not only an accuracy one |
-| **No standard benchmark exists**                      | A scoping review found 7 qualifying studies and only 2 public datasets, and named the absence of standard hallucination and error metrics as the central gap | There is no standard benchmark for comparison. Report the evaluation method; PDQI-9 with a severity scale is the closest available convention           |
+| **No standard benchmark exists**                      | A scoping review found 7 qualifying studies and only 2 public datasets, and named the absence of standard hallucination and error metrics as the central gap | There is no standard benchmark for comparison. Report the evaluation method; PDQI-9 with a severity scale is the closest available convention                            |
 
 ### 20.8.1 The Published Work Closest To This Design
 
@@ -1050,7 +1050,7 @@ Published findings support the gap engine's shape in section 12. `deriveGaps` do
 
 ### Amended 10/09/26: The Tick Is Removed, And The Surface Becomes A Theatre
 
-The sign-off above is unchanged and is not re-opened: same vendor, socket, region and minting route, so no new egress and no new grant. What moved is the interface in front of it, and one control is gone (@Andersonnn7788, #365, `docs/DECISIONS.md` D-001).
+The sign-off above is unchanged and is not re-opened: same vendor, socket, region and minting route, so no new egress and no new grant. What moved is the interface in front of it, and one control is gone (@Andersonnn7788, #365, `docs/decisions/` D-001).
 
 | Behaviour              | Before                                               | After                                                                         |
 | ---------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------- |
@@ -1285,7 +1285,7 @@ The grant above is scoped to ambient capture, and its "What it does not" row nam
 
 **This basis is weaker than the one above, and is recorded as weaker.** The 06/09/26 grant rested on the owner's own usability test of code-switched speech. This one rests on an argument about scope: what changes is which surface may open the socket, not where the audio goes or who receives it. Nothing about dictation accuracy on this provider is measured, and the "What Is Not Measured" table below applies to it unchanged.
 
-**What it does not license is the interesting half.** The two-control consent rule is not waived by the surface being small: a dictated phrase leaves the device exactly as a consultation does, so it takes the same standing device preference plus a per-consultation tick that dies with the component. On-device Whisper stays the floor on that page and is where every failure lands (`docs/DECISIONS.md` D-001). **Both halves of that sentence were overtaken the same day.** The default moved in the next subsection, and the tick was removed outright in the one after it; the paragraph is kept as written because the grant rested on it and a reader needs to see what was undertaken before seeing what was withdrawn.
+**What it does not license is the interesting half.** The two-control consent rule is not waived by the surface being small: a dictated phrase leaves the device exactly as a consultation does, so it takes the same standing device preference plus a per-consultation tick that dies with the component. On-device Whisper stays the floor on that page and is where every failure lands (`docs/decisions/` D-001). **Both halves of that sentence were overtaken the same day.** The default moved in the next subsection, and the tick was removed outright in the one after it; the paragraph is kept as written because the grant rested on it and a reader needs to see what was undertaken before seeing what was withdrawn.
 
 ### Extended 28/09/26: The Sign-Off Reaches Two-Way Translation
 
@@ -1300,11 +1300,11 @@ The grant above is scoped to ambient capture, and its "What it does not" row nam
 
 ### Extended 06/10/26: Mandarin And Tamil
 
-| Question         | Answer                                                                                                                            |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Who              | @AlaskanTuna, on 06/10/26                                                                                                         |
-| What it covers   | The same two-way translation between English and Mandarin or Tamil, on the same socket, key type, region and minting route        |
-| What it does not | Cantonese as a pair of its own, any other language pair, and any claim about accuracy: neither language is measured (§20.12)      |
+| Question         | Answer                                                                                                                       |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Who              | @AlaskanTuna, on 06/10/26                                                                                                    |
+| What it covers   | The same two-way translation between English and Mandarin or Tamil, on the same socket, key type, region and minting route   |
+| What it does not | Cantonese as a pair of its own, any other language pair, and any claim about accuracy: neither language is measured (§20.12) |
 | What prompted it | Clinic request to support Mandarin- and Tamil-speaking patients, with the Urdu and Bengali mechanism already in place (#385) |
 
 ### Amended 10/09/26: Streaming Becomes The Default On That Page
@@ -1324,11 +1324,11 @@ The sign-off above is unchanged and is not re-opened here: same vendor, socket, 
 - **Every review page carrying an analysed note now issues `GET /asr/live-sessions/config?mode=dictation` on mount.** That is the shape `AmbientCapture` has used since #268, but it is new traffic on a page that previously issued none. It also makes the config-failure copy commonly visible, so that copy now distinguishes a 503 (this deployment has no key) from any other failure (the network did not answer), rather than asserting the first for both.
 - **Expected mint volume on the dictation bucket rises**, because the path is now taken by default rather than by opt-in. The per-mode limiter and the 120 second per-session cap added in #356 are what absorb it. The absence of a global spend cap recorded in `.claude/rules/security.md` is unchanged and now carries more load; it remains a gap rather than a control.
 
-**What it costs is a control, and `docs/DECISIONS.md` D-001 carries the full accounting.** In short: the standing device preference ships already set to send, so this surface holds one defaulted preference and one deliberate tick rather than two chosen controls. The tick is untouched and still gates every send. Separately, #363 found the preference had been unreachable from the review page for the whole of #357's life, because its only writer was mounted in `CapturePanel`; it is now mounted on both surfaces, which stay mutually exclusive by their render conditions.
+**What it costs is a control, and `docs/decisions/` D-001 carries the full accounting.** In short: the standing device preference ships already set to send, so this surface holds one defaulted preference and one deliberate tick rather than two chosen controls. The tick is untouched and still gates every send. Separately, #363 found the preference had been unreachable from the review page for the whole of #357's life, because its only writer was mounted in `CapturePanel`; it is now mounted on both surfaces, which stay mutually exclusive by their render conditions.
 
 ### Amended 06/10/26: The Preference Goes
 
-The device preference this subsection describes no longer exists (`docs/DECISIONS.md` D-001, "Amended 2026-10-06"). Dictation always prefers streaming and falls back to this device only when streaming is unavailable or unreachable, with the notice that says so. `loadAudioSettings` drops a stored `dictationEngine`, so a device that once chose on-device cannot stay pinned to a choice no screen shows. The failure table above is unchanged.
+The device preference this subsection describes no longer exists (`docs/decisions/` D-001, "Amended 2026-10-06"). Dictation always prefers streaming and falls back to this device only when streaming is unavailable or unreachable, with the notice that says so. `loadAudioSettings` drops a stored `dictationEngine`, so a device that once chose on-device cannot stay pinned to a choice no screen shows. The failure table above is unchanged.
 
 ### Why The Provider Changed
 
@@ -1388,14 +1388,14 @@ Two properties of that flow are load-bearing rather than incidental. The microph
 
 ### The Ambient Disclosure, Removed 10/09/26
 
-**The tick in that flow is unchanged. The paragraph above it is gone** (`docs/DECISIONS.md` D-004, authorised by the owner). It named Soniox, the region read from `config.region`, and that our server issues the key and never receives the audio.
+**The tick in that flow is unchanged. The paragraph above it is gone** (`docs/decisions/` D-004, authorised by the owner). It named Soniox, the region read from `config.region`, and that our server issues the key and never receives the audio.
 
-| Property                       | State                                                                                                                                                                                                                                     |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The two-control rule           | Both halves exist, but the Capture Mode half ships pre-set from 21/09/26 (`DECISIONS.md` D-007), so the tick is the only one the doctor still chooses. It is enforced in the start dispatcher and asserted to the mint as `consent: true` |
-| What no longer exists anywhere | Any on-screen statement of the processor or the region for this path. The Audio dialog's ambient card names the provider only, and no longer points at a Record tab sentence that is gone                                                 |
-| Why the prop is nullable       | `ConsentGate`'s `disclosure` defaults to the relay's sentence, which says ILMU in Malaysia. Ambient passes `null` rather than omitting it, so a fall-through cannot misstate the destination                                              |
-| How it is pinned               | `AmbientCapture.test.tsx` asserts the panel matches no `/Soniox\|United States\|leaves this device/i`. The removal is a test that must be deleted to undo, not an assertion quietly withdrawn                                             |
+| Property                       | State                                                                                                                                                                                                                                   |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The two-control rule           | Both halves exist, but the Capture Mode half ships pre-set from 21/09/26 (`decisions/` D-007), so the tick is the only one the doctor still chooses. It is enforced in the start dispatcher and asserted to the mint as `consent: true` |
+| What no longer exists anywhere | Any on-screen statement of the processor or the region for this path. The Audio dialog's ambient card names the provider only, and no longer points at a Record tab sentence that is gone                                               |
+| Why the prop is nullable       | `ConsentGate`'s `disclosure` defaults to the relay's sentence, which says ILMU in Malaysia. Ambient passes `null` rather than omitting it, so a fall-through cannot misstate the destination                                            |
+| How it is pinned               | `AmbientCapture.test.tsx` asserts the panel matches no `/Soniox\|United States\|leaves this device/i`. The removal is a test that must be deleted to undo, not an assertion quietly withdrawn                                           |
 
 ### What Is Not Measured
 
@@ -1744,7 +1744,7 @@ One patient sentence per trigger, in each language, run through the real engine:
 | No refine tying pairs to `machineTranslation` | A missing marker costs a banner; a refine would refuse the save and lose the transcript over a display fact                                                            |
 | Diarisation off, endpoint detection on        | Roles come from the spoken language, so a frozen wrong speaker id has nothing to damage, the argument that inverts dictation's settings. `<end>` bounds each turn      |
 | No `terms`                                    | Both vocabularies target Malay consultations, and §20.7.1 measured a wrong-language context scoring worse than none                                                    |
-| Consent stays English only                    | The owner's decision, 28/09/26, recorded with its cost in `docs/DECISIONS.md` D-008                                                                                    |
+| Consent stays English only                    | The owner's decision, 28/09/26, recorded with its cost in `docs/decisions/` D-008                                                                                      |
 
 ### Never Sent To A Model
 
@@ -1752,7 +1752,7 @@ One patient sentence per trigger, in each language, run through the real engine:
 - **What enforces it.** `backend/src/deid/no-stray-other-language.test.ts` pins it behaviourally, on `serialiseTranscript` and the copilot digest.
 - **Structurally, too.** The same test finds the field named nowhere in backend source. The API stores the transcript and never needs to read this field. That half matches the name only, so a spread or a stringified transcript would slip past it.
 - **At the gate, whatever a client sends.** The `SCRIPT` detector (#391) tokenises any run of Bengali, Arabic or Devanagari script, so script reaching model-bound text by any route becomes a token. `assertNoIdentifiers` re-runs it at egress.
-- **The gap that remains, narrowed (#418).** Chinese and Tamil script sit outside `SCRIPT` on purpose, because ambient capture hints both and tokenising them would blind the note. A name in either is now tokenised where a cue marks it: a self-introduction ("我叫", "我姓", "என் பெயர்", or a Latin "my name is" or "nama saya" before the script) or a title (the surname alone directly before 先生, 小姐 or 医生, where it starts a word; one word after திரு, திருமதி or செல்வி). A Chinese name must open on a listed surname unless it ends the clause, and a cued name that ends a clause is found again where it repeats. A name said with neither still passes the gate on the untranslated Auto-detect path (`DECISIONS.md` D-011).
+- **The gap that remains, narrowed (#418).** Chinese and Tamil script sit outside `SCRIPT` on purpose, because ambient capture hints both and tokenising them would blind the note. A name in either is now tokenised where a cue marks it: a self-introduction ("我叫", "我姓", "என் பெயர்", or a Latin "my name is" or "nama saya" before the script) or a title (the surname alone directly before 先生, 小姐 or 医生, where it starts a word; one word after திரு, திருமதி or செல்வி). A Chinese name must open on a listed surname unless it ends the clause, and a cued name that ends a clause is found again where it repeats. A name said with neither still passes the gate on the untranslated Auto-detect path (`decisions/` D-011).
 - **Mandarin and Tamil on a translated session.** The original rides in `otherLanguage` like Urdu and Bengali, and the script guard in `frontend/src/audio/live/bilingual.ts`, an allowlist of Latin script, keeps Chinese, Tamil and any neighbouring script out of `turn.text`. It runs in the browser, so on these two pairs it and `no-stray-other-language.test.ts` are the protection, with no gate-side backstop: a client other than the SPA, or a doctor's edit to the transcript, bypasses it, exactly as on Auto-detect.
 - **Pinyin names.** Mandarin translation spells a Chinese name in Pinyin, which the Malaysian romanisations in the gazetteer never match, so thirty common Pinyin surnames were added with #385.
 - **Erasure.** `eraseConsultation` already nulls the whole transcript column, originals included.
@@ -2088,7 +2088,7 @@ Read 15/10/26, unverified by us.
 
 ## 20.14 Refinement After Stop: Batch `scribe_v2`, Browser-Direct, Under An API-Minted Token
 
-**Status: `Decided, building`.** Recorded 16/10/26 (issue #436, `docs/DECISIONS.md` D-014). Production is inert until the gated items below are done: nothing is offered while `ELEVENLABS_API_KEY` is unset, and the measurement gate has not run. Realtime stays on Soniox (§20.10, §20.13).
+**Status: `Decided, building`.** Recorded 16/10/26 (issue #436, `docs/decisions/` D-014). Production is inert until the gated items below are done: nothing is offered while `ELEVENLABS_API_KEY` is unset, and the measurement gate has not run. Realtime stays on Soniox (§20.10, §20.13).
 
 - **What it does.** Soniox streams during capture exactly as before. After Stop on an untranslated ambient consultation, the whole recording is re-transcribed with batch ElevenLabs `scribe_v2`, and that is the transcript the doctor reviews.
 - **On failure.** Any failed sanity check, timeout, Skip, or lost connection keeps the live Soniox transcript, with a notice. Never silently.
@@ -2238,4 +2238,3 @@ Each is a named constant, **provisional until the measurement gate**.
 | Spelled-out identifiers        | Depend on #435; this section is not safe to ship before it                                                                                                                        |
 
 ---
-

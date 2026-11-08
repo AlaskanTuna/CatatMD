@@ -18,14 +18,14 @@ interface LLMClient {
 
 ## `GenerateRequest<T>`
 
-| Field          | Type           | Note                                                     |
-| -------------- | -------------- | -------------------------------------------------------- |
-| `operation`    | `string`       | Names the call site in logs/traces; never patient data   |
-| `system`       | `string`       | System prompt                                            |
+| Field          | Type           | Note                                                    |
+| -------------- | -------------- | ------------------------------------------------------- |
+| `operation`    | `string`       | Names the call site in logs/traces; never patient data  |
+| `system`       | `string`       | System prompt                                           |
 | `content`      | `Deidentified` | The only field carrying transcript-derived text, see §5 |
-| `schema`       | `z.ZodType<T>` | Validated against on return                              |
-| `schemaName`   | `string`       | Name given to the provider's structured-output schema    |
-| `temperature?` | `number`       | Defaults to `0.2` at the adapter, not the port           |
+| `schema`       | `z.ZodType<T>` | Validated against on return                             |
+| `schemaName`   | `string`       | Name given to the provider's structured-output schema   |
+| `temperature?` | `number`       | Defaults to `0.2` at the adapter, not the port          |
 
 ## `LLMResponseError`
 
@@ -171,10 +171,10 @@ Two clarifications, because the adjacent bound is easy to confuse with these:
 
 ## Failure Modes
 
-| Failure                   | Trigger                                                                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Empty response            | `completion.choices[0]?.message.content` is falsy                                                                        |
-| Malformed JSON            | `JSON.parse(raw)` throws                                                                                                 |
+| Failure                   | Trigger                                                                                                                 |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Empty response            | `completion.choices[0]?.message.content` is falsy                                                                       |
+| Malformed JSON            | `JSON.parse(raw)` throws                                                                                                |
 | Schema-validation failure | `request.schema.safeParse(parsed)` returns `success: false`, the error message includes `z.prettifyError(result.error)` |
 
 All three throw `LLMResponseError` with the operation name attached; there is no partial-success return path.
@@ -182,4 +182,3 @@ All three throw `LLMResponseError` with the operation name attached; there is no
 `getLLMClient()` (`backend/src/lib/llm/index.ts`) builds and caches a singleton client from `env.LLM_PROVIDER`, throwing on first client construction if the matching provider's API key is missing.
 
 ---
-

@@ -22,4 +22,3 @@ Source: `backend/src/app.ts`, `backend/src/routes/health.ts`.
 The rest of the surface has since been built and is catalogued in §13; `backend/src/app.ts` is authoritative for the middleware stack, which has grown well past the three entries above (request context, client-ip resolution, helmet, a session guard per protected prefix, and per-route rate limiters), with the load-bearing pieces named in `.claude/rules/security.md`.
 
 ---
-

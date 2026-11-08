@@ -1,23 +1,24 @@
 <a id="readme-top"></a>
+
 # Prisma
 
 Prisma schema, migrations, and seed entry points for the Postgres database.
 
 ## Models
 
-| Model | Purpose |
-| --- | --- |
-| User | Doctor account and account-level settings |
-| Session | better-auth login sessions |
-| Account | better-auth credential and provider account records |
-| Verification | better-auth verification values |
-| RateLimit | Persistent better-auth rate-limit counters |
-| Patient | Registered patient identity and ownership |
-| Consultation | Transcript, analysis, note edits, review state, and prescriptions |
+| Model             | Purpose                                                                |
+| ----------------- | ---------------------------------------------------------------------- |
+| User              | Doctor account and account-level settings                              |
+| Session           | better-auth login sessions                                             |
+| Account           | better-auth credential and provider account records                    |
+| Verification      | better-auth verification values                                        |
+| RateLimit         | Persistent better-auth rate-limit counters                             |
+| Patient           | Registered patient identity and ownership                              |
+| Consultation      | Transcript, analysis, note edits, review state, and prescriptions      |
 | ConsultationAudio | Optional retained recording, stored separately from consultation reads |
-| AuditEvent | Append-only record of event types and identifiers |
-| GuidelineDocument | Guideline provenance and retrieval scope |
-| GuidelineChunk | Searchable text spans for guideline retrieval |
+| AuditEvent        | Append-only record of event types and identifiers                      |
+| GuidelineDocument | Guideline provenance and retrieval scope                               |
+| GuidelineChunk    | Searchable text spans for guideline retrieval                          |
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 

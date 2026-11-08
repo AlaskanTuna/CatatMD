@@ -23,4 +23,3 @@ Every section below carries exactly one tag.
 The no-invention rule holds throughout: where a fact is not derivable from existing code or an established decision, the section is tagged `Open` rather than given a fabricated answer.
 
 ---
-

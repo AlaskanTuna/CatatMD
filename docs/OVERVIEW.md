@@ -247,7 +247,7 @@ transcript ──► deid gate ──► LLMClient ──► provider
 
 - **Tokenisation is stable within a request** — `[PATIENT_1]`, `[NRIC_1]` — so the model sees one consistent handle per person across the whole transcript.
 - **The vault is request-scoped.** It is never a singleton, never attached to a database row, never logged, and is discarded when the handler returns.
-- **Identifiers read aloud are tokenised too, with measured gaps.** A spoken IC, phone or record number arrives as words, not digits, so a dedicated detector tokenises number-word runs. On 28 measured readings of one synthetic IC, 18 tokenise whole, 4 up to the transcriber's comma and 6 pass; Tamil numerals and phonetic fragments still pass ([`TRD.md` §9, Spoken Digit Runs](./TRD.md#spoken-digit-runs)).
+- **Identifiers read aloud are tokenised too, with measured gaps.** A spoken IC, phone or record number arrives as words, not digits, so a dedicated detector tokenises number-word runs. On 28 measured readings of one synthetic IC, 18 tokenise whole, 4 up to the transcriber's comma and 6 pass; Tamil numerals and phonetic fragments still pass ([`TRD.md` §9, Spoken Digit Runs](./architecture/09-de-identification-pipeline.md#spoken-digit-runs)).
 - **Audit events record detector _labels_, never values** (`["NRIC","NAME"]`), so the audit trail cannot become a second leak vector (`docs/TRD.md` §15).
 
 `LLMClient.generate()` accepts only a `Deidentified` branded string, so passing a plain `string` — an accidental leak — is a compile error, not a code-review question. Two further enforcement points were open gaps in earlier drafts and were **closed on 13/08/26**:
@@ -279,7 +279,7 @@ The claim stops there, because on modest clinic hardware the on-device path has 
 | Prescription dictation | 10/09/26 (D-001)         | On-device recognition, or typing                                          |
 | Ambient capture        | 21/09/26 (D-007)         | Press to record, which has an on-device path. Ambient has none of its own |
 
-The rest of the rule holds on both: failure degrades to press-to-record, to the device, or to typing, never to the cloud. Ambient still sends nothing without its per-consultation tick. See [`DECISIONS.md`](./DECISIONS.md).
+The rest of the rule holds on both: failure degrades to press-to-record, to the device, or to typing, never to the cloud. Ambient still sends nothing without its per-consultation tick. See [`decisions/`](./decisions/README.md).
 
 **That last clause is the load-bearing one.** Silently switching to hosted transcription because a device is slow would be a privacy control that fails **open** under load, degrading exactly when the doctor is least able to notice. It is written down as rejected rather than left to an implementer's judgement.
 
@@ -308,9 +308,9 @@ The hosted adapter is **built and live**, and reaching it takes two separate act
 
 **Two destinations leave the region: Soniox, reached by two paths, and ElevenLabs batch refinement after Stop, browser-direct and gated off in production.** Soniox offers the United States, the European Union, Japan and India, and no Malaysian or Singapore option. That is the honest cost of the only streaming recogniser tested here that both handles Malay, English and Chinese switching mid-sentence and tells the speakers apart (ElevenLabs' realtime model could not, [`TRD.md`](./TRD.md) §20.13), and the transfer basis is recorded as open in [`DPIA.md`](./DPIA.md) rather than treated as solved. Our servers never hold that audio. ElevenLabs offers no residency option on its default endpoint, and its retention of the uploaded recording is unmeasured ([`TRD.md`](./TRD.md) §20.14, [`DPIA.md`](./DPIA.md)).
 
-**Prescription dictation streams by default, and it is the one audio path with no consent control left.** Dictate opens the prescription surface and the microphone with it; the disclosure and the per-consultation tick were removed on 10/09/26 on the owner's instruction, so a doctor who touches nothing sends a patient's voice to a United States endpoint on one press. Authorised and scoped to that one surface ([`TRD.md`](./TRD.md) §20.10). The cost is recorded as a cost rather than argued away: the live count of consent controls there is zero ([`DECISIONS.md`](./DECISIONS.md) D-001). What did not weaken is the trail, which now records `consentAsserted: false` on that path instead of claiming an agreement nobody gave. Every failure still lands back on the device or on typing rather than on the cloud.
+**Prescription dictation streams by default, and it is the one audio path with no consent control left.** Dictate opens the prescription surface and the microphone with it; the disclosure and the per-consultation tick were removed on 10/09/26 on the owner's instruction, so a doctor who touches nothing sends a patient's voice to a United States endpoint on one press. Authorised and scoped to that one surface ([`TRD.md`](./TRD.md) §20.10). The cost is recorded as a cost rather than argued away: the live count of consent controls there is zero ([`decisions/`](./decisions/README.md) D-001). What did not weaken is the trail, which now records `consentAsserted: false` on that path instead of claiming an agreement nobody gave. Every failure still lands back on the device or on typing rather than on the cloud.
 
-**Ambient keeps its tick, and lost the other half on 21/09/26.** A new consultation now opens in ambient ([`DECISIONS.md`](./DECISIONS.md) D-007), so the capture-mode half of the rule ships already set and the per-consultation tick is the only control the doctor still exercises there. Nothing streams without it: the start dispatcher refuses, and the API rejects an ambient session request that does not assert it.
+**Ambient keeps its tick, and lost the other half on 21/09/26.** A new consultation now opens in ambient ([`decisions/`](./decisions/README.md) D-007), so the capture-mode half of the rule ships already set and the per-consultation tick is the only control the doctor still exercises there. Nothing streams without it: the start dispatcher refuses, and the API rejects an ambient session request that does not assert it.
 
 **The split is deliberate, and it was got wrong once.** For three weeks the engine preference was the whole gate while the interface still said each patient was asked. A remembered agreement is one the next patient never gave, so the per-consultation half was restored and is now pinned by a test that fails if the claim and the control ever part company again (#254).
 
@@ -322,12 +322,12 @@ The hosted adapter is **built and live**, and reaching it takes two separate act
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **What the safety checks read** | The English only. The red-flag engine and de-identification read Latin script, so the other-language half is stored beside each turn and never sent to a model                                                        |
 | **Roles**                       | Taken from the language spoken: English is the doctor and anything else the patient. Still a draft, and still `labelsReviewed: false`                                                                                 |
-| **Consent**                     | The tick says the patient agreed to machine translation. It is written in English only, by the owner's decision (`DECISIONS.md` D-008)                                                                                |
+| **Consent**                     | The tick says the patient agreed to machine translation. It is written in English only, by the owner's decision (`decisions/` D-008)                                                                                  |
 | **Measured**                    | On synthetic voices only (#389). Every translation arrived directly after the words it translated, and the red-flag engine caught 12 of 12 translated warning signs after #390. **Mandarin and Tamil are unmeasured** |
 
 **Machine translation is not an interpreter.** Nothing here measures it on real speech, speakers of Sylheti or Chittagonian are likely poorly served, and a line that comes back untranslated is counted on the review page as one the safety checks could not read. See [`TRD.md`](./TRD.md) §20.12.
 
-**Auto-Detect reads English, Malay, Mandarin and Tamil, and Cantonese is not supported** (#218, `DECISIONS.md` D-009). The Record tab says so before capture starts.
+**Auto-Detect reads English, Malay, Mandarin and Tamil, and Cantonese is not supported** (#218, `decisions/` D-009). The Record tab says so before capture starts.
 
 | Language  | Measured On Production's Config, Synthetic Voices Only |
 | --------- | ------------------------------------------------------ |
@@ -466,7 +466,7 @@ Reuse terms for the AMM-hosted MOH CPG library are unconfirmed (issue #250). Thi
 
 Also deliberately absent (`docs/PRD.md` §6):
 
-- **Diagnosis, triage decisions and treatment selection.** Safety boundaries, not deferred features. Recording what the doctor stated is in scope and transcription-bound; producing it is not (`docs/DECISIONS.md` D-001)
+- **Diagnosis, triage decisions and treatment selection.** Safety boundaries, not deferred features. Recording what the doctor stated is in scope and transcription-bound; producing it is not (`docs/decisions/` D-001)
 - **Red-flag deletion or silent dismissal.** Flags may be acknowledged, never removed
 - **Any edit after approval**, and any autonomous action
 - **Any confidence or uncertainty score**

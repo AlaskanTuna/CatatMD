@@ -142,4 +142,3 @@ What it establishes:
 The harness now mirrors `runAnalysis` and reports `guideline_retrieval` and `suggestions` separately, and `analyseNote` times its two calls as `extraction` and `note_generation`. **Re-measure before citing any figure here**, and remember that the operation being timed has itself changed: `suggestions_and_red_flags` is now two calls, one of which is skipped when retrieval returns nothing.
 
 The harness prints counts and durations only, never transcript or model text.
-

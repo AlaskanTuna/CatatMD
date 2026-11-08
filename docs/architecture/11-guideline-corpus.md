@@ -2,7 +2,7 @@
 
 Part of the [Technical Reference](../TRD.md).
 
-**Status: `Built`:** implemented 13/08/26 (issue #8) as 11 hand-written chunks, then retired in favour of a single retrieval-only pipeline on 09/09/26 (`docs/DECISIONS.md` D-002). Nothing is hand-written today; every citable document, the three originally curated ones included, is ingested through the same pipeline.
+**Status: `Built`:** implemented 13/08/26 (issue #8) as 11 hand-written chunks, then retired in favour of a single retrieval-only pipeline on 09/09/26 (`docs/decisions/` D-002). Nothing is hand-written today; every citable document, the three originally curated ones included, is ingested through the same pipeline.
 
 - The stable document references and the prompt serialisation live in `backend/src/guidelines/documents.ts` and `backend/src/guidelines/prompt.ts`; the retrieval algorithm lives in `backend/src/retrieval/`.
 - The full CPG library, the three originally curated sources included, is indexed in `corpus/cpg/manifest.json` and stored in `guideline_document` and `guideline_chunk`.
@@ -47,9 +47,9 @@ The corpus as a whole carries `GUIDELINE_CORPUS_VERSION`, one of the five versio
 
 Three sources anchor the corpus, and every other ingested CPG scopes around them:
 
-| Source                                                                                   | Covers                                                                                                  | Licence Posture                                                                      |
-| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| **MOH National Antimicrobial Guideline (NAG) 4th ed., 2024**, §A10, §A17, §C1/C3/C4     | Modified Centor scoring, acute pharyngitis, acute cough and bronchitis, acute rhinosinusitis, UTI scope | © MOH Malaysia, **all rights reserved**, summarise + link, `verbatimAllowed: false` |
+| Source                                                                                   | Covers                                                                                                  | Licence Posture                                                                     |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **MOH National Antimicrobial Guideline (NAG) 4th ed., 2024**, §A10, §A17, §C1/C3/C4      | Modified Centor scoring, acute pharyngitis, acute cough and bronchitis, acute rhinosinusitis, UTI scope | © MOH Malaysia, **all rights reserved**, summarise + link, `verbatimAllowed: false` |
 | **Abdullah et al. (2024), Malaysian sore-throat Delphi consensus**, _Infect Drug Resist_ | McIsaac scoring, antibiotic thresholds, point-of-care testing, symptomatic treatment                    | **CC BY-NC 3.0**, quotable with attribution, `verbatimAllowed: true`                |
 | **Ooi et al. (2022)**, _Malaysian Family Physician_                                      | Malaysian URTI presenting patterns and antibiotic use                                                   | **CC BY 4.0**, quotable with attribution, `verbatimAllowed: true`                   |
 
@@ -66,7 +66,7 @@ Merging them into one "Centor threshold" chunk would manufacture a consensus tha
 
 ## Sore-Throat Score (Built 08/10/26)
 
-`docs/DECISIONS.md` D-012 carries the rationale; this is the implementation reference (#221).
+`docs/decisions/` D-012 carries the rationale; this is the implementation reference (#221).
 
 | Part         | Where                                          | Contract                                                                                                                                    |
 | ------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -163,4 +163,3 @@ AMM/MOH reuse terms for the CPG library are unconfirmed (issue #250); every inge
 Issue #250 also covers a narrower, still-open question: whether MOH-ARR spans (the NAG document) may be sent to the model for grounding at all, distinct from whether they may be displayed. The current posture, stated rather than assumed, is that they are sent, de-identified like every other retrieved span, and display is off: `verbatimAllowed: false` suppresses the summary and quote in the review UI (above) but does not remove the chunk from the model's candidate set. §19 row 23 tracks this as open.
 
 ---
-

@@ -1,4 +1,5 @@
 <a id="readme-top"></a>
+
 # Browser Library
 
 Shared API and browser helpers used across the frontend.

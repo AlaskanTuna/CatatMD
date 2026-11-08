@@ -12,7 +12,7 @@ All schemas live in `shared/src/index.ts`. Types are inferred (`z.infer`), never
 | ---------------------- | ------------------------------------------------------------------------------------- |
 | `SpeakerSchema`        | `enum(['doctor', 'patient'])`                                                         |
 | `TranscriptTurnSchema` | `speaker: Speaker`, `text: string().min(1)`, `offsetSeconds?: number().nonnegative()` |
-| `TranscriptSchema`     | `turns: TranscriptTurn[]`, `.min(1)`                                                 |
+| `TranscriptSchema`     | `turns: TranscriptTurn[]`, `.min(1)`                                                  |
 
 ## Transcript Provenance: `Transcript.source`
 
@@ -33,13 +33,13 @@ It does double duty, and both jobs are load-bearing enough that neither would ju
 
 | Schema                       | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SoapNoteSchema`             | `subjective`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                                                                                                                                                                                                                             |
+| `SoapNoteSchema`             | `subjective`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                                                                                                                                                                                                                              |
 | `NoteTemplateSchema`         | `enum(['soap','malaysian'])`                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `MedicalRecordNoteSchema`    | `presentingComplaint`, `historyOfPresentingComplaint`, `pastMedicalHistory`, `socialHistory`, `familyHistory`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                                                                                                                            |
+| `MedicalRecordNoteSchema`    | `presentingComplaint`, `historyOfPresentingComplaint`, `pastMedicalHistory`, `socialHistory`, `familyHistory`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                                                                                                                             |
 | `InformationGapSchema`       | `id: string`, `question: string`, `rationale: string`, `priority: enum(['high','medium','low'])`, `source?: GapSource`                                                                                                                                                                                                                                                                                                                                     |
 | `RedFlagSchema`              | `id: string`, `label: string`, `severity: enum(['emergency','urgent','advisory'])`, `evidence: string`, `source: enum(['rule','model'])`, `ruleId?: string`                                                                                                                                                                                                                                                                                                |
 | `CitationSchema`             | `guidelineId: string`, `quote?: string`                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `ClinicalSuggestionSchema`   | `id: string`, `text: string`, `citations: Citation[]`, `.min(1)`                                                                                                                                                                                                                                                                                                                                                                                          |
+| `ClinicalSuggestionSchema`   | `id: string`, `text: string`, `citations: Citation[]`, `.min(1)`                                                                                                                                                                                                                                                                                                                                                                                           |
 | `ConsultationAnalysisSchema` | `note: SoapNote`, `medicalRecordNote?: MedicalRecordNote`, `gaps: InformationGap[]`, `redFlags: RedFlag[]`, `suggestions: ClinicalSuggestion[]`, `retrievedGuidelines?: GuidelineChunk[]` (the retrieved CPG chunks offered to the model, persisted so a citation resolves without re-running retrieval; §11), `scores?: ClinicalScore[]` (the sore-throat scores the doctor completes, each pre-filled only from the transcript; §11, Sore-Throat Scores) |
 
 ### Note Template Projections
@@ -98,13 +98,13 @@ Separately: `.refine()` is **silently dropped** by `z.toJSONSchema()`, so a refi
 
 **Status: `Built`**, human-ratified and implemented 13/08/26 (issue #31). The payer-enforced record schema (PMCare panel GP contract §1.9/§1.15) is condition → treatment → itemised medication dispensed → MC days → referral. Two of those fields have no home in SOAP, so a SOAP-only note is incomplete against the contract the clinic signed. The note therefore carries an operational block alongside the four SOAP strings:
 
-| Field                  | Type                  | Semantics                                                             |
-| ---------------------- | --------------------- | --------------------------------------------------------------------- |
+| Field                  | Type                  | Semantics                                                            |
+| ---------------------- | --------------------- | -------------------------------------------------------------------- |
 | `diagnosis`            | `ClinicalAssertion`   | The impression **the doctor stated**. Transcription-bound, see below |
-| `medicationsDispensed` | `ClinicalAssertion[]` | Drugs the doctor named as dispensed, with dose where stated           |
-| `mcDays`               | `ClinicalAssertion`   | Medical-certificate days the doctor stated                            |
-| `referral`             | `ClinicalAssertion`   | Referral the doctor stated                                            |
-| `followUp`             | `ClinicalAssertion`   | Follow-up interval the doctor stated                                  |
+| `medicationsDispensed` | `ClinicalAssertion[]` | Drugs the doctor named as dispensed, with dose where stated          |
+| `mcDays`               | `ClinicalAssertion`   | Medical-certificate days the doctor stated                           |
+| `referral`             | `ClinicalAssertion`   | Referral the doctor stated                                           |
+| `followUp`             | `ClinicalAssertion`   | Follow-up interval the doctor stated                                 |
 
 **Every operational-block field is extraction, not generation.** Each is subject to the evidence-bound assertion control (§21.4) without exception: `PRESENT` requires a verbatim span in which the doctor states the value, and absent that span the field resolves to `NOT_ASSESSED` and surfaces as an information gap.
 
@@ -122,4 +122,3 @@ The schema is ratified **as a hypothesis to be tested, not as a mitigation to be
 3. **The evidence-span rule is scoped to assertion state, not concept vocabulary** (§21.4), `state` requires a span; `value` may be a normalised term.
 
 ---
-

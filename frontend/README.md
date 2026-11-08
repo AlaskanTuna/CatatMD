@@ -1,4 +1,5 @@
 <a id="readme-top"></a>
+
 # Frontend SPA
 
 CatatMD's browser client is a React 19 and Vite 7 single-page app for adult GP visits with upper respiratory symptoms, including acute cough and sore throat. It presents captured information and generated notes for clinician review. It does not diagnose, and the clinician approves the final note. Repository consultation data is synthetic.
@@ -7,13 +8,13 @@ CatatMD's browser client is a React 19 and Vite 7 single-page app for adult GP v
 
 From the repository root, **bun run dev:frontend** in the root [package.json](../package.json) builds shared first and starts Vite. The frontend package scripts below run from **frontend/** after shared has been built.
 
-| Action | Command |
-| --- | --- |
-| Start Vite | **bun run dev** |
-| Build TypeScript and the Vite bundle | **bun run build** |
-| Run frontend tests | **bun run test** |
-| Check TypeScript | **bun run typecheck** |
-| Serve the production bundle locally | **bun run preview** |
+| Action                               | Command               |
+| ------------------------------------ | --------------------- |
+| Start Vite                           | **bun run dev**       |
+| Build TypeScript and the Vite bundle | **bun run build**     |
+| Run frontend tests                   | **bun run test**      |
+| Check TypeScript                     | **bun run typecheck** |
+| Serve the production bundle locally  | **bun run preview**   |
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -21,17 +22,17 @@ From the repository root, **bun run dev:frontend** in the root [package.json](..
 
 Tests sit beside the source files they cover.
 
-| Directory | Purpose | README |
-| --- | --- | --- |
-| **audio/** | Audio capture, transcription, and live speech helpers | [audio](src/audio/README.md) |
-| **copilot/** | CatatAI conversation and proposal UI | [copilot](src/copilot/README.md) |
-| **demo/** | State and controls for the guided demo tour | [demo](src/demo/README.md) |
-| **lib/** | API client, shared browser helpers, and theme state | [lib](src/lib/README.md) |
-| **preview/** | Synthetic API stub used by preview builds | [preview](src/preview/README.md) |
-| **review/** | Note, safety, transcript, and prescription review components | [review](src/review/README.md) |
-| **routes/** | Page components and consultation capture panel | [routes](src/routes/README.md) |
-| **shell/** | Public and signed-in application layouts | [shell](src/shell/README.md) |
-| **ui/** | Reusable visual controls and display primitives | [ui](src/ui/README.md) |
+| Directory    | Purpose                                                      | README                           |
+| ------------ | ------------------------------------------------------------ | -------------------------------- |
+| **audio/**   | Audio capture, transcription, and live speech helpers        | [audio](src/audio/README.md)     |
+| **copilot/** | CatatAI conversation and proposal UI                         | [copilot](src/copilot/README.md) |
+| **demo/**    | State and controls for the guided demo tour                  | [demo](src/demo/README.md)       |
+| **lib/**     | API client, shared browser helpers, and theme state          | [lib](src/lib/README.md)         |
+| **preview/** | Synthetic API stub used by preview builds                    | [preview](src/preview/README.md) |
+| **review/**  | Note, safety, transcript, and prescription review components | [review](src/review/README.md)   |
+| **routes/**  | Page components and consultation capture panel               | [routes](src/routes/README.md)   |
+| **shell/**   | Public and signed-in application layouts                     | [shell](src/shell/README.md)     |
+| **ui/**      | Reusable visual controls and display primitives              | [ui](src/ui/README.md)           |
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -39,16 +40,16 @@ Tests sit beside the source files they cover.
 
 [App.tsx](src/App.tsx) uses React Router. The report page has session protection but sits outside the signed-in shell.
 
-| Route | Page | Layout |
-| --- | --- | --- |
-| **/** | Landing | MarketingShell |
-| **/privacy** | Privacy | MarketingShell |
-| **/login** | Login | Standalone |
-| **/consultations/:id/report** | ConsultationReportPage | Protected, outside AppShell |
+| Route                                               | Page                               | Layout                      |
+| --------------------------------------------------- | ---------------------------------- | --------------------------- |
+| **/**                                               | Landing                            | MarketingShell              |
+| **/privacy**                                        | Privacy                            | MarketingShell              |
+| **/login**                                          | Login                              | Standalone                  |
+| **/consultations/:id/report**                       | ConsultationReportPage             | Protected, outside AppShell |
 | **/patients**, **/patients/new**, **/patients/:id** | Patient list, creation, and detail | RequireSession and AppShell |
-| **/consultations**, **/consultations/:id** | Consultation list and review | RequireSession and AppShell |
-| **/guidelines**, **/settings** | Guideline library and settings | RequireSession and AppShell |
-| All other paths | Redirect to **/** | None |
+| **/consultations**, **/consultations/:id**          | Consultation list and review       | RequireSession and AppShell |
+| **/guidelines**, **/settings**                      | Guideline library and settings     | RequireSession and AppShell |
+| All other paths                                     | Redirect to **/**                  | None                        |
 
 RequireSession loads the session through api.session. A missing session redirects to /login.
 
@@ -58,13 +59,13 @@ RequireSession loads the session through api.session. A missing session redirect
 
 main.tsx creates a TanStack Query client with one retry and no refetch on window focus. It wraps App in QueryClientProvider. Most route queries and mutations use methods from [lib/api.ts](src/lib/api.ts); Settings owns a separate retention helper.
 
-| Response Path | Current Validation |
-| --- | --- |
+| Response Path                     | Current Validation                                                                                                                                                     |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | JSON through lib/api.ts request() | safeParse before return. Clinical contracts use @shared/types; local Zod envelopes wrap nested responses. Auth success calls using z.unknown have no shape validation. |
-| Settings retention | safeParse with a local envelope and the shared RetentionPolicySchema. |
-| CatatAI stream | use-copilot.ts decodes SSE frames with JSON.parse and casts them. It does not safeParse frames with a shared schema. |
-| Consultation audio download | Returns a Blob and handles status codes directly. It is not a JSON response. |
-| Hosted batch ASR response | Parsed with a local Zod wire schema in audio/live/elevenlabs-batch.ts. |
+| Settings retention                | safeParse with a local envelope and the shared RetentionPolicySchema.                                                                                                  |
+| CatatAI stream                    | use-copilot.ts decodes SSE frames with JSON.parse and casts them. It does not safeParse frames with a shared schema.                                                   |
+| Consultation audio download       | Returns a Blob and handles status codes directly. It is not a JSON response.                                                                                           |
+| Hosted batch ASR response         | Parsed with a local Zod wire schema in audio/live/elevenlabs-batch.ts.                                                                                                 |
 
 Response validation is therefore not universal across frontend paths. Preserve each path's current parsing boundary when changing it.
 

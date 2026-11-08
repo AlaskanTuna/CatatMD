@@ -276,4 +276,3 @@ Both projects stay on their free tiers; no upgrade is required.
 Two infrastructure facts previously recorded here as `Open` are now **resolved**, see §19 rows 5 and 6: the Supabase project exists in `ap-southeast-1` (Singapore), and `QWEN_MODEL` is pinned to `qwen3.7-flash`, which accepts JSON-Schema-constrained decoding (§21.2, re-measured 14/08/26; it is not the only such model, and `qwen-flash` is no longer reachable on this account). `.env.example` and `render.yaml` both carry the corrected value.
 
 ---
-

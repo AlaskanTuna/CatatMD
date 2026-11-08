@@ -1,4 +1,5 @@
 <a id="readme-top"></a>
+
 # Shared Types
 
 @shared/types is the workspace package for Zod contracts and their inferred TypeScript types. The frontend and backend import the same schemas at their boundaries.
@@ -21,17 +22,17 @@ Root scripts build shared/ before frontend and backend work. The frontend develo
 
 ## Main Schema Groups
 
-| Group | Examples In src/index.ts |
-| --- | --- |
-| Transcript And Capture | TranscriptSchema, TranscriptTurnSchema, CaptureModeSchema, NoteTemplateSchema |
-| Speech Recognition | HostedAsrResultSchema, DraftTurnSchema, LiveAsrConfigSchema, LiveSessionSchema |
-| Notes And Clinical Assertions | SoapNoteSchema, MedicalRecordNoteSchema, ClinicalFactsSchema, AssertionStateSchema |
-| Safety And Evidence | InformationGapSchema, RedFlagSchema, CitationSchema, GuidelineDocumentSchema, ClinicalSuggestionSchema |
-| Analysis And Consultation | ConsultationAnalysisSchema, ConsultationSchema, ConsultationDetailSchema, ConsultationListItemSchema |
-| Prescriptions | PrescriptionSchema, PrescriptionLineSchema, PrescriptionParseResponseSchema |
-| Patients And Notifications | PatientSchema, PatientDetailSchema, NotificationItemSchema |
-| Review And Retention | DispositionSchema, EraseConsultationsResultSchema, ErasePatientResultSchema, RetentionPolicySchema |
-| Copilot And Live Analysis | CopilotRequestSchema, CopilotProposalSchema, LiveAnalysisResponseSchema, LiveFlagsResponseSchema |
-| Common Responses | ErrorEnvelopeSchema, FixtureSchema, TranscriptCorrectionsResponseSchema |
+| Group                         | Examples In src/index.ts                                                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Transcript And Capture        | TranscriptSchema, TranscriptTurnSchema, CaptureModeSchema, NoteTemplateSchema                          |
+| Speech Recognition            | HostedAsrResultSchema, DraftTurnSchema, LiveAsrConfigSchema, LiveSessionSchema                         |
+| Notes And Clinical Assertions | SoapNoteSchema, MedicalRecordNoteSchema, ClinicalFactsSchema, AssertionStateSchema                     |
+| Safety And Evidence           | InformationGapSchema, RedFlagSchema, CitationSchema, GuidelineDocumentSchema, ClinicalSuggestionSchema |
+| Analysis And Consultation     | ConsultationAnalysisSchema, ConsultationSchema, ConsultationDetailSchema, ConsultationListItemSchema   |
+| Prescriptions                 | PrescriptionSchema, PrescriptionLineSchema, PrescriptionParseResponseSchema                            |
+| Patients And Notifications    | PatientSchema, PatientDetailSchema, NotificationItemSchema                                             |
+| Review And Retention          | DispositionSchema, EraseConsultationsResultSchema, ErasePatientResultSchema, RetentionPolicySchema     |
+| Copilot And Live Analysis     | CopilotRequestSchema, CopilotProposalSchema, LiveAnalysisResponseSchema, LiveFlagsResponseSchema       |
+| Common Responses              | ErrorEnvelopeSchema, FixtureSchema, TranscriptCorrectionsResponseSchema                                |
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>

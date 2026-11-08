@@ -1,4 +1,5 @@
 <a id="readme-top"></a>
+
 # Repository Scripts
 
 Repository-level utilities live here. Their commands are defined in the root [package.json](../package.json).
@@ -28,11 +29,11 @@ The [demo/](demo/) directory contains tooling for producing the product walkthro
 
 The recorder drives a synthetic consultation workflow and writes these artifacts:
 
-| Artifact | Purpose |
-| --- | --- |
-| capture.webm | Browser capture |
-| beats.json | Step timing metadata |
-| take-ok | Success marker with value catatmd-demo-v1 |
+| Artifact     | Purpose                                   |
+| ------------ | ----------------------------------------- |
+| capture.webm | Browser capture                           |
+| beats.json   | Step timing metadata                      |
+| take-ok      | Success marker with value catatmd-demo-v1 |
 
 Narration helpers apply the fixed script and generated captions, then export the MP4. The default output is CatatMD-Demo.mp4.
 

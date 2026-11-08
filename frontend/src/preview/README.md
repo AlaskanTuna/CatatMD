@@ -1,4 +1,5 @@
 <a id="readme-top"></a>
+
 # Preview Stub
 
 The preview module supplies a synthetic API for frontend preview builds.

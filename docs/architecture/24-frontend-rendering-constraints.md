@@ -59,4 +59,3 @@ Restated here only far enough to be findable, with the detail kept in DESIGN.md:
 Anything prefixed `VITE_` is inlined into the bundle and is therefore public. The two the app reads are in §7. No secret may ever carry that prefix.
 
 ---
-

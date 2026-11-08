@@ -6,12 +6,12 @@ Part of the [Technical Reference](../TRD.md).
 
 Source: `backend/src/deid/types.ts`.
 
-| Construct                 | Shape                                                                                                                  |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Construct                 | Shape                                                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `Deidentified`            | `string & { readonly [brand]: 'deidentified' }`, a branded string, `brand` is a module-private `unique symbol`        |
 | `markDeidentified(value)` | `(value: string) => Deidentified`, casts a plain string into the branded type                                         |
 | `TokenVault`              | `{ readonly entries: ReadonlyMap<string, string>; rehydrate(text: string): string }`, request-scoped, never persisted |
-| `DeidentificationResult`  | `{ readonly text: Deidentified; readonly vault: TokenVault; readonly detected: readonly string[] }`                    |
+| `DeidentificationResult`  | `{ readonly text: Deidentified; readonly vault: TokenVault; readonly detected: readonly string[] }`                   |
 
 ## What The Compiler Enforces Versus What Convention Enforces
 
@@ -24,4 +24,3 @@ It is no longer exported. Minting now lives module-private in `backend/src/deid/
 **What remains, stated rather than glossed:** a deliberate `value as Deidentified` cast is still possible, TypeScript cannot prevent one, and no lint rule reliably catches every spelling of it. That residual is why the provenance guarantee does not rest on the type system alone: the egress guard (§7) re-scans every payload immediately before it leaves the process, so a smuggled value fails at runtime even when it compiles. The two controls sit at different tiers deliberately, compile-time for the convenient bypass, runtime for the determined one.
 
 ---
-

@@ -11,10 +11,10 @@ Source: `backend/src/config/env.ts`. `EnvSchema` is validated against `process.e
 | `NODE_ENV`           | `enum(['development','test','production'])`        | `development`                                            |
 | `PORT`               | `coerce.number().int().positive()`                 | `3001`                                                   |
 | `CORS_ORIGIN`        | `string().url()`                                   | `http://localhost:5173`                                  |
-| `DATABASE_URL`       | `string().min(1)`                                  | none, required                                          |
-| `DIRECT_URL`         | `string().min(1)`                                  | none, required                                          |
-| `BETTER_AUTH_SECRET` | `string().min(32)`                                 | none, required                                          |
-| `BETTER_AUTH_URL`    | `string().url()`                                   | none, required                                          |
+| `DATABASE_URL`       | `string().min(1)`                                  | none, required                                           |
+| `DIRECT_URL`         | `string().min(1)`                                  | none, required                                           |
+| `BETTER_AUTH_SECRET` | `string().min(32)`                                 | none, required                                           |
+| `BETTER_AUTH_URL`    | `string().url()`                                   | none, required                                           |
 | `LLM_PROVIDER`       | `enum(['qwen','gemini','deepseek'])`               | `qwen`                                                   |
 | `QWEN_API_KEY`       | `string().optional()`                              | none                                                     |
 | `QWEN_BASE_URL`      | `string().url()`                                   | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` |
@@ -69,4 +69,3 @@ A separate contract, and a smaller one. These are read by `frontend/` at build t
 **Anything prefixed `VITE_` is public.** Vite inlines it into the bundle, so a value with that prefix is shipped to every visitor. No secret may ever carry it, which is why neither field above is a credential and why `.env.example` documents API-side keys separately.
 
 ---
-

@@ -116,4 +116,3 @@ Both model-side levers were spent (§25.4), so the fix moved tier: when an answe
 The question and statement arms are not re-run because their path is unchanged: a turn the doctor did not press for sends exactly the request it sent before, with no `toolChoice`. The forced card is still a proposal the doctor applies or discards.
 
 ---
-

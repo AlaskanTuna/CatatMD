@@ -52,10 +52,10 @@ Measured in the same session, identical payload, varying only `model`:
 
 | Model           | `response_format: json_schema` + `strict: true` |
 | --------------- | ----------------------------------------------- |
-| `qwen-flash`    | **HTTP 200**, schema-conforming JSON returned  |
-| `qwen3.7-flash` | HTTP 400, `InvalidParameter`                   |
-| `qwen3.6-flash` | HTTP 400, `InvalidParameter`                   |
-| `qwen3.5-flash` | HTTP 400, `InvalidParameter`                   |
+| `qwen-flash`    | **HTTP 200**, schema-conforming JSON returned   |
+| `qwen3.7-flash` | HTTP 400, `InvalidParameter`                    |
+| `qwen3.6-flash` | HTTP 400, `InvalidParameter`                    |
+| `qwen3.5-flash` | HTTP 400, `InvalidParameter`                    |
 
 The three rejecting models return `'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'`, the endpoint's signature for a model that supports only `json_object` mode, not JSON-Schema-constrained decoding.
 
@@ -90,8 +90,8 @@ The same probe, same endpoint, same payload, re-run because `qwen-flash` began r
 
 Controls are ranked by what makes them hold. **A control's tier, not its wording, is what determines whether it can be relied on.**
 
-| Tier                                 | Mechanism                                                                  | Fails how                                       | Examples in this system                                                                                            |
-| ------------------------------------ | -------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Tier                                | Mechanism                                                                  | Fails how                                       | Examples in this system                                                                                            |
+| ----------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **1, Structural** (strongest)       | The model cannot emit the bad value; decoding is constrained by the schema | Loudly, as a decoding or validation error       | Per-field assertion enum (§3 proposal); `z.enum(corpusIds)` citations (§11); `citations.min(1)` (§3)               |
 | **2, Deterministic**                | Code that runs regardless of model output                                  | Loudly, and testably                            | Red-flag rules engine (§10); gap derivation from assertion states; egress re-scan (§7 gap); de-identification (§9) |
 | **3, Post-hoc validation**          | Code that inspects model output and rejects or downgrades it               | Loudly, at the cost of false downgrades         | **Evidence-bound assertion (§21.4)**; diagnostic-phrasing check                                                    |
@@ -141,12 +141,12 @@ This is stated as a design property, not a solved problem: no control here claim
 
 Added 13/08/26 from the research phase. **No published study measures "fabricated pertinent negatives on sparse transcripts" as a named phenomenon.** This section records an observation that those studies do not measure. But four primary sources independently establish its _mechanism_, which matters because it means the control is not designed against a single observation on a single model:
 
-| Finding                                                                                                                                            | Source                                                                               |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| **Negation is the second-largest hallucination class, 30% (56/191)**, in LLM primary-care note generation, and the class flagged most concerning | Asgari et al., _npj Digital Medicine_, May 2025 (PriMock consultation transcripts)   |
-| **Models do not abstain when context is insufficient**: 10.2% incorrect with _no_ context, rising to **66.1% with insufficient context**           | Joren et al., "Sufficient Context", ICLR 2025                                        |
-| **Ambient notes carry more hallucination than physician notes (31% vs 20%)** while scoring higher on thoroughness and lower on succinctness        | Palm et al., _Frontiers in AI_, Oct 2025                                             |
-| Negation handling is a structural LLM weakness generally: 59–72% hallucination with negation vs 26–42% without                                     | Varshney et al., arXiv:2406.05494 (general domain, small open models, context only) |
+| Finding                                                                                                                                          | Source                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| **Negation is the second-largest hallucination class, 30% (56/191)**, in LLM primary-care note generation, and the class flagged most concerning | Asgari et al., _npj Digital Medicine_, May 2025 (PriMock consultation transcripts)  |
+| **Models do not abstain when context is insufficient**: 10.2% incorrect with _no_ context, rising to **66.1% with insufficient context**         | Joren et al., "Sufficient Context", ICLR 2025                                       |
+| **Ambient notes carry more hallucination than physician notes (31% vs 20%)** while scoring higher on thoroughness and lower on succinctness      | Palm et al., _Frontiers in AI_, Oct 2025                                            |
+| Negation handling is a structural LLM weakness generally: 59–72% hallucination with negation vs 26–42% without                                   | Varshney et al., arXiv:2406.05494 (general domain, small open models, context only) |
 
 **State the relationship precisely.** The literature's "negation" is the model _flipping_ an assertion that was made; §21.1's finding is the model _inventing_ an assertion state for a topic never raised. These are siblings, both are assertion-polarity errors that survive fluency checks, not the same measurement. The defensible claim is: _the literature establishes assertion-polarity error as a distinct, high-severity class in primary-care note generation; §21.1 measures a specific, previously unmeasured variant of it._ Do not write "the literature replicated our finding."
 
@@ -160,4 +160,3 @@ The third row is the sharpest corroboration of the _mechanism_: "more thorough +
 - **The ASR layer is a second fabrication surface these controls do not reach** (§20). Nothing in §21 protects against a transcript that is already wrong.
 
 ---
-

@@ -12,12 +12,12 @@
 
 ## Target Users
 
-|                    | Primary                                                                                                     | Secondary                                                |
-| ------------------ | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| **Who**            | Malaysian GPs in private practice and panel clinics                                                         | A reviewer of the code                                   |
-| **Context**        | Between patients, 10 to 20 consultations a session, screen shared with a real desk and a real queue outside | Reading the repo and using the guided demo tour once     |
-| **Time budget**    | 30 to 60 seconds per note review                                                                            | 90 seconds to first real output                          |
-| **What they need** | To see what the AI got wrong, fast, and sign off on something they can defend                               | Verify the safety controls against the implementation   |
+|                    | Primary                                                                                                     | Secondary                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Who**            | Malaysian GPs in private practice and panel clinics                                                         | A reviewer of the code                                |
+| **Context**        | Between patients, 10 to 20 consultations a session, screen shared with a real desk and a real queue outside | Reading the repo and using the guided demo tour once  |
+| **Time budget**    | 30 to 60 seconds per note review                                                                            | 90 seconds to first real output                       |
+| **What they need** | To see what the AI got wrong, fast, and sign off on something they can defend                               | Verify the safety controls against the implementation |
 
 The primary user is not impressed by software. They are interrupted, accountable, and medico-legally exposed. Every second of decoration is a second not spent on the patient outside.
 
@@ -49,13 +49,13 @@ The interface should reflect these engineering choices. **Restraint is the brand
 
 What this must not resemble, and why:
 
-| Anti-reference                                                                  | Why it fails here                                                                                                                                                                        |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Consumer health apps (illustration, mascots, encouragement)                     | Reads as a wellness product. Stream 08 concluded that a companion mascot conflicts most with the safety-first design; it is out of the current build                                  |
-| Hospital marketing sites (badge walls, phone numbers, WhatsApp FABs, carousels) | Over-signals to patients when the primary user is a doctor already using the clinical workflow                                                                                          |
-| Generic SaaS dashboards (hero metric, gradient accents, identical card grids)   | Says nothing true about the product and everything about the template                                                                                                                    |
-| Legacy clinical systems (grey chrome, dense grids, 11px labels)                 | Familiar to the user, and the reason they hate their current software                                                                                                                    |
-| AI-forward dark tooling (terminal aesthetics, neon, monospace everywhere)       | Signals a dev tool, not a medical record a doctor signs                                                                                                                                  |
+| Anti-reference                                                                  | Why it fails here                                                                                                                                    |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Consumer health apps (illustration, mascots, encouragement)                     | Reads as a wellness product. Stream 08 concluded that a companion mascot conflicts most with the safety-first design; it is out of the current build |
+| Hospital marketing sites (badge walls, phone numbers, WhatsApp FABs, carousels) | Over-signals to patients when the primary user is a doctor already using the clinical workflow                                                       |
+| Generic SaaS dashboards (hero metric, gradient accents, identical card grids)   | Says nothing true about the product and everything about the template                                                                                |
+| Legacy clinical systems (grey chrome, dense grids, 11px labels)                 | Familiar to the user, and the reason they hate their current software                                                                                |
+| AI-forward dark tooling (terminal aesthetics, neon, monospace everywhere)       | Signals a dev tool, not a medical record a doctor signs                                                                                              |
 
 ## Strategic Design Principles
 

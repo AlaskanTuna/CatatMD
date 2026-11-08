@@ -17,4 +17,3 @@ Part of the [Technical Reference](../TRD.md).
 **Open**, with sign-up now publicly reachable rather than seeded-only, the exact better-auth configuration to apply before it goes live, e.g. requiring email verification, and confirming the default rate limiting named in §16 actually covers `/api/auth/sign-up/email` on the installed better-auth version, is unresolved. See §19, row 4 (revised from "should sign-up be disabled" to "what should guard it, now that it is enabled").
 
 ---
-

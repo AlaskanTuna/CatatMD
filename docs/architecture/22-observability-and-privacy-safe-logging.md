@@ -44,4 +44,3 @@ A probabilistic check is a useful backstop and a poor boundary. Per-field value 
 The log **message** is developer-authored and interpolation into it is not reachable by field rules. A name templated into a message string is caught only if the detector scores it above threshold. The convention is therefore load-bearing: **put data in fields, not in the message.**
 
 ---
-
