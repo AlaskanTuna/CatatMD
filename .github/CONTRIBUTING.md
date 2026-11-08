@@ -74,6 +74,21 @@ The lane is chosen by what the change is, not by how big it is.
 4. A change to `prisma/schema.prisma` ships its migration. Production does not apply migrations on deploy; the template's Migrations section says what to run after merging.
 5. Run the matching reviewer from `.claude/agents/` on a diff in its area (`docs/agents/skills.md` lists them).
 
+## Releases
+
+CatatMD follows [Semantic Versioning](https://semver.org/), driven by the Conventional Commit types that land on `main`. [release-please](https://github.com/googleapis/release-please) (`.github/workflows/release.yml`) does the bookkeeping.
+
+| Commit Type On `main`                                   | Effect On The Next Version |
+| ------------------------------------------------------- | -------------------------- |
+| `fix`, `perf`, `deps`                                   | Patch, `1.0.0` to `1.0.1`  |
+| `feat`                                                  | Minor, `1.0.0` to `1.1.0`  |
+| A `!` after the type, or `BREAKING CHANGE:` in the body | Major, `1.0.0` to `2.0.0`  |
+| `docs`, `refactor`, `test`, `chore`, `ci`, `style`      | No release on its own      |
+
+1. After a releasable merge, release-please opens or updates one pull request, `chore(main): release X.Y.Z`, which bumps `package.json` and writes `CHANGELOG.md`.
+2. Merging that pull request is the release decision. The next run tags `vX.Y.Z` and publishes the GitHub release with the changelog as its notes.
+3. Releases are version markers, not deploy triggers: every merge to `main` already deploys through `ci.yml`.
+
 ## Deploys
 
 - A merge to `main` that touches a deployable path deploys the frontend to Vercel and the API to Render through the `deploy` job in `ci.yml`.

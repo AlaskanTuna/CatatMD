@@ -1,0 +1,38 @@
+# Versions CatatMD with release-please. It keeps one release pull request that
+# bumps the root package.json version and writes CHANGELOG.md from the
+# Conventional Commits merged since the last release. Merging that pull request
+# is the release decision: the next run tags vX.Y.Z and creates the GitHub
+# release. Deploys are not tied to releases; every merge to main deploys
+# through ci.yml, so a release names a version of what is already live.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - name: Summarise
+        if: ${{ steps.release.outputs.release_created == 'true' }}
+        env:
+          TAG: ${{ steps.release.outputs.tag_name }}
+        run: echo "Released $TAG." >> "$GITHUB_STEP_SUMMARY"
