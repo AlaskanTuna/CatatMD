@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "include-component-in-tag": false,
+  "bootstrap-sha": "bd952ccb2257b8ce56a7dfbd9435cf84c9f9664b",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "catatmd",
+      "changelog-path": "CHANGELOG.md"
+    }
+  }
+}
