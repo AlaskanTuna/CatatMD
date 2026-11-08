@@ -1,4 +1,6 @@
+import type { MedicationCandidateWire } from '@shared/types'
 import type { ProfileId } from '../clinical-profiles/types.js'
+import { buildSourceMappedText, type SourceMappedText } from '../lib/text/source-map.js'
 import { lexiconFor, MEDICATION_LEXICON } from './lexicon.js'
 import { admits, type Similarity, similarity } from './similarity.js'
 import { SIG_STOPWORDS } from './vocabulary.js'
@@ -24,58 +26,43 @@ const MIN_TOKEN_LENGTH = 4
 /** A garbled name can arrive split across words, so windows span up to three. */
 const MAX_WINDOW_TOKENS = 3
 
-export type MedicationCandidate = {
-  readonly lexiconId: string
-  /** The proposal. Never written back over `heard`. */
-  readonly generic: string
-  /** Exactly what the doctor said, cut from the untouched input. */
-  readonly heard: string
-  readonly start: number
-  readonly end: number
-  readonly score: number
-}
+export type MedicationCandidate = MedicationCandidateWire
 
 /**
  * Lowercased, punctuation dropped, whitespace collapsed, carrying an index
- * map back to the source. Same shape and same purpose as `Expansion` in
- * `redflags/mishears.ts:64`: match against the normalised text, quote from
- * the original.
+ * map back to the source. Match against the normalised text, quote from the
+ * original.
  *
  * `origin[i]` is the index in `source` that produced normalised character
- * `i`. One entry is pushed per *output* character, inside the lowercase loop,
- * because `toLowerCase` is not one-to-one for every code point and a
- * length-changing fold would otherwise desynchronise the map.
+ * `i`. Lowercasing can expand a source character, so every folded output
+ * character receives the source index that produced it.
  */
-export type Normalised = { readonly text: string; readonly origin: readonly number[] }
+export type Normalised = SourceMappedText
 
 const WORD = /[\p{L}\p{N}]/u
 
 export const normalise = (source: string): Normalised => {
-  let text = ''
-  const origin: number[] = []
+  let hasText = false
   let pendingSeparator = false
 
-  for (let i = 0; i < source.length; i++) {
-    const character = source[i] as string
+  return buildSourceMappedText((append) => {
+    for (let i = 0; i < source.length; i++) {
+      const character = source[i] as string
 
-    if (!WORD.test(character)) {
-      pendingSeparator = true
-      continue
+      if (!WORD.test(character)) {
+        pendingSeparator = true
+        continue
+      }
+
+      if (pendingSeparator && hasText) append(' ', i)
+      pendingSeparator = false
+
+      for (const folded of character.toLowerCase()) {
+        append(folded, i)
+        hasText = true
+      }
     }
-
-    if (pendingSeparator && text.length > 0) {
-      text += ' '
-      origin.push(i)
-    }
-    pendingSeparator = false
-
-    for (const folded of character.toLowerCase()) {
-      text += folded
-      origin.push(i)
-    }
-  }
-
-  return { text, origin }
+  })
 }
 
 /**

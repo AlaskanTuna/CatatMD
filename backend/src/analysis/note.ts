@@ -1,8 +1,8 @@
 import type {
-  AssertionState,
   ClinicalAssertion,
   ClinicalFacts,
   OperationalBlock,
+  EvidenceLink as SharedEvidenceLink,
 } from '@shared/types'
 
 /**
@@ -14,11 +14,7 @@ import type {
  * (§12), not composed from these facts. Data only; docs/TRD.md §21.4's Open
  * item (§19 row 17) scopes surfacing this as clickable UI out for now.
  */
-export interface EvidenceLink {
-  fieldId: string
-  state: AssertionState
-  evidence: string
-}
+export type EvidenceLink = Pick<SharedEvidenceLink, 'fieldId' | 'state' | 'evidence'>
 
 function linkFor(fieldId: string, assertion: ClinicalAssertion): EvidenceLink[] {
   return assertion.evidence

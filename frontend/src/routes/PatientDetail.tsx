@@ -4,17 +4,13 @@ import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../lib/api.js'
+import { formatGender } from '../lib/patient-format.js'
 import { count } from '../lib/plural.js'
 import { Button } from '../ui/Button.js'
 import { Card, EmptyState, Skeleton } from '../ui/Card.js'
 import { PageHeader } from '../ui/PageHeader.js'
 import { ConsultationRows } from './ConsultationRows.js'
 import { ErasePatientDialog } from './PatientList.js'
-
-const formatGender = (gender: 'male' | 'female' | 'other' | null) => {
-  if (gender === null) return 'Not recorded'
-  return gender.charAt(0).toUpperCase() + gender.slice(1)
-}
 
 export function PatientDetail() {
   const { id = '' } = useParams()

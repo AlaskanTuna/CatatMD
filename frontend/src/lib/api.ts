@@ -1,4 +1,6 @@
 import {
+  type AuditEvent,
+  AuditEventSchema,
   type BatchSession,
   BatchSessionSchema,
   type CaptureMode,
@@ -21,6 +23,7 @@ import {
   FixtureSchema,
   type GuidelineDocument,
   GuidelineDocumentSchema,
+  HealthResponseSchema,
   type HostedAsrResult,
   HostedAsrResultSchema,
   type InterpretedLanguage,
@@ -120,15 +123,9 @@ const NotificationsEnvelope = z.object({ notifications: z.array(NotificationItem
  * `AuditEvent` is append-only and therefore the authority for what produced a
  * note; `analysis` is overwritten on re-analysis and is not (issue #31).
  */
-const AuditEventSchema = z.object({
-  id: z.string(),
-  action: z.string(),
-  createdAt: z.coerce.date(),
-  metadata: z.unknown().nullable().optional(),
-})
 const HistoryEnvelope = z.object({ events: z.array(AuditEventSchema) })
 
-export type AuditEvent = z.infer<typeof AuditEventSchema>
+export type { AuditEvent }
 
 export const api = {
   session: () =>
@@ -572,13 +569,5 @@ export const api = {
    * `database` is absent in production by design, so a missing field must be
    * read as "no warning to give", never as a failure to check.
    */
-  health: () =>
-    request(
-      '/health',
-      z.object({
-        status: z.string(),
-        provider: z.string().optional(),
-        database: z.enum(['local', 'remote', 'unreachable']).optional(),
-      }),
-    ),
+  health: () => request('/health', HealthResponseSchema),
 }

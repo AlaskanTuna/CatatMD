@@ -44,7 +44,7 @@ import { HttpError } from '../lib/http-error.js'
 import { getLLMDescriptor } from '../lib/llm/index.js'
 import { logger } from '../lib/logger.js'
 import { inFlightGate, parseAudioBody } from '../middleware/audio-body.js'
-import { ALL_REDFLAG_TRIGGERS, evaluateRedFlags } from '../redflags/index.js'
+import { ALL_REDFLAG_TRIGGERS, evaluateRedFlags, firedRuleIds } from '../redflags/index.js'
 
 export const asrRouter = Router()
 
@@ -611,10 +611,6 @@ const asCheckedTranscript = (
   labelsReviewed: false,
   turns: turns.map((text) => ({ speaker, text })),
 })
-
-/** The rule ids a transcript raises over every trigger there is. */
-const firedRuleIds = (transcript: Transcript): Set<string> =>
-  new Set(evaluateRedFlags(transcript, ALL_REDFLAG_TRIGGERS).map((flag) => flag.ruleId ?? flag.id))
 
 /*
  * Whether a refined transcript would lose a rule hit the live one raised (#436).

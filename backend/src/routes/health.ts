@@ -1,3 +1,4 @@
+import type { HealthResponse } from '@shared/types'
 import { Router } from 'express'
 import { env } from '../config/env.js'
 import { prisma } from '../lib/prisma.js'
@@ -41,8 +42,8 @@ healthRouter.get('/health', async (_req, res) => {
       status: 'ok',
       provider: env.LLM_PROVIDER,
       ...(locality ? { database: locality } : {}),
-    })
+    } satisfies HealthResponse)
   } catch {
-    res.status(503).json({ status: 'degraded', database: 'unreachable' })
+    res.status(503).json({ status: 'degraded', database: 'unreachable' } satisfies HealthResponse)
   }
 })

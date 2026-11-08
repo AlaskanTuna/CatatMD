@@ -7,14 +7,14 @@ Centralizes the version stamps for active clinical content and selects stamps fo
 ## Owns
 
 - The active registry for clinical artefacts and profile versions in [index.ts](index.ts).
-- The shared ClinicalArtefactVersion type in [types.ts](types.ts).
+- The ClinicalArtefactVersion type, re-exported by [types.ts](types.ts) from the leaf module [../clinical-types.ts](../clinical-types.ts) so data files can import it without a cycle.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
 ## Entry Points
 
 - [index.ts](index.ts): getActiveClinicalVersions, ACTIVE_CLINICAL_VERSIONS and ACTIVE_PROFILE_VERSIONS.
-- [types.ts](types.ts): ClinicalArtefactVersion.
+- [types.ts](types.ts): ClinicalArtefactVersion (declared in [../clinical-types.ts](../clinical-types.ts), beside ProfileIdSchema).
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 

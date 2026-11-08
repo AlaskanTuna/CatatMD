@@ -63,7 +63,7 @@ export type PipelineStage = (typeof PIPELINE_STAGES)[number]
  * Failure taxonomy. Each class is distinguishable in a log line without
  * inspecting any payload, which is the entire purpose of the field.
  */
-export const ERROR_CLASSES = [
+const ERROR_CLASSES = [
   'model_error',
   'schema_parse_error',
   'rule_engine_error',
@@ -256,7 +256,7 @@ export function withRequestContext<T>(requestId: string, fn: () => T): T {
   return requestStore.run({ requestId }, fn)
 }
 
-export function currentRequestId(): string | undefined {
+function currentRequestId(): string | undefined {
   return requestStore.getStore()?.requestId
 }
 

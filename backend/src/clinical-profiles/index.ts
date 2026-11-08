@@ -1,9 +1,8 @@
-import type { ClinicalArtefactVersion } from '../clinical-versions/types.js'
+import { type ClinicalArtefactVersion, PROFILE_IDS, type ProfileId } from '../clinical-types.js'
 import { ALL_GAP_CHECKLIST, type GapChecklistEntry } from '../gaps/index.js'
 import { ALL_REDFLAG_TRIGGERS, type RedFlagTrigger } from '../redflags/index.js'
-import { PROFILE_IDS, type ProfileId } from './types.js'
 
-export { PROFILE_IDS, type ProfileId, ProfileIdSchema } from './types.js'
+export { PROFILE_IDS, type ProfileId, ProfileIdSchema } from '../clinical-types.js'
 
 export interface ClinicalProfile {
   readonly id: ProfileId
