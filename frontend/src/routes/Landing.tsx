@@ -36,7 +36,7 @@ const CLAIMS = [
 const LIMITS = [
   {
     term: 'Not a Registered Medical Device',
-    body: 'It is a prototype built for evaluation, and no clinician has reviewed its output in a validation study.',
+    body: 'It is a research prototype, not a medical device, and no clinician has reviewed its output in a validation study.',
   },
   {
     term: 'Not Real Patient Data',
