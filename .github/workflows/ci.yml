@@ -105,8 +105,16 @@ jobs:
           gitleaks git --config .gitleaks.toml --redact --no-banner --exit-code 1 --log-opts="$range"
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        id: setup-bun
+        # Bun's binary comes from GitHub releases; when those fail, the same
+        # pinned version installs from the npm registry instead.
+        continue-on-error: true
         with:
           bun-version-file: package.json
+      - if: steps.setup-bun.outcome == 'failure'
+        run: |
+          npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          bun --version
 
       - run: bun install --frozen-lockfile
 
@@ -455,8 +463,16 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        id: setup-bun
+        # Bun's binary comes from GitHub releases; when those fail, the same
+        # pinned version installs from the npm registry instead.
+        continue-on-error: true
         with:
           bun-version-file: package.json
+      - if: steps.setup-bun.outcome == 'failure'
+        run: |
+          npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          bun --version
 
       # Pinned rather than @latest: the deploy path should not change under us
       # between one merge and the next.
@@ -795,9 +811,15 @@ jobs:
           fi
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        id: setup-bun
         if: steps.filter.outputs.deployable == 'true'
+        continue-on-error: true
         with:
           bun-version-file: package.json
+      - if: steps.filter.outputs.deployable == 'true' && steps.setup-bun.outcome == 'failure'
+        run: |
+          npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          bun --version
 
       - name: Install Vercel CLI
         if: steps.filter.outputs.deployable == 'true'
