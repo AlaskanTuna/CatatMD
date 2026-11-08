@@ -11,6 +11,7 @@ Page-level components and the consultation capture panel mounted by App.tsx.
 - [Landing.tsx](Landing.tsx), [Privacy.tsx](Privacy.tsx), and [Login.tsx](Login.tsx) provide public and sign-in pages.
 - [PatientList.tsx](PatientList.tsx), [PatientNew.tsx](PatientNew.tsx), and [PatientDetail.tsx](PatientDetail.tsx) provide patient pages.
 - [ConsultationList.tsx](ConsultationList.tsx), [ConsultationReview.tsx](ConsultationReview.tsx), and [ConsultationReportPage.tsx](ConsultationReportPage.tsx) provide consultation pages.
+- [consultation-review/](consultation-review/) holds the review screen's sections: `ReviewHeader.tsx`, `ReviewPanes.tsx`, `review-panels.tsx`, `settled-conversation.tsx` and pure `helpers.ts`.
 - [Guidelines.tsx](Guidelines.tsx) and [Settings.tsx](Settings.tsx) provide the remaining signed-in pages.
 - [CapturePanel.tsx](CapturePanel.tsx) coordinates transcript entry and audio capture inside consultation review.
 - [ConsultationRow.tsx](ConsultationRow.tsx), [ConsultationRows.tsx](ConsultationRows.tsx), and [StartConsultationDialog.tsx](StartConsultationDialog.tsx) are route-level workflow components.
