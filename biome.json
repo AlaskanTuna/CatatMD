@@ -11,6 +11,7 @@
       "!**/dist",
       "!**/node_modules",
       "!graphify-out",
+      "!docs/assets/diagrams/*.svg",
       "!prisma/migrations",
       "!.claude/skills",
       "!.agents/skills",

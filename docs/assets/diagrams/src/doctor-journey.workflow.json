@@ -1,0 +1,198 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "The Doctor's Journey",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "frontend": {
+          "label": "Doctor action"
+        },
+        "backend": {
+          "label": "CatatMD"
+        },
+        "database": {
+          "label": "Stored record"
+        },
+        "cloud": {
+          "label": "Third party"
+        },
+        "security": {
+          "label": "Trust gate"
+        },
+        "external": {
+          "label": "In the room"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "doctor",
+      "label": "Doctor"
+    },
+    {
+      "id": "app",
+      "label": "CatatMD, Inside The Trust Boundary"
+    },
+    {
+      "id": "hosted",
+      "label": "Outside The Boundary",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "consult",
+    "start",
+    "transcript",
+    "analyse",
+    "findings",
+    "review",
+    "approve",
+    "locked"
+  ],
+  "nodes": [
+    {
+      "id": "consult",
+      "lane": "doctor",
+      "col": 0,
+      "type": "external",
+      "label": "Consult In Room",
+      "sublabel": "patient still present",
+      "width": 150
+    },
+    {
+      "id": "start",
+      "lane": "doctor",
+      "col": 1,
+      "type": "frontend",
+      "label": "Start A Consultation",
+      "sublabel": "record, paste or upload",
+      "width": 150
+    },
+    {
+      "id": "hosted",
+      "lane": "hosted",
+      "col": 1,
+      "type": "cloud",
+      "label": "Hosted Speech",
+      "sublabel": "per-consultation consent",
+      "width": 150
+    },
+    {
+      "id": "transcript",
+      "lane": "app",
+      "col": 2,
+      "type": "database",
+      "label": "Draft Transcript",
+      "sublabel": "speaker-labelled",
+      "width": 150
+    },
+    {
+      "id": "analyse",
+      "lane": "app",
+      "col": 3,
+      "type": "security",
+      "label": "Analyse",
+      "sublabel": "rules, de-identify, model",
+      "width": 150
+    },
+    {
+      "id": "findings",
+      "lane": "app",
+      "col": 4,
+      "type": "backend",
+      "label": "Note And Findings",
+      "sublabel": "gaps, flags, cited advice",
+      "width": 150
+    },
+    {
+      "id": "review",
+      "lane": "doctor",
+      "col": 4,
+      "type": "frontend",
+      "label": "Review And Edit",
+      "sublabel": "acknowledge every flag",
+      "width": 150
+    },
+    {
+      "id": "approve",
+      "lane": "doctor",
+      "col": 5,
+      "type": "frontend",
+      "label": "Approve",
+      "sublabel": "explicit and audited",
+      "width": 150
+    },
+    {
+      "id": "locked",
+      "lane": "app",
+      "col": 5,
+      "type": "database",
+      "label": "Locked Note",
+      "sublabel": "final, PDF export",
+      "width": 150
+    }
+  ],
+  "edges": [
+    {
+      "id": "consult-start",
+      "from": "consult",
+      "to": "start"
+    },
+    {
+      "id": "start-transcript",
+      "from": "start",
+      "to": "transcript",
+      "label": "typed or on-device",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "start-hosted",
+      "from": "start",
+      "to": "hosted",
+      "label": "consented audio",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "hosted-transcript",
+      "from": "hosted",
+      "to": "transcript",
+      "label": "text",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "transcript-analyse",
+      "from": "transcript",
+      "to": "analyse"
+    },
+    {
+      "id": "analyse-findings",
+      "from": "analyse",
+      "to": "findings"
+    },
+    {
+      "id": "findings-review",
+      "from": "findings",
+      "to": "review"
+    },
+    {
+      "id": "review-approve",
+      "from": "review",
+      "to": "approve"
+    },
+    {
+      "id": "approve-locked",
+      "from": "approve",
+      "to": "locked",
+      "label": "terminal",
+      "variant": "emphasis"
+    }
+  ]
+}

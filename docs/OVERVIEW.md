@@ -126,7 +126,12 @@ AI note-taking is already commoditised in this market, bundled into clinic syste
 
 The two diagrams below are the system as it actually runs. The first is what the doctor experiences; the second is what it is built from.
 
-![CatatMD doctor journey, from consultation to approved note. The doctor consults in-room with the patient still present, then starts a consultation from one of four inputs: a bundled fixture, pasted text, an uploaded .txt or .json file, or live audio transcribed on the doctor's device by default and returned as draft speaker-labelled lines the doctor reviews. The transcript is saved as a draft consultation, passed through the de-identification gate, and sent as safe text to the language model, which returns a structured note, documentation gaps, cited suggestions and red-flag candidates only. Real names are restored before anything is saved or shown. Separately, and before the model call, a deterministic rules engine checks red flags against the original transcript and never shows its results to the model, while a deterministic checklist derives documentation gaps from the note's assertion states. Findings are assembled as a union and never filtered. The doctor reviews, edits, acknowledges red flags without removing them, and approves; the approved note is locked and final, exportable as PDF. The hosted transcription adapter is drawn dashed outside the trust boundary, reachable only by per-consultation consent.](assets/user-journey.drawio.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/diagrams/doctor-journey-dark.svg" />
+    <img src="assets/diagrams/doctor-journey-light.svg" alt="The doctor's journey. The doctor consults in the room with the patient present, then starts a consultation by recording, pasting or uploading. Typed or on-device text becomes a speaker-labelled draft transcript; hosted speech, outside the trust boundary, is used only with per-consultation consent. CatatMD analyses the transcript (rules, de-identification, then the model) and returns a note with gaps, red flags and cited advice. The doctor reviews and edits, acknowledging every flag, then approves explicitly; approval is audited and terminal, and the note is locked and exportable as PDF." width="100%" />
+  </picture>
+</p>
 
 Three claims the journey diagram is drawn to make checkable:
 
@@ -136,13 +141,18 @@ Three claims the journey diagram is drawn to make checkable:
 
 `approved` is terminal and reachable only through an explicit doctor action. The hosted transcription path is drawn dashed and outside the boundary because it is the one route by which audio can leave the device, entered only by a recorded per-consultation act (`docs/TRD.md` §20).
 
-![CatatMD technical stack. Inside the trust boundary: React, TypeScript, Vite and Tailwind on Vercel; Node, Express and Bun on Render, carrying the deid PHI gate, the lib/llm client, and the routes, redflags, guidelines and audit modules; PostgreSQL, Prisma and Supabase. Outside it: the Qwen language model, reachable only through lib/llm, and the hosted ASR provider ILMU, reached only by an API relay under per-consultation consent.](assets/tech-stack.drawio.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/diagrams/tech-stack-dark.svg" />
+    <img src="assets/diagrams/tech-stack-light.svg" alt="CatatMD technical stack. Inside one Singapore trust boundary: the React SPA on Vercel, the Express API on Render and Postgres with pgvector on Supabase. Inside the API, the transcript passes deid/, which turns identifiers into tokens, then lib/llm/, the only egress, which sends tokens only to Qwen on Model Studio Singapore. The red-flag rules read the raw text in-process. Outside the boundary, ILMU is reached only through a consented API relay, while Soniox live speech (US region) and ElevenLabs post-stop refinement receive audio directly from the browser." width="100%" />
+  </picture>
+</p>
 
 Three claims the stack diagram is drawn to make checkable:
 
 - **`lib/llm/` Is The Only Text Egress**, and everything crossing that line has already passed `deid/`.
 - **`lib/llm/` Now Carries Two Egress Calls, Completion And Embedding,** and both accept only de-identified text.
-- **Two Audio Paths Leave The Boundary, And Neither Can Be De-Identified First.** Speech-to-text runs on the device by default, so it opens only when a doctor has chosen the hosted engine for the device and ticked the per-consultation consent box for that patient. The diagram draws it dashed because it sits outside the boundary, and the audio reaches it only as a relay through the API (`docs/TRD.md` §20.4). Ambient capture is the second: it never enters the API at all, streaming from the browser to the provider under a short-lived key the API mints, which is why the browser carries a guard of its own pinning that socket to one module.
+- **Three Audio Paths Leave The Boundary, And None Can Be De-Identified First.** Speech-to-text runs on the device by default, so it opens only when a doctor has chosen the hosted engine for the device and ticked the per-consultation consent box for that patient. The diagram draws it dashed because it sits outside the boundary, and the audio reaches it only as a relay through the API (`docs/TRD.md` §20.4). Ambient capture is the second: it never enters the API at all, streaming from the browser to the provider under a short-lived key the API mints, which is why the browser carries a guard of its own pinning that socket to one module. Post-stop refinement is the third: ElevenLabs batch speech-to-text, also browser-direct under a token the API mints (`docs/TRD.md` §20.14).
 
 Bun workspaces · TypeScript · Zod (shared contracts) · Express 5 · Prisma 6 · better-auth · React 19 + Vite 7 + Tailwind 4 · Supabase Postgres · Vitest · Biome. Hosting: frontend to Vercel, backend to Render, database to Supabase, all three in one region by design.
 
@@ -236,14 +246,12 @@ The central architectural invariant: **no text containing patient identifiers le
 
 The precise claim matters, because "we de-identify" is a word every competitor uses. What is enforced here is narrower and checkable: **de-identification applied on the inference path, before every outbound call, at a single egress point that refuses un-gated input**, with a request-scoped token vault and re-hydration on the way back.
 
-```
-transcript ──► deid gate ──► LLMClient ──► provider
-   (raw)      tokenises      only egress    (outside
-              identifiers      point         boundary)
-                  │
-                  └──► vault (request-scoped, never persisted)
-                            └──► rehydrates model output on return
-```
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/diagrams/phi-boundary-dark.svg" />
+    <img src="assets/diagrams/phi-boundary-light.svg" alt="The PHI boundary inside the API. The raw transcript passes the de-identification gate, which turns identifiers into tokens and writes the token map to a request-scoped vault that is never stored. LLMClient, the only egress point, sends tokens only to the model provider outside the boundary. The provider's output is re-hydrated from the vault, so real names exist only inside the API." width="100%" />
+  </picture>
+</p>
 
 - **Tokenisation Is Stable Within A Request** — `[PATIENT_1]`, `[NRIC_1]` — so the model sees one consistent handle per person across the whole transcript.
 - **The Vault Is Request-Scoped.** It is never a singleton, never attached to a database row, never logged, and is discarded when the handler returns.
@@ -404,7 +412,12 @@ Ranked by what makes them hold rather than by how they are worded (`docs/TRD.md`
 | Evidence-bound assertion — every fact needs a verbatim span                | 3 — post-hoc      | Loudly, at the cost of occasional false downgrades             |
 | System-prompt instruction                                                  | 4 — prompt        | **Silently.** No error, no signal — this is how §21.1 happened |
 
-![The CatatMD analyse pipeline. A POST to the analyze route passes an ownership check, then splits: the raw transcript goes to the de-identification gate and, separately, to the deterministic red-flag engine, which runs in-process and never egresses. De-identified text feeds four concurrent LLM operations, clinical_facts, note_and_gaps, red_flags and suggestions, which reach the provider only through lib/llm, the single egress point, and it re-scans its own outbound payload before sending. Returning output passes the evidence check, deterministic gap derivation, and a union assembly that adds model output to rule output without ever filtering it, then rehydration, persistence, and an audit event carrying labels and ids but never content.](assets/module-detail.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/diagrams/analyse-pipeline-dark.svg" />
+    <img src="assets/diagrams/analyse-pipeline-light.svg" alt="The analyse pipeline inside the Express API. POST /analyze checks the session, then ownership. The raw transcript goes to deid/ and, separately, to the red-flag rules, which never egress. Tokens and guideline IDs feed four concurrent LLM operations, which reach Qwen only through lib/llm/; it re-scans its payload and fails closed. Returned JSON passes the evidence check, where a fact without a verbatim span becomes NOT_ASSESSED, then deterministic gap derivation, then a union assembly that adds model output to rule hits without filtering. Results are re-hydrated and persisted as awaiting_review, and an audit event records labels and ids, never content." width="100%" />
+  </picture>
+</p>
 
 Two properties the diagram is drawn to make checkable:
 

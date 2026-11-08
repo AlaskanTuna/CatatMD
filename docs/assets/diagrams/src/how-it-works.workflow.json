@@ -1,0 +1,220 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "How A Consultation Becomes An Approved Note",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "frontend": {
+          "label": "Doctor-facing"
+        },
+        "backend": {
+          "label": "Clinical logic"
+        },
+        "database": {
+          "label": "Stored record"
+        },
+        "cloud": {
+          "label": "Third party"
+        },
+        "security": {
+          "label": "Trust gate"
+        },
+        "external": {
+          "label": "Input"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "doctor",
+      "label": "Doctor"
+    },
+    {
+      "id": "api",
+      "label": "API, Inside The Trust Boundary"
+    },
+    {
+      "id": "model",
+      "label": "Outside The Boundary",
+      "variant": "exception"
+    },
+    {
+      "id": "rules",
+      "label": "Deterministic, In-Process"
+    }
+  ],
+  "mainPath": [
+    "capture",
+    "transcript",
+    "deid",
+    "llm",
+    "model",
+    "evidence",
+    "union",
+    "rehydrate",
+    "review"
+  ],
+  "nodes": [
+    {
+      "id": "capture",
+      "lane": "doctor",
+      "col": 0,
+      "type": "external",
+      "label": "Consultation",
+      "sublabel": "audio, paste or upload",
+      "width": 140
+    },
+    {
+      "id": "transcript",
+      "lane": "api",
+      "col": 0,
+      "type": "database",
+      "label": "Transcript",
+      "sublabel": "speaker-labelled draft",
+      "width": 140
+    },
+    {
+      "id": "deid",
+      "lane": "api",
+      "col": 1,
+      "type": "security",
+      "label": "De-identification",
+      "sublabel": "names and IDs to tokens",
+      "width": 140
+    },
+    {
+      "id": "llm",
+      "lane": "api",
+      "col": 2,
+      "type": "security",
+      "label": "LLMClient",
+      "sublabel": "the only egress",
+      "width": 140
+    },
+    {
+      "id": "model",
+      "lane": "model",
+      "col": 2,
+      "type": "cloud",
+      "label": "Language Model",
+      "sublabel": "sees tokens only",
+      "width": 140
+    },
+    {
+      "id": "rules",
+      "lane": "rules",
+      "col": 0,
+      "type": "backend",
+      "label": "Red-Flag Rules",
+      "sublabel": "never egresses",
+      "width": 140
+    },
+    {
+      "id": "evidence",
+      "lane": "api",
+      "col": 3,
+      "type": "backend",
+      "label": "Evidence Check",
+      "sublabel": "every fact quotes a span",
+      "width": 140
+    },
+    {
+      "id": "union",
+      "lane": "api",
+      "col": 4,
+      "type": "backend",
+      "label": "Union Assembly",
+      "sublabel": "model adds, never removes",
+      "width": 140
+    },
+    {
+      "id": "rehydrate",
+      "lane": "api",
+      "col": 5,
+      "type": "security",
+      "label": "Re-hydrate",
+      "sublabel": "tokens back to names",
+      "width": 140
+    },
+    {
+      "id": "review",
+      "lane": "doctor",
+      "col": 5,
+      "type": "frontend",
+      "label": "Review And Approve",
+      "sublabel": "approval locks the note",
+      "width": 140
+    }
+  ],
+  "edges": [
+    {
+      "id": "capture-transcript",
+      "from": "capture",
+      "to": "transcript",
+      "label": "save",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "transcript-deid",
+      "from": "transcript",
+      "to": "deid"
+    },
+    {
+      "id": "transcript-rules",
+      "from": "transcript",
+      "to": "rules",
+      "label": "raw text",
+      "role": "branch",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "deid-llm",
+      "from": "deid",
+      "to": "llm",
+      "label": "tokens"
+    },
+    {
+      "id": "llm-model",
+      "from": "llm",
+      "to": "model",
+      "label": "de-identified",
+      "variant": "security"
+    },
+    {
+      "id": "model-evidence",
+      "from": "model",
+      "to": "evidence",
+      "label": "JSON",
+      "variant": "dashed"
+    },
+    {
+      "id": "evidence-union",
+      "from": "evidence",
+      "to": "union"
+    },
+    {
+      "id": "rules-union",
+      "from": "rules",
+      "to": "union",
+      "label": "rule hits",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "union-rehydrate",
+      "from": "union",
+      "to": "rehydrate"
+    },
+    {
+      "id": "rehydrate-review",
+      "from": "rehydrate",
+      "to": "review"
+    }
+  ]
+}

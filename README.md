@@ -155,20 +155,12 @@ Clinical scope is deliberately narrow: **adult GP consultations for acute cough,
 
 ### How It Works
 
-```mermaid
-flowchart LR
-  A[Consultation<br/>audio, paste or upload] --> T[Transcript<br/>draft, speaker-labelled]
-  T --> R[Red-flag rules engine<br/>deterministic, never egresses]
-  T --> D[De-identification gate<br/>names and IDs become tokens]
-  D --> L[LLMClient<br/>the only egress]
-  L --> M[(Model)]
-  M --> E[Evidence check<br/>every fact needs a verbatim span]
-  E --> U[Union assembly<br/>model may add, never remove]
-  R --> U
-  U --> H[Re-hydrate tokens]
-  H --> V[Doctor reviews,<br/>edits, approves]
-  V --> P[Approved note<br/>locked, exportable as PDF]
-```
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/diagrams/how-it-works-dark.svg" />
+    <img src="docs/assets/diagrams/how-it-works-light.svg" alt="How a consultation becomes an approved note. The consultation is saved as a speaker-labelled transcript inside the API. The raw transcript goes to the deterministic red-flag rules, which never egress, and to the de-identification gate, which turns names and IDs into tokens. LLMClient, the only egress, sends de-identified text to the language model outside the trust boundary. Its JSON passes the evidence check, then a union assembly where rule hits join model output, so the model can add but never remove. Tokens are re-hydrated to real names, and the doctor reviews and approves; approval locks the note." width="100%" />
+  </picture>
+</p>
 
 1. **Capture.** The doctor records the consultation (on-device, hosted, or ambient streaming with per-consultation consent), pastes a transcript, or uploads one.
 2. **Rules First.** A deterministic engine checks the transcript against a versioned list of danger signs before any model sees it.
@@ -204,11 +196,21 @@ Every note field is **extraction, not generation**: it carries a verbatim span f
 
 ### Architecture
 
-![CatatMD technical stack: the React SPA on Vercel, the Express API on Render carrying the de-identification gate, the LLM client, and the routes, red-flag, guideline and audit modules, and Postgres on Supabase, all inside the trust boundary. The language model and the hosted speech providers sit outside it.](docs/assets/tech-stack.drawio.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/diagrams/tech-stack-dark.svg" />
+    <img src="docs/assets/diagrams/tech-stack-light.svg" alt="CatatMD technical stack. Inside one Singapore trust boundary: the React SPA on Vercel, the Express API on Render and Postgres with pgvector on Supabase. Inside the API, the transcript passes deid/, which turns identifiers into tokens, then lib/llm/, the only egress, which sends tokens only to Qwen on Model Studio Singapore. The red-flag rules read the raw text in-process. Outside the boundary, ILMU is reached only through a consented API relay, while Soniox live speech (US region) and ElevenLabs post-stop refinement receive audio directly from the browser." width="100%" />
+  </picture>
+</p>
 
 Three tiers: a React SPA, an Express API and Postgres. **The API is the only component that holds identifiable data.** The model sits outside the trust boundary and is reached through one de-identification gate. Frontend, API and database run in one region (Singapore) by design, for data residency.
 
-![The analyse pipeline: an ownership check, then the raw transcript goes to the de-identification gate and separately to the deterministic red-flag engine. De-identified text feeds concurrent LLM operations through the single egress point, which re-scans its own payload before sending. Output passes the evidence check, deterministic gap derivation and a union assembly, then re-hydration, persistence and an audit event carrying labels and ids, never content.](docs/assets/module-detail.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/diagrams/analyse-pipeline-dark.svg" />
+    <img src="docs/assets/diagrams/analyse-pipeline-light.svg" alt="The analyse pipeline inside the Express API. POST /analyze checks the session, then ownership. The raw transcript goes to deid/ and, separately, to the red-flag rules, which never egress. Tokens and guideline IDs feed four concurrent LLM operations, which reach Qwen only through lib/llm/; it re-scans its payload and fails closed. Returned JSON passes the evidence check, where a fact without a verbatim span becomes NOT_ASSESSED, then deterministic gap derivation, then a union assembly that adds model output to rule hits without filtering. Results are re-hydrated and persisted as awaiting_review, and an audit event records labels and ids, never content." width="100%" />
+  </picture>
+</p>
 
 [`docs/TRD.md`](docs/TRD.md) is the implementation reference: contracts, data model, every pipeline and every security control, one section per file.
 
@@ -413,38 +415,41 @@ See the [open issues](https://github.com/AlaskanTuna/CatatMD/issues) for the ful
 
 ## Team
 
+<p align="center">The four founding members of CatatMD.</p>
+
+<div align="center">
 <table>
   <tr>
-    <td align="center" width="25%">
-      <a href="https://github.com/AlaskanTuna"><img src="https://github.com/AlaskanTuna.png?size=100" width="96" alt="Hee Zi Jie" /></a><br />
+    <td align="center" valign="top" width="50%">
+      <a href="https://github.com/AlaskanTuna"><img src="https://contrib.rocks/image?repo=AlaskanTuna/AlaskanTuna" width="88" alt="Hee Zi Jie" /></a><br />
       <b>Hee Zi Jie</b><br />
-      <a href="https://github.com/AlaskanTuna">@AlaskanTuna</a><br />
-      <sub>Project lead. Architecture and the PHI boundary, the review screen and note templates, consultation and patient flows, the API, and hosting.</sub>
+      <a href="https://github.com/AlaskanTuna"><sub>@AlaskanTuna</sub></a><br />
+      <sub><i>Project Lead</i></sub><br />
+      <sub>&bull; Architecture and the PHI boundary<br />&bull; Review screen, note templates, consultation and patient flows<br />&bull; The API and hosting</sub>
     </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/Andersonnn7788"><img src="https://github.com/Andersonnn7788.png?size=100" width="96" alt="Ling Jing Jie" /></a><br />
+    <td align="center" valign="top" width="50%">
+      <a href="https://github.com/Andersonnn7788"><img src="https://contrib.rocks/image?repo=Andersonnn7788/Andersonnn7788" width="88" alt="Ling Jing Jie" /></a><br />
       <b>Ling Jing Jie</b><br />
-      <a href="https://github.com/Andersonnn7788">@Andersonnn7788</a><br />
-      <sub>Ambient capture end to end, hosted and on-device speech recognition with their measurements, Malay red-flag and de-identification coverage, and the guideline corpus.</sub>
+      <a href="https://github.com/Andersonnn7788"><sub>@Andersonnn7788</sub></a><br />
+      <sub>&bull; Ambient capture, end to end<br />&bull; Hosted and on-device speech recognition, with measurements<br />&bull; Malay red-flag and de-identification coverage, and the guideline corpus</sub>
     </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/DebbieLim98"><img src="https://github.com/DebbieLim98.png?size=100" width="96" alt="Lim Yii Tien" /></a><br />
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="50%">
+      <a href="https://github.com/DebbieLim98"><img src="https://contrib.rocks/image?repo=DebbieLim98/AI-Clinical-Assistant" width="88" alt="Lim Yii Tien" /></a><br />
       <b>Lim Yii Tien</b><br />
-      <a href="https://github.com/DebbieLim98">@DebbieLim98</a><br />
-      <sub>The GP usability study and the changes it produced: question-form missing information, the Malaysian record grouping, and the model-language safety filter.</sub>
+      <a href="https://github.com/DebbieLim98"><sub>@DebbieLim98</sub></a><br />
+      <sub>&bull; The GP usability study<br />&bull; Question-form missing information and the Malaysian record grouping<br />&bull; The model-language safety filter</sub>
     </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/WeeKen99"><img src="https://github.com/WeeKen99.png?size=100" width="96" alt="Goh Wee Ken" /></a><br />
+    <td align="center" valign="top" width="50%">
+      <a href="https://github.com/WeeKen99"><img src="https://contrib.rocks/image?repo=WeeKen99/WeeKen99" width="88" alt="Goh Wee Ken" /></a><br />
       <b>Goh Wee Ken</b><br />
-      <a href="https://github.com/WeeKen99">@WeeKen99</a><br />
-      <sub>Guideline licensing research, practising-GP interviews, and competitive positioning against established AI scribes.</sub>
+      <a href="https://github.com/WeeKen99"><sub>@WeeKen99</sub></a><br />
+      <sub>&bull; Guideline licensing research<br />&bull; Practising-GP interviews<br />&bull; Competitive positioning against established AI scribes</sub>
     </td>
   </tr>
 </table>
-
-<a href="https://github.com/AlaskanTuna/CatatMD/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=AlaskanTuna/CatatMD" alt="Contributors" />
-</a>
+</div>
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 

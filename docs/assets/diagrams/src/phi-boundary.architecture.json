@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "The PHI Boundary",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "API logic"
+        },
+        "database": {
+          "label": "Data"
+        },
+        "cloud": {
+          "label": "Third party"
+        },
+        "security": {
+          "label": "Trust gate"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "transcript",
+      "type": "database",
+      "label": "Transcript",
+      "sublabel": "raw, identifiable",
+      "pos": [40, 80],
+      "size": [200, 64]
+    },
+    {
+      "id": "deid",
+      "type": "security",
+      "label": "De-identification Gate",
+      "sublabel": "identifiers to tokens",
+      "pos": [310, 80],
+      "size": [200, 64]
+    },
+    {
+      "id": "llm",
+      "type": "security",
+      "label": "LLMClient",
+      "sublabel": "the only egress point",
+      "pos": [580, 80],
+      "size": [200, 64]
+    },
+    {
+      "id": "provider",
+      "type": "cloud",
+      "label": "Model Provider",
+      "sublabel": "outside the boundary",
+      "pos": [850, 80],
+      "size": [200, 64]
+    },
+    {
+      "id": "vault",
+      "type": "database",
+      "label": "Token Vault",
+      "sublabel": "request-scoped, never stored",
+      "pos": [310, 240],
+      "size": [200, 64]
+    },
+    {
+      "id": "rehydrate",
+      "type": "backend",
+      "label": "Re-hydrate",
+      "sublabel": "real names restored",
+      "pos": [580, 240],
+      "size": [200, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Inside The API",
+      "wraps": ["transcript", "deid", "llm", "vault", "rehydrate"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "t-d",
+      "from": "transcript",
+      "to": "deid",
+      "label": "raw"
+    },
+    {
+      "id": "d-l",
+      "from": "deid",
+      "to": "llm",
+      "label": "tokens"
+    },
+    {
+      "id": "l-p",
+      "from": "llm",
+      "to": "provider",
+      "label": "tokens only",
+      "variant": "security"
+    },
+    {
+      "id": "d-v",
+      "from": "deid",
+      "to": "vault",
+      "label": "token map",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "dashed"
+    },
+    {
+      "id": "p-r",
+      "from": "provider",
+      "to": "rehydrate",
+      "label": "output",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "v-r",
+      "from": "vault",
+      "to": "rehydrate",
+      "label": "lookup"
+    }
+  ]
+}

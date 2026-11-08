@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "CatatMD Technical Stack",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "frontend": {
+          "label": "Browser"
+        },
+        "backend": {
+          "label": "API module"
+        },
+        "database": {
+          "label": "Database"
+        },
+        "cloud": {
+          "label": "Third-party processor"
+        },
+        "security": {
+          "label": "Trust gate"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "soniox",
+      "type": "cloud",
+      "label": "Soniox",
+      "sublabel": "live speech, US",
+      "pos": [0, 150],
+      "size": [124, 64]
+    },
+    {
+      "id": "eleven",
+      "type": "cloud",
+      "label": "ElevenLabs",
+      "sublabel": "post-stop refinement",
+      "pos": [146, 150],
+      "size": [150, 64]
+    },
+    {
+      "id": "ilmu",
+      "type": "cloud",
+      "label": "ILMU",
+      "sublabel": "hosted speech",
+      "pos": [340, 150],
+      "size": [150, 64]
+    },
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "React SPA",
+      "sublabel": "Vite, Tailwind, Vercel",
+      "pos": [40, 300],
+      "size": [190, 64]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "Express API",
+      "sublabel": "Bun, Render Singapore",
+      "pos": [330, 300],
+      "size": [170, 64]
+    },
+    {
+      "id": "deid",
+      "type": "security",
+      "label": "deid/",
+      "sublabel": "identifiers to tokens",
+      "pos": [590, 300],
+      "size": [160, 64]
+    },
+    {
+      "id": "llm",
+      "type": "security",
+      "label": "lib/llm/",
+      "sublabel": "the only egress",
+      "pos": [840, 300],
+      "size": [150, 64]
+    },
+    {
+      "id": "qwen",
+      "type": "cloud",
+      "label": "Qwen",
+      "sublabel": "Model Studio, Singapore",
+      "pos": [1090, 300],
+      "size": [180, 64]
+    },
+    {
+      "id": "rules",
+      "type": "backend",
+      "label": "Red-Flag Rules",
+      "sublabel": "raw text, in-process",
+      "pos": [590, 450],
+      "size": [160, 64]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "Postgres",
+      "sublabel": "Supabase, pgvector, Prisma",
+      "pos": [320, 590],
+      "size": [190, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Trust Boundary: One Region, Singapore",
+      "wraps": ["spa", "api", "deid", "llm", "rules", "db"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Express API On Render",
+      "wraps": ["api", "deid", "llm", "rules"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "spa-api",
+      "from": "spa",
+      "to": "api",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-deid",
+      "from": "api",
+      "to": "deid",
+      "label": "transcript"
+    },
+    {
+      "id": "deid-llm",
+      "from": "deid",
+      "to": "llm",
+      "label": "tokens",
+      "variant": "security"
+    },
+    {
+      "id": "llm-qwen",
+      "from": "llm",
+      "to": "qwen",
+      "label": "tokens only",
+      "variant": "security"
+    },
+    {
+      "id": "api-rules",
+      "from": "api",
+      "to": "rules",
+      "label": "raw text",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "api-db",
+      "from": "api",
+      "to": "db",
+      "label": "Prisma",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "api-ilmu",
+      "from": "api",
+      "to": "ilmu",
+      "label": "consented relay",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "spa-soniox",
+      "from": "spa",
+      "to": "soniox",
+      "label": "audio",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "spa-eleven",
+      "from": "spa",
+      "to": "eleven",
+      "label": "audio",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    }
+  ]
+}
