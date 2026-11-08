@@ -1,0 +1,4 @@
+title = "CatatMD Gitleaks configuration"
+
+[extend]
+useDefault = true

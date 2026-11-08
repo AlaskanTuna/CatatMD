@@ -4,13 +4,13 @@ docs/*
 !docs/README.md
 !docs/prd.md
 !docs/trd.md
-!docs/proposal.md
 .claude/
 .codex/
 .agents/
 AGENTS.md
 CLAUDE.md
 GEMINI.md
+docs/agents/
 .cursorrules
 .windsurfrules
 RTK.md

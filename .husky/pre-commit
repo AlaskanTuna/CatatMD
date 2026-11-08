@@ -1,1 +1,8 @@
+# Scan staged changes for secrets. CI scans every pull request too, so a
+# machine without Gitleaks warns here instead of blocking the commit.
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --config .gitleaks.toml --redact --no-banner --staged --pre-commit || exit 1
+else
+  printf '%s\n' "gitleaks not installed: skipping the local secret scan (CI still runs it)." >&2
+fi
 bunx lint-staged
