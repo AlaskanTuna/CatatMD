@@ -6,9 +6,9 @@ Project skills are committed, so every collaborator's agent has the same capabil
 
 - **`.agents/skills/<name>/`** holds the real skill, the tool-agnostic home.
 - **`.claude/skills/<name>`** is a symlink to `../../.agents/skills/<name>`, so Claude Code sees the same copy.
-- **Impeccable is the one exception.** It is a real directory at `.claude/skills/impeccable/`, because its hook manifest hard-codes that path. Never rehome it.
+- **Impeccable Is The One Exception.** It is a real directory at `.claude/skills/impeccable/`, because its hook manifest hard-codes that path. Never rehome it.
 - **`skills-lock.json`** pins the upstream source and hash of each skill installed with the `skills` CLI. Provenance for the hand-vendored sets is in `.agents/skills/.superpowers-provenance` and `.agents/skills/.mattpocock-provenance`.
-- **Windows checkouts need symlink support.** `.agents/skills/README.md` has the recovery steps for a checkout where the links landed as plain text files.
+- **Windows Checkouts Need Symlink Support.** `.agents/skills/README.md` has the recovery steps for a checkout where the links landed as plain text files.
 
 ## What Is Here
 
@@ -40,5 +40,5 @@ Project skills are committed, so every collaborator's agent has the same capabil
 
 ## Changing A Skill
 
-- **Vendored skills are not hand-edited.** A refresh replaces them wholesale, so a local edit is lost. Put a project-specific rule in `docs/agents/` instead; it wins on any conflict.
-- **Adding a skill** takes the Branch Lane: vendor it into `.agents/skills/`, add the symlink, and add a row above.
+- **Vendored Skills Are Not Hand-Edited.** A refresh replaces them wholesale, so a local edit is lost. Put a project-specific rule in `docs/agents/` instead; it wins on any conflict.
+- **Adding A Skill** takes the Branch Lane: vendor it into `.agents/skills/`, add the symlink, and add a row above.

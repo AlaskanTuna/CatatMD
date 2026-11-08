@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# acceptance
+# Acceptance
 
 Checks the backend safety guarantees against synthetic fixtures and records compact measurements.
 

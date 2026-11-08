@@ -28,16 +28,16 @@ A probabilistic check is a useful backstop and a poor boundary. Per-field value 
 
 ## What Is Recorded
 
-- **Request id** on every line, via `AsyncLocalStorage`, so one analysis is one trace. Returned as the `x-request-id` response header on every response, success or failure. It is deliberately _not_ in the JSON error envelope: `ErrorEnvelopeSchema` (§13) is a contract the SPA parses, whereas a correlation id is transport metadata.
-- **Per-stage latency** via `timeStage()`: `deidentification`, `rules`, `note_generation`, `retrieval`, `persistence`.
-- **Error class** from a fixed taxonomy, so model, schema-parse, rule-engine, retrieval and de-identification failures are distinguishable without opening a payload.
-- **De-identification observability**: detector labels and a count, never values.
+- **Request Id** on every line, via `AsyncLocalStorage`, so one analysis is one trace. Returned as the `x-request-id` response header on every response, success or failure. It is deliberately _not_ in the JSON error envelope: `ErrorEnvelopeSchema` (§13) is a contract the SPA parses, whereas a correlation id is transport metadata.
+- **Per-Stage Latency** via `timeStage()`: `deidentification`, `rules`, `note_generation`, `retrieval`, `persistence`.
+- **Error Class** from a fixed taxonomy, so model, schema-parse, rule-engine, retrieval and de-identification failures are distinguishable without opening a payload.
+- **De-Identification Observability**: detector labels and a count, never values.
 
 ## Deliberate Omissions
 
-- **No third-party APM.** Sending a clinical application's exceptions to an external processor is a PDPA data-processor decision with a DPIA attached (§19, row 11), not a library choice. Structured JSON on stdout, which Render already drains, satisfies the issue's "works with Render and move on" constraint without creating a new cross-border data flow.
-- **No debug flag for raw content.** Named as a non-goal in the issue and enforced by test: the flag would itself become the vulnerability.
-- **Per-provider-call timing is not split.** `analyseNote` issues `clinical_facts` and `note_and_gaps` concurrently (§12), and `timeStage` wraps the pair, so `note_generation` is the wall-clock of the slower half. Splitting them needs a hook inside `backend/src/analysis/`. Worth doing, because per-call variance rather than the mean is what threatens the CAP-1 budget.
+- **No Third-Party APM.** Sending a clinical application's exceptions to an external processor is a PDPA data-processor decision with a DPIA attached (§19, row 11), not a library choice. Structured JSON on stdout, which Render already drains, satisfies the issue's "works with Render and move on" constraint without creating a new cross-border data flow.
+- **No Debug Flag For Raw Content.** Named as a non-goal in the issue and enforced by test: the flag would itself become the vulnerability.
+- **Per-Provider-Call Timing Is Not Split.** `analyseNote` issues `clinical_facts` and `note_and_gaps` concurrently (§12), and `timeStage` wraps the pair, so `note_generation` is the wall-clock of the slower half. Splitting them needs a hook inside `backend/src/analysis/`. Worth doing, because per-call variance rather than the mean is what threatens the CAP-1 budget.
 
 ## Residual Risk
 

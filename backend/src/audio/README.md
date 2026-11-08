@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# audio
+# Audio
 
 Stores consultation recordings under an adopted retention window and enforces expiry on reads and cleanup.
 

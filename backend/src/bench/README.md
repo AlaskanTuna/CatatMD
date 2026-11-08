@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# bench
+# Bench
 
 Runs the analysis workflow against a fixed synthetic transcript to measure stage durations and output counts.
 

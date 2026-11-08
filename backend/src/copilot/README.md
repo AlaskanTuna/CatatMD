@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# copilot
+# Copilot
 
 Runs CatatAI review turns and returns streamed text and constrained proposal tool calls.
 

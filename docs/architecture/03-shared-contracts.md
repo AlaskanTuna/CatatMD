@@ -24,10 +24,10 @@ TranscriptSourceSchema = z.enum(['fixture','paste','upload','asr_local','asr_hos
 
 It does double duty, and both jobs are load-bearing enough that neither would justify the field alone:
 
-- **Egress audit.** `asr_hosted` is the only input path on which audio leaves the doctor's device (§20). The field is the durable record of which consultations took that path, alongside the audit event in §15.
-- **Fabrication-risk signal for the reviewer.** §20's threat table applies only to `asr_*` sources. A pasted or fixture transcript is what someone typed; a transcribed one may contain a substituted content word carrying a perfectly valid evidence span (§21.4). The review UI can therefore cue closer reading of the transcript itself on `asr_*` sources, and say nothing on the others, which is the difference between a useful warning and a banner the doctor learns to ignore.
+- **Egress Audit.** `asr_hosted` is the only input path on which audio leaves the doctor's device (§20). The field is the durable record of which consultations took that path, alongside the audit event in §15.
+- **Fabrication-Risk Signal For The Reviewer.** §20's threat table applies only to `asr_*` sources. A pasted or fixture transcript is what someone typed; a transcribed one may contain a substituted content word carrying a perfectly valid evidence span (§21.4). The review UI can therefore cue closer reading of the transcript itself on `asr_*` sources, and say nothing on the others, which is the difference between a useful warning and a banner the doctor learns to ignore.
 
-**`source` is client-asserted, and the backend cannot verify it.** Transcription runs in the browser on both ASR paths, so the API receives a claim about how the transcript was produced, not evidence of it. This is stated rather than glossed: the field is an honest provenance record for a cooperating client, not a security control, and nothing in the safety architecture rests on it. What is not client-asserted is the de-identification gate (§9), which treats every transcript identically regardless of `source`.
+**`source` Is Client-Asserted, And The Backend Cannot Verify It.** Transcription runs in the browser on both ASR paths, so the API receives a claim about how the transcript was produced, not evidence of it. This is stated rather than glossed: the field is an honest provenance record for a cooperating client, not a security control, and nothing in the safety architecture rests on it. What is not client-asserted is the de-identification gate (§9), which treats every transcript identically regardless of `source`.
 
 ## Clinical Note & Analysis
 
@@ -74,7 +74,7 @@ An empty canonical category renders as `Not established`; it is never omitted or
 
 **Status: `Built`**, human-ratified (§19 row 10, closed), implemented 13/08/26 (issue #31). `SoapNoteSchema` (above) is four free-text strings and cannot express per-field assertion states. `docs/PRD.md` §10 requires that a symptom, allergy, medication, history item, vital sign, examination finding, safety question, or operational-block field never established must never be represented as denied, which requires distinguishing `NOT_ASSESSED`/`UNKNOWN` from `DENIED`/`PRESENT` at the level of an individual clinical fact. Four opaque note strings cannot do that. The schema therefore grows a structured per-field representation **alongside** `SoapNoteSchema`, which is retained as the review scaffold.
 
-**As built**, the shape is as proposed, but it ships as **two** schemas over one object, which the specification did not anticipate:
+**As Built**, the shape is as proposed, but it ships as **two** schemas over one object, which the specification did not anticipate:
 
 ```
 ClinicalAssertionSchema = z.object({
@@ -86,13 +86,13 @@ ClinicalAssertionSchema = z.object({
 LlmClinicalAssertionSchema = /* the same object, deliberately unrefined */
 ```
 
-**Why the split, measured, not preferred.** Against the live `qwen-flash` endpoint on 13/08/26, the model returned `{"state":"DENIED","value":"no fever"}` **with no evidence span**; none of its `PRESENT`/`DENIED` assertions carried one. Enforcing the span rule at the decoding boundary would therefore fail `safeParse`, throw `LLMResponseError` from §6, and leave the doctor with nothing at all.
+**Why The Split, Measured, Not Preferred.** Against the live `qwen-flash` endpoint on 13/08/26, the model returned `{"state":"DENIED","value":"no fever"}` **with no evidence span**; none of its `PRESENT`/`DENIED` assertions carried one. Enforcing the span rule at the decoding boundary would therefore fail `safeParse`, throw `LLMResponseError` from §6, and leave the doctor with nothing at all.
 
 That is the opposite of what §21.4 specifies: the evidence check runs **after** `safeParse` and forces the individual fact to `NOT_ASSESSED`, so one unsupported assertion costs one gap prompt rather than the entire analysis. The permissive schema is what the model decodes into; the refined one is the persisted and API-facing contract, applied after the check has run, where it acts as a loud backstop against an evidence-less `DENIED` reaching a doctor.
 
 Separately: `.refine()` is **silently dropped** by `z.toJSONSchema()`, so a refinement could never have been a Tier-1 decoding constraint in the first place. The Tier-1 control here is the state enum; the span rule is Tier 3, exactly as §21.3 classifies it.
 
-**`clinicalFacts` is a fixed 29-key set** (`ClinicalFactsSchema`), taken verbatim from `docs/PRD.md` §9 CAP-2's completeness checklist. §12 deferred this shape and this is it. Fixed keys are **required** by `docs/PRD.md` §10: a field the transcript never touches must never be defaulted to `DENIED` _or silently omitted_, and only a fixed key set can guarantee the second half. It is also what lets gaps derive deterministically in code (a Tier-2 control) rather than being asked of the model. This is the template §19 row 16 flags as the largest unvalidated assumption in the guardrail architecture, see the measurement note there.
+**`clinicalFacts` Is A Fixed 29-key Set** (`ClinicalFactsSchema`), taken verbatim from `docs/PRD.md` §9 CAP-2's completeness checklist. §12 deferred this shape and this is it. Fixed keys are **required** by `docs/PRD.md` §10: a field the transcript never touches must never be defaulted to `DENIED` _or silently omitted_, and only a fixed key set can guarantee the second half. It is also what lets gaps derive deterministically in code (a Tier-2 control) rather than being asked of the model. This is the template §19 row 16 flags as the largest unvalidated assumption in the guardrail architecture, see the measurement note there.
 
 ## Malaysian Operational Block
 
@@ -106,9 +106,9 @@ Separately: `.refine()` is **silently dropped** by `z.toJSONSchema()`, so a refi
 | `referral`             | `ClinicalAssertion`   | Referral the doctor stated                                           |
 | `followUp`             | `ClinicalAssertion`   | Follow-up interval the doctor stated                                 |
 
-**Every operational-block field is extraction, not generation.** Each is subject to the evidence-bound assertion control (§21.4) without exception: `PRESENT` requires a verbatim span in which the doctor states the value, and absent that span the field resolves to `NOT_ASSESSED` and surfaces as an information gap.
+**Every Operational-Block Field Is Extraction, Not Generation.** Each is subject to the evidence-bound assertion control (§21.4) without exception: `PRESENT` requires a verbatim span in which the doctor states the value, and absent that span the field resolves to `NOT_ASSESSED` and surfaces as an information gap.
 
-**`diagnosis` carries an additional, stricter constraint.** `docs/PRD.md` §10 permits a `diagnosis` field only because it is transcription-bound; it is the one field where a generation failure would put the system on the wrong side of its own intended-purpose statement (`docs/PRD.md` §11). Two consequences bind the implementation:
+**`diagnosis` Carries An Additional, Stricter Constraint.** `docs/PRD.md` §10 permits a `diagnosis` field only because it is transcription-bound; it is the one field where a generation failure would put the system on the wrong side of its own intended-purpose statement (`docs/PRD.md` §11). Two consequences bind the implementation:
 
 - The `note_and_gaps` prompt (§12) must never request a diagnosis, differential, or impression. It requests **the diagnosis the doctor stated, if any**, and the schema's `NOT_ASSESSED` state must be the cheapest path for the model, not an error condition.
 - The evidence check for `diagnosis` runs at Tier 3 like every other field, but its failure mode is not merely a noisy gap: an inferred label surviving into `diagnosis` is a **CAP-1 acceptance-criteria failure and a `docs/PRD.md` §10 safety-constraint breach**, and must be covered by an explicit test using a fixture in which the doctor examines and prescribes but never names a condition.
@@ -117,8 +117,8 @@ Separately: `.refine()` is **silently dropped** by `z.toJSONSchema()`, so a refi
 
 The schema is ratified **as a hypothesis to be tested, not as a mitigation to be assumed.** The one published study that imposed a template on LLM note generation (Asgari et al., _npj Digital Medicine_ 2025) measured an **increase** in major hallucinations. Three conditions attach:
 
-1. **`NOT_ASSESSED` must be the default and cheapest path.** No field may be implicitly required to be filled, in the schema, in the prompt, or in the UI's rendering of an empty field.
+1. **`NOT_ASSESSED` Must Be The Default And Cheapest Path.** No field may be implicitly required to be filled, in the schema, in the prompt, or in the UI's rendering of an empty field.
 2. **The eval must compare schema-constrained output against free-form output on the same sparse transcripts**, the §21.1 fixtures are the baseline. If the schema increases fabrication, that is a finding to report, not a result to bury.
-3. **The evidence-span rule is scoped to assertion state, not concept vocabulary** (§21.4), `state` requires a span; `value` may be a normalised term.
+3. **The Evidence-Span Rule Is Scoped To Assertion State, Not Concept Vocabulary** (§21.4), `state` requires a span; `value` may be a normalised term.
 
 ---

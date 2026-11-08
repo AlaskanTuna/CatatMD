@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# draft-turns
+# Draft-Turns
 
 Uses a constrained model pass to label speaker turns in hosted-ASR text, then reconstructs each turn from the input.
 

@@ -10,7 +10,7 @@
 
 A dropped socket is reopened on its own, with the audio spoken during the outage queued and sent late. A reload is guarded by the browser's leave-page prompt and is **not** survived: no draft transcript is stored server-side.
 
-| Event                     | What happens now                                                                                                                                                     |
+| Event                     | What Happens Now                                                                                                                                                     |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Socket drops              | A fresh recorder queues the audio, a new key is minted, and the socket reopens: at once, then after one and three seconds. The doctor sees how many seconds are held |
 | Reopened                  | Queued audio is sent in order, and a note says words around the drop may be missing                                                                                  |
@@ -25,7 +25,7 @@ A dropped socket is reopened on its own, with the audio spoken during the outage
 
 ## What This Decision Does Not License
 
-- **No audio stored.** The queue lives in memory for at most 60 seconds and goes only to the socket.
-- **No new egress or surface.** A reopened socket uses the same minting route, vendor, region and audit row as the first; each reopen is its own audited mint.
-- **No cap bypass.** A reconnect never extends a capture past the cap the API minted.
-- **What reverses it:** a server-side draft column, taken through `db-migrator`, `eraseConsultation` and `../DPIA.md` together.
+- **No Audio Stored.** The queue lives in memory for at most 60 seconds and goes only to the socket.
+- **No New Egress Or Surface.** A reopened socket uses the same minting route, vendor, region and audit row as the first; each reopen is its own audited mint.
+- **No Cap Bypass.** A reconnect never extends a capture past the cap the API minted.
+- **What Reverses It:** a server-side draft column, taken through `db-migrator`, `eraseConsultation` and `../DPIA.md` together.

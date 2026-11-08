@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# config
+# Config
 
 Loads and validates backend runtime configuration before the API starts.
 

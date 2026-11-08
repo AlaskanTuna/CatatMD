@@ -1,10 +1,10 @@
-# Research 02 — The Malaysian Private GP's Tooling, Language, and Billing Reality
+# Research 02 — The Malaysian Private GP's Tooling, Language, And Billing Reality
 
 **Stream:** Forward-deployed / market reality (second half)
 **Date:** 13 August 2026
-**Question set:** What do Malaysian private GPs type into? Is "no EMR write-back" fatal? How much code-switching is there? What does panel/TPA billing compel?
+**Question Set:** What do Malaysian private GPs type into? Is "no EMR write-back" fatal? How much code-switching is there? What does panel/TPA billing compel?
 
-**Evidence conventions used throughout**
+**Evidence Conventions Used Throughout**
 
 | Tag              | Meaning                                                                  |
 | ---------------- | ------------------------------------------------------------------------ |
@@ -19,24 +19,24 @@ No clinical fact or statistic in this document is invented. Where a number is co
 
 ## 0. Bottom Line Up Front
 
-1. **There is no dominant private-GP EMR in Malaysia to write back to.** The market is a long tail of small local vendors, plus a legacy on-premise installed base, with no published API standard and no interoperability mandate that currently reaches private GP clinics.
+1. **There Is No Dominant Private-GP EMR In Malaysia To Write Back To.** The market is a long tail of small local vendors, plus a legacy on-premise installed base, with no published API standard and no interoperability mandate that currently reaches private GP clinics.
 2. **"No EMR write-back" is therefore an acceptable MVP boundary — but the stated justification in the PRD is weak and should be replaced.** "MVP scope" is a shrug; "there is no write-back rail in Malaysian private primary care, and the national one lands with private _hospitals_ from January 2027" is a defensible architectural answer.
-3. **The export set is aimed at the wrong artifact.** PDF/print is a dead end in a clinic that is already required to e-invoice and already submits claims through a TPA portal. Segmented copy (per-SOAP-section) plus a structured JSON export is a far better use of the same effort.
-4. **English-only survives contact with reality better than expected** — because Malaysian doctors _write_ in English even when they _speak_ Malay/Manglish. The input is mixed; the output language is stable.
-5. **Browser-side Whisper on code-switched Malaysian speech is the real risk**, and its documented failure mode (silently translating instead of transcribing) is clinically dangerous because it produces fluent, plausible, wrong text.
-6. **Roughly six in ten Malaysian GP patients are panel/TPA cases**, and the TPA — not clinical convention — is what actually shapes what gets recorded.
+3. **The Export Set Is Aimed At The Wrong Artifact.** PDF/print is a dead end in a clinic that is already required to e-invoice and already submits claims through a TPA portal. Segmented copy (per-SOAP-section) plus a structured JSON export is a far better use of the same effort.
+4. **English-only Survives Contact With Reality Better Than Expected** — because Malaysian doctors _write_ in English even when they _speak_ Malay/Manglish. The input is mixed; the output language is stable.
+5. **Browser-side Whisper On Code-Switched Malaysian Speech Is The Real Risk**, and its documented failure mode (silently translating instead of transcribing) is clinically dangerous because it produces fluent, plausible, wrong text.
+6. **Roughly Six In Ten Malaysian GP Patients Are panel/TPA Cases**, and the TPA — not clinical convention — is what actually shapes what gets recorded.
 
 ---
 
 ## 1. What System Do Malaysian Private GPs Already Type Into?
 
-### 1.1 The Honest Answer: A Fragmented Long Tail, Not a Platform
+### 1.1 The Honest Answer: A Fragmented Long Tail, Not A Platform
 
 I could not find a credible market-share study for clinic management systems in Malaysian private GP clinics. **[UNVERIFIED]** — and I do not think one exists publicly. What the evidence supports instead is a fragmented market of small local vendors, none of which shows up as a de-facto standard.
 
-**Vendors I could verify as real, Malaysia-facing clinic systems:**
+**Vendors I Could Verify As Real, Malaysia-facing Clinic Systems:**
 
-| Vendor / Product                         | What it is                                                                                            | Source                                                                                        |
+| Vendor / Product                         | What It Is                                                                                            | Source                                                                                        |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | kumoDoc                                  | Malaysian cloud CMS for GP clinics; TPA management, MyInvois/LHDN integration                         | [kumodoc.com](https://www.kumodoc.com/)                                                       |
 | Desk Clinic                              | Cloud CMS for private clinics / GP groups / multi-branch                                              | [desk.clinic](https://desk.clinic/malaysia)                                                   |
@@ -52,9 +52,9 @@ I could not find a credible market-share study for clinic management systems in 
 | MyCLINIC / MyHIS                         | Cloud clinic app + hospital system                                                                    | [myclinichealthcare.com](https://www.myclinichealthcare.com/)                                 |
 | CMAGSYS                                  | Named as a legacy Malaysian clinic stack running on local servers                                     | [desk.clinic blog](https://desk.clinic/blog/best-clinic-management-system-malaysia-2026)      |
 
-**Vendor names checked and their verification status:**
+**Vendor Names Checked And Their Verification Status:**
 
-| Name checked  | Verdict                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name Checked  | Verdict                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Qmed Asia** | **[VERIFIED]** real, but it is a patient-experience/queue/teleconsult layer, **not** a full GP EMR                                                                                                                                                                                                                                                                                                                               |
 | **Mednefits** | **[VERIFIED]** real, but it is **not** a clinic system — it is a Singapore-origin employee medical benefits platform operating in Malaysia (1,500+ GP clinics in its SG+MY network; RM24m Series A in 2020). Sits on the _payer_ side. [mednefits.com](https://www.mednefits.com/about-us), [hrnews.my](https://hrnews.my/2020/11/19/mednefits-concludes-series-a-rm24-million-funding-enhancing-employee-benefits-in-malaysia/) |
@@ -74,7 +74,7 @@ I could not find a credible market-share study for clinic management systems in 
 
 Direct measurement of private GP paper use: **[UNVERIFIED]**. But the surrounding evidence points hard in one direction.
 
-- **Public sector is the documented laggard.** As of 2019, "only 24% of MoH hospitals (35 out of 145) equipped with a HIS" and "7% of health clinics (118 of 1703) using a clinical information system." **[VERIFIED]** — [Naim et al., _DIGITAL HEALTH_ (2025), four-decade narrative review](https://pmc.ncbi.nlm.nih.gov/articles/PMC12227897/)
+- **Public Sector Is The Documented Laggard.** As of 2019, "only 24% of MoH hospitals (35 out of 145) equipped with a HIS" and "7% of health clinics (118 of 1703) using a clinical information system." **[VERIFIED]** — [Naim et al., _DIGITAL HEALTH_ (2025), four-decade narrative review](https://pmc.ncbi.nlm.nih.gov/articles/PMC12227897/)
 - The same review states the private sector shows "markedly stronger digital adoption" and warns "the digitalisation gap between the public and private sectors, if left unaddressed, may lead to a fragmented and inequitable healthcare landscape." **[VERIFIED]** — same source
 - A 2017 MMA survey is repeatedly cited as showing "almost 80 per cent [of] private medical practitioners across the country already using personal computers." **[REPORTED]** — surfaced via search snippets of [The Borneo Post via PressReader](https://www.pressreader.com/malaysia/the-borneo-post/20220109/281668258326834); the page returned HTTP 403 and I could not read the primary. Treat as directional only. Note also that "uses a PC" ≠ "uses an EMR."
 - MMA and MCMC launched a digitalisation push for private GPs in March 2024 via **Geran Digital PMKS Madani** — a RM100 million grant giving 50% matching up to RM5,000 to eligible micro/small enterprises. **[VERIFIED]** — [CodeBlue, Mar 2024](https://codeblue.galencentre.org/2024/03/mma-mcmc-launch-digitalisation-initiative-for-private-gps/). **[INFERRED]** a government-funded push to get private GPs onto digital tools in 2024 implies a meaningful un-digitised base at that point.
@@ -90,12 +90,12 @@ Direct measurement of private GP paper use: **[UNVERIFIED]**. But the surroundin
 
 **[INFERRED]** — Consequence for CatatMD: even _if_ a write-back API existed, the destination field for a full SOAP note in a typical Malaysian GP CMS is a small free-text box, not a structured clinical document. A rich structured note has nowhere native to land. This weakens the case for write-back independently of the API question.
 
-### 1.4 What the Government Is Building (And Who It Reaches)
+### 1.4 What The Government Is Building (And Who It Reaches)
 
-| Programme                                                                                                      | Scope                                                                                                                                     | Reaches private GPs?          |
+| Programme                                                                                                      | Scope                                                                                                                                     | Reaches Private GPs?          |
 | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
 | **CCMS** (Cloud-Based Clinic Management System), reportedly running **SystmOne**                               | MOH _public_ health clinics. 412 clinics by end-2025, +137 in 2026, remaining 588 by end-2027; another source cites 2,917 clinics by 2028 | **No**                        |
-| **MDHCN** (Malaysia Digital Health Certification Network) + Malaysia Patient Summary, "One Person, One Record" | Trust framework for public⇄private interoperability; MediAsas _network hospitals_ expected to participate                                 | **Not yet** — hospitals first |
+| **MDHCN** (Malaysia Digital Health Certification Network) + Malaysia Patient Summary, "One Person, One Record" | Trust framework for public⇄private interoperability; MediAsas _network hospitals_ expected to participate                                 | **Not Yet** — hospitals first |
 | **Digital Health Act**                                                                                         | Tabled 2026; standardises digital healthcare delivery                                                                                     | Future                        |
 
 Sources: [The Vibes on the 2027 EMR deadline](https://www.thevibes.com/articles/lifestyles/120041/moh-to-complete-electronic-medical-records-rollout-in-primary-care-by-2027) **[REPORTED]**; [MOF press release on MediAsas + MDHCN, 6 July 2026](https://www.mof.gov.my/portal/en/news/press-release/press-release-jbmkks-mediasas-060726) **[VERIFIED]** (pilot end-July to Oct 2026 in Klang Valley, nationwide rollout Jan 2027); [OpenGov Asia](https://archive.opengovasia.com/2025/02/10/malaysia-cloud-based-management-and-ai-enhance-healthcare/?c=us) and [The Sun](https://thesun.my/news/malaysia-news/people-issues/cloud-based-clinical-management-system-reduces-patient-waiting-times-in-health-clinics-to-under-60-minutes/) on CCMS **[REPORTED]** — the two clinic-count figures are inconsistent across sources; treat as "hundreds now, low thousands by 2027–28."
@@ -104,29 +104,29 @@ The MOF release is explicit that MediAsas/MDHCN participation is framed for **ho
 
 ---
 
-## 2. Is "No EMR Write-Back" an Acceptable MVP Boundary — or a Fatal Flaw?
+## 2. Is "No EMR Write-Back" An Acceptable MVP Boundary — Or A Fatal Flaw?
 
-### Verdict: Acceptable. Not fatal. But the _justification_ and the _export set_ both need to change.
+### Verdict: Acceptable. Not Fatal. But The _Justification_ And The _Export Set_ Both Need To Change.
 
 ### 2.1 Why It Is Not Fatal
 
-1. **There is no rail.** No dominant private-GP EMR; no published API standard; no interoperability obligation that currently reaches private GP clinics (§1.4). Integration would be N bespoke vendor deals, not one integration. Where an API is offered at all it is a commercial add-on — kumoDoc lists APIs "as an add-on" with no public developer documentation found. **[REPORTED]** — [kumodoc.com](https://www.kumodoc.com/)
-2. **The national interoperability path is real but not here yet.** MDHCN + Malaysia Patient Summary is pilot-stage with private _hospitals_; nationwide January 2027. **[VERIFIED]** — [MOF](https://www.mof.gov.my/portal/en/news/press-release/press-release-jbmkks-mediasas-060726). Building write-back today would mean building to a target that does not exist and will change.
-3. **Copy-paste is the industry-standard MVP posture.** Self-serve AI scribes commonly stop at copy-paste. **[REPORTED — and this source is a competitor-comparison marketing page, so treat with suspicion]** — [Heidi Health blog](https://www.heidihealth.com/en-us/blog/nabla-copilot-alternative). The claim is directionally consistent with how these products are marketed, but I would not put it in the README as evidence.
-4. **There is no obvious destination field** for a structured SOAP note inside a dispensing-and-billing-first CMS (§1.3). **[INFERRED]**
+1. **There Is No Rail.** No dominant private-GP EMR; no published API standard; no interoperability obligation that currently reaches private GP clinics (§1.4). Integration would be N bespoke vendor deals, not one integration. Where an API is offered at all it is a commercial add-on — kumoDoc lists APIs "as an add-on" with no public developer documentation found. **[REPORTED]** — [kumodoc.com](https://www.kumodoc.com/)
+2. **The National Interoperability Path Is Real But Not Here Yet.** MDHCN + Malaysia Patient Summary is pilot-stage with private _hospitals_; nationwide January 2027. **[VERIFIED]** — [MOF](https://www.mof.gov.my/portal/en/news/press-release/press-release-jbmkks-mediasas-060726). Building write-back today would mean building to a target that does not exist and will change.
+3. **Copy-paste Is The Industry-Standard MVP Posture.** Self-serve AI scribes commonly stop at copy-paste. **[REPORTED — and this source is a competitor-comparison marketing page, so treat with suspicion]** — [Heidi Health blog](https://www.heidihealth.com/en-us/blog/nabla-copilot-alternative). The claim is directionally consistent with how these products are marketed, but I would not put it in the README as evidence.
+4. **There Is No Obvious Destination Field** for a structured SOAP note inside a dispensing-and-billing-first CMS (§1.3). **[INFERRED]**
 
-### 2.2 Why the Current Framing Is Still Wrong
+### 2.2 Why The Current Framing Is Still Wrong
 
-**PDF/print is the weakest export you could have picked for this market.**
+**PDF/print Is The Weakest Export You Could Have Picked For This Market.**
 
 - Clinics are moving _away_ from paper under tax pressure, not toward it. E-invoicing is mandatory for clinics above the turnover threshold, with direct MyInvois API submission inside the CMS as the recommended pattern. **[REPORTED]** — [einvoicingmalaysia.com](https://einvoicingmalaysia.com/guides/e-invoicing-for-healthcare), [medicalmet.com](https://medicalmet.com/blog/lhdn-e-invoice-complete-guide-clinics/)
 - A printed SOAP note has no consumer in the clinic day. It is not the claim, not the MC, not the invoice, and not the record. It creates a _second_ unfiled artifact and a PHI-handling problem (a paper note containing identifiers, left on a printer).
 - **[INFERRED]** The genuine risk to this product is not write-back. It is that for a 10-minute URTI consult, review-then-edit-then-paste costs more time than a Malaysian GP's existing behaviour: writing "URTI, T39, PCM QID, MC 2/7". If approval takes longer than ~30 seconds the product loses on its own terms.
 
-### 2.3 The Honest Answer to "Is a Copy-Paste Note Useful in a Real Clinic Day?"
+### 2.3 The Honest Answer To "Is A Copy-Paste Note Useful In A Real Clinic Day?"
 
-- **For the high-volume short URTI consult: marginal.** Consultation fees anchored at RM10–RM35 for decades, six-in-ten patients on TPA rates paying below RM35 (§4.1), and dispensing-dependent economics all point to a throughput-optimised clinic where a 3-minute note is already fast.
-- **For the longer consult: plausibly yes.** The 2026 fee reform raised the ceiling from RM35 to RM80 explicitly to reward depth — the Health Minister contrasted "a 10-minute consultation for a common cold" with "a 40-minute session for diabetes, cholesterol, hypertension, or mental health assessments." Floor stays RM10, unchanged since the MMA Fee Schedule 1992. **[VERIFIED]** — [Malay Mail, 11 Oct 2025](https://www.malaymail.com/news/malaysia/2025/10/11/health-minister-says-rm10-still-the-floor-price-for-doctor-visits-but-ceiling-raised-to-rm80/194240)
+- **For The High-Volume Short URTI Consult: Marginal.** Consultation fees anchored at RM10–RM35 for decades, six-in-ten patients on TPA rates paying below RM35 (§4.1), and dispensing-dependent economics all point to a throughput-optimised clinic where a 3-minute note is already fast.
+- **For The Longer Consult: Plausibly Yes.** The 2026 fee reform raised the ceiling from RM35 to RM80 explicitly to reward depth — the Health Minister contrasted "a 10-minute consultation for a common cold" with "a 40-minute session for diabetes, cholesterol, hypertension, or mental health assessments." Floor stays RM10, unchanged since the MMA Fee Schedule 1992. **[VERIFIED]** — [Malay Mail, 11 Oct 2025](https://www.malaymail.com/news/malaysia/2025/10/11/health-minister-says-rm10-still-the-floor-price-for-doctor-visits-but-ceiling-raised-to-rm80/194240)
 - **[INFERRED]** The defensible positioning is therefore **documentation quality and a safety net**, not "saves you time on coughs." Red-flag detection and missing-information prompts are the value; the note is the vehicle. That framing survives the "but I can write it faster by hand" objection. The time-saving claim does not.
 
 ---
@@ -145,11 +145,11 @@ The MOF release is explicit that MediAsas/MDHCN participation is framed for **ho
 
 I found Malaysian code-switching work in classrooms and nurse–patient interaction, and code-switching-in-consultation work from _other_ health systems (Galician–Spanish, using a 586-consultation audio corpus — [MDPI _Languages_](https://www.mdpi.com/2226-471X/9/6/209)), but nothing that gives a switch rate for a Malaysian GP room.
 
-> **Do not put a made-up percentage in the PRD.** Write the Known Limitation qualitatively and cite the ambient evidence. No quantified rate for Malaysian GP consultations was found.
+> **Do Not Put A Made-Up Percentage In The PRD.** Write the Known Limitation qualitatively and cite the ambient evidence. No quantified rate for Malaysian GP consultations was found.
 
-### 3.3 The Asymmetry That Saves the Design
+### 3.3 The Asymmetry That Saves The Design
 
-**[INFERRED, but well-supported]** Malaysian doctors _speak_ Malay/Manglish/dialect with patients and _write_ records in English. Malaysian clinical documentation, prescriptions, and medical education run in English; the MMC's own records guidance and MOH clinical materials are English. See [MMC Medical Records & Medical Reports guidance](https://mmc.gov.my/wp-content/uploads/2025/09/Medical-Records-Medical-Reports.pdf) (PDF is binary-encoded and I could not extract quotes — **[UNVERIFIED]** as to its exact clauses) and [Malay medical terminology overview](https://preply.com/en/blog/malay-medical-terminology/) confirming Rumi-script official documentation.
+**[INFERRED, But Well-Supported]** Malaysian doctors _speak_ Malay/Manglish/dialect with patients and _write_ records in English. Malaysian clinical documentation, prescriptions, and medical education run in English; the MMC's own records guidance and MOH clinical materials are English. See [MMC Medical Records & Medical Reports guidance](https://mmc.gov.my/wp-content/uploads/2025/09/Medical-Records-Medical-Reports.pdf) (PDF is binary-encoded and I could not extract quotes — **[UNVERIFIED]** as to its exact clauses) and [Malay medical terminology overview](https://preply.com/en/blog/malay-medical-terminology/) confirming Rumi-script official documentation.
 
 Consequence: **the output language is stable (English) even when the input is mixed.** English-only _output_ is not a limitation at all in this market. The limitation is entirely on the _input_ side. That reframing is worth making explicitly — it converts a scary-sounding Known Limitation into a narrow, technical, ASR-scoped one.
 
@@ -157,42 +157,42 @@ Consequence: **the output language is stable (English) even when the input is mi
 
 This is where the real damage is, and it is worse for CatatMD's specific architecture than for a server-side scribe.
 
-**Whisper's documented behaviour on code-switched speech:**
+**Whisper's Documented Behaviour On Code-Switched Speech:**
 
 - Whisper Large V3 Turbo sat bottom of a frontier-ASR code-switching benchmark, **WER 0.16 to 0.61**. **[VERIFIED]** — [ServiceNow-AI code-switching benchmark](https://huggingface.co/blog/ServiceNow-AI/code-switching)
 - Language pairs tested were **Spanish/French/Canadian-French/German ↔ English. No Southeast Asian language was included.** **[VERIFIED]** — same source. So these numbers are a floor-setting analogy, not a Malay measurement. State it that way.
 - The critical failure mode: "when called without an explicit language parameter on code-switched audio, Whisper defaults to **translating into English rather than transcribing**, failing to preserve the language spoken in the audio." **[VERIFIED]** — same source.
 
-**[INFERRED — and this is the load-bearing safety point]** Silent translation is the worst possible failure for a clinical pipeline. It does not produce garbage that a doctor notices; it produces _fluent, plausible English_ that a downstream LLM will confidently structure into a SOAP note. The de-identification gate, the red-flag rules engine, and the citation constraint all sit _downstream_ of a transcript that may already be a paraphrase. None of them can detect it. This deserves a line in the TRD's threat model, not just the Known Limitations list.
+**[INFERRED — And This Is The Load-Bearing Safety Point]** Silent translation is the worst possible failure for a clinical pipeline. It does not produce garbage that a doctor notices; it produces _fluent, plausible English_ that a downstream LLM will confidently structure into a SOAP note. The de-identification gate, the red-flag rules engine, and the citation constraint all sit _downstream_ of a transcript that may already be a paraphrase. None of them can detect it. This deserves a line in the TRD's threat model, not just the Known Limitations list.
 
-**Browser-side specifically makes it worse:**
+**Browser-side Specifically Makes It Worse:**
 
 - Practical browser models are small: whisper-tiny ~75MB, whisper-small.en ~240MB; large-v3-turbo ~2.7GB is impractical to ship to a clinic browser. **[REPORTED]** — [whisperstt.com](https://whisperstt.com/blog/transcribe-audio-in-browser/), [OfflineTTS comparison](https://offlinetts.com/blog/browser-speech-recognition-whisper-comparison/)
 - Whisper is designed for 30-second windows; long audio needs sliding-window chunking, and hallucination clusters at chunk boundaries and in silence. **[REPORTED]** — same sources
 - One source claims `SuppressTokensLogitsProcessor` is commented out in transformers.js v3.8.1, meaning ~90 hallucination-prone tokens are never suppressed. **[REPORTED — single source, technically specific, not independently confirmed]** — [whisperstt.com](https://whisperstt.com/blog/transcribe-audio-in-browser/). Verify in the installed version before repeating this anywhere public.
 - Default pipeline is single-threaded on the main thread; long audio blocks the UI. **[REPORTED]** — same source
 
-**The remediation that already exists and should be named:**
+**The Remediation That Already Exists And Should Be Named:**
 
-**Mesolitica / malaysia-ai publish Whisper models fine-tuned on Malaysian audio** — `malaysian-whisper-small-v2/v3`, `malaysian-whisper-medium`, trained on IMDA STT, pseudolabelled Malaysian YouTube, the Malay Conversational Speech Corpus and Nusantara audiobooks; v3 is described as offering better handling for **Malay, Manglish, Mandarin, Tamil**. A Malay–Singlish code-switching finetune also exists. **[REPORTED]** — [Malaysian Whisper collection](https://huggingface.co/collections/mesolitica/malaysian-whisper-6590b6b733d72b44f0cfae79), [malaysian-whisper-small-v3](https://huggingface.co/mesolitica/malaysian-whisper-small-v3), [malaya-speech](https://github.com/malaysia-ai/malaya-speech/releases)
+**Mesolitica / Malaysia-ai Publish Whisper Models Fine-Tuned On Malaysian Audio** — `malaysian-whisper-small-v2/v3`, `malaysian-whisper-medium`, trained on IMDA STT, pseudolabelled Malaysian YouTube, the Malay Conversational Speech Corpus and Nusantara audiobooks; v3 is described as offering better handling for **Malay, Manglish, Mandarin, Tamil**. A Malay–Singlish code-switching finetune also exists. **[REPORTED]** — [Malaysian Whisper collection](https://huggingface.co/collections/mesolitica/malaysian-whisper-6590b6b733d72b44f0cfae79), [malaysian-whisper-small-v3](https://huggingface.co/mesolitica/malaysian-whisper-small-v3), [malaya-speech](https://github.com/malaysia-ai/malaya-speech/releases)
 
 Not part of current scope. Naming it turns the Known Limitation into a costed roadmap item.
 
 ---
 
-## 4. Documentation Compelled by Panel/MCO Billing Rather Than Clinical Need
+## 4. Documentation Compelled By Panel/MCO Billing Rather Than Clinical Need
 
-### 4.1 Panel Work Is the Majority of Malaysian GP Practice
+### 4.1 Panel Work Is The Majority Of Malaysian GP Practice
 
 - "Currently about **60 per cent of GP clinics are seeing third-party administrator (TPA)-related cases**" — PMPS President Dr Kirubakaran Malapan. And per MMA, "**six in 10 patients seen by GPs come from TPAs and companies that pay doctors below RM35**." **[VERIFIED]** — [CodeBlue, Oct 2025 GP town hall](https://codeblue.galencentre.org/2025/10/at-town-hall-gps-demand-fee-revision-to-rm40-to-rm125/)
 - FPMPAM: private clinic doctors "once managed 60% of outpatient visits but now their patient numbers are falling." **[REPORTED]** — [FMT, Nov 2024](https://www.freemalaysiatoday.com/category/nation/2024/11/18/private-clinic-doctors-threaten-rm20-surcharge-over-new-price-display-rule)
 - "About **30 TPAs** currently managing the health benefits of employees," each with its own registration procedure, claim submission process and documentation; registration fees RM100–RM2,500, plus monthly admin fees, per-claim submission fees, payment fees, and mandatory **terminal rental at the clinic**; payment delayed 3–6 months. **[VERIFIED]** — [Malaysiakini letter](https://www.malaysiakini.com/letters/328416). Note this is an opinion letter, not a study — but the operational picture it describes is consistent with everything else here.
 
-**Verified TPA/MCO names:** **PMCare** (self-described pioneer/leading TPA, [pmcare.com](https://www.pmcare.com.my/)), **MediExpress**, **MiCare** ([eclaims.micaresvc.com](https://eclaims.micaresvc.com/)), **Medilink-Global** ([medilink-global.com](https://www.medilink-global.com/)), **HealthMetrics**, **WeCare TPA** ([wecaretpa.com](https://www.wecaretpa.com/)), **Selcare** ([CodeBlue](https://codeblue.galencentre.org/2024/03/selcare-isnt-your-typical-tpa-with-fast-payments-no-consultation-fee-cap/)), **MediJaring**, **Compumed**, **Emas**, **HealthConnect** (last four **[REPORTED]** from [Mayflax panel-clinic guide](https://mayflax.com/becoming-a-panel-clinic/) only). **Mednefits** is payer-side but is a benefits platform, not a classical TPA. **ProtectHealth** is the government-scheme administrator.
+**Verified TPA/MCO Names:** **PMCare** (self-described pioneer/leading TPA, [pmcare.com](https://www.pmcare.com.my/)), **MediExpress**, **MiCare** ([eclaims.micaresvc.com](https://eclaims.micaresvc.com/)), **Medilink-Global** ([medilink-global.com](https://www.medilink-global.com/)), **HealthMetrics**, **WeCare TPA** ([wecaretpa.com](https://www.wecaretpa.com/)), **Selcare** ([CodeBlue](https://codeblue.galencentre.org/2024/03/selcare-isnt-your-typical-tpa-with-fast-payments-no-consultation-fee-cap/)), **MediJaring**, **Compumed**, **Emas**, **HealthConnect** (last four **[REPORTED]** from [Mayflax panel-clinic guide](https://mayflax.com/becoming-a-panel-clinic/) only). **Mednefits** is payer-side but is a benefits platform, not a classical TPA. **ProtectHealth** is the government-scheme administrator.
 
-### 4.2 What the Panel Claim Actually Demands
+### 4.2 What The Panel Claim Actually Demands
 
-**The claim workflow (verified shape):**
+**The Claim Workflow (Verified Shape):**
 
 1. Receptionist verifies eligibility "via the insurer or MCO portal" — annual benefit limit, employment still active
 2. Consultation "proceeds exactly as a regular visit"
@@ -202,20 +202,20 @@ Not part of current scope. Naming it turns the Known Limitation into a costed ro
 
 **[VERIFIED]** — [Klinik Muhibbah panel guide](https://klinikmuhibbah.com/guides/insurance-panel-clinic-guide)
 
-**The submission channel is a TPA portal, not the clinic's EMR:**
+**The Submission Channel Is A TPA Portal, Not The Clinic's EMR:**
 
 - PMCare panel clinics submit through **Mediline** (pmcare4u.com.my) for member verification, claims submission and status; clinics "are required to have an Internet-ready computer system to implement the Mediline applications"; submissions carry a **RM0.20 processing fee**; manual submission within 30 days of month-end attracts **RM2.00 per transaction**. **[REPORTED]** — from search snippets of the [PMCare panel GP terms PDF](https://www.mediline.com.my/popalert/WGGPClinics_Revision7.pdf) and [PMCare partner page](https://www.pmcare.com.my/?page_id=21187). The PDF is binary-encoded; I could not fetch and quote its clauses directly. **Do not quote clause numbers.**
 - The government's Madani Medical Scheme uses **PRIMIS** (Primary Care Information System), a free web-based provider portal run by ProtectHealth, on a fee-for-service basis; panel clinics need "a telephone line, Internet access, computer and printer." **[REPORTED]** — [ProtectHealth](https://protecthealth.com.my/skimperubatanmadani/), [primis-provider.protecthealth.com.my](https://primis-provider.protecthealth.com.my/)
 
-**What fields the claim record contains — the most interesting single finding:**
+**What Fields The Claim Record Contains — The Most Interesting Single Finding:**
 
 A peer-reviewed study of **83,556 outpatient visits by 10,150 employees (Jan 2016 – Aug 2019)** drawn from the **PMCare database** lists the captured fields as: _"claim codes, dates of clinic visit, patient codes, medicine costs, consultation fees, total costs, medicine names and doses, the treatment duration, and the number of tablets prescribed."_ **[VERIFIED]** — [Trends in the Cost of Medicines, Consultation Fees and Clinic Visits in Malaysia's Private Primary Healthcare System, _PMC10284298_](https://pmc.ncbi.nlm.nih.gov/articles/PMC10284298/)
 
-**[INFERRED — flagged carefully]** That field list is **billing and dispensing data with no clinical narrative and no diagnosis field named**. Absence from one study's field list is not proof the claim carries no diagnosis, and I could **not** verify whether Malaysian panel GP claims require ICD-10 or any diagnosis coding — **[UNVERIFIED]**, and the answer is behind private panel agreements, so it is not obtainable in this window. But the direction is clear: what the payer wants is _what was given and what it cost_, not _what the doctor reasoned_.
+**[INFERRED — Flagged Carefully]** That field list is **billing and dispensing data with no clinical narrative and no diagnosis field named**. Absence from one study's field list is not proof the claim carries no diagnosis, and I could **not** verify whether Malaysian panel GP claims require ICD-10 or any diagnosis coding — **[UNVERIFIED]**, and the answer is behind private panel agreements, so it is not obtainable in this window. But the direction is clear: what the payer wants is _what was given and what it cost_, not _what the doctor reasoned_.
 
 The same study's caveat is also instructive: "only drug charges within the coverage (≤RM 45) were captured in the database, whereas excess charges covered out-of-pocket by the patients themselves were not recorded." **[VERIFIED]** — the payer record is not even a complete billing record, let alone a clinical one.
 
-### 4.3 The TPA Also Constrains the Clinical Decision Itself
+### 4.3 The TPA Also Constrains The Clinical Decision Itself
 
 FPMPAM states that "**referrals, investigations, medication choices, and even treatment quantities were subject to TPA validation and approval**," calling it "unauthorised intrusion into medical decision-making, not benefit management," and adding that "No call centre or administrative officer should override or delay a doctor's clinical judgement." It attributes GP fees anchored at RM30–RM35 to "decades-old fee ceilings and strict TPA reimbursement controls." **[VERIFIED]** — [CodeBlue, Dec 2025](https://codeblue.galencentre.org/2025/12/managed-care-achieves-lower-costs-by-restricting-care-says-fpmpam/)
 
@@ -229,7 +229,7 @@ A Malaysian MC carries: patient name and NRIC/passport number, doctor's name and
 
 ### 4.5 Tax-Driven Documentation: LHDN e-Invoice
 
-| Phase | From       | Turnover band                                  |
+| Phase | From       | Turnover Band                                  |
 | ----- | ---------- | ---------------------------------------------- |
 | 1     | 1 Aug 2024 | > RM100m                                       |
 | 2     | 1 Jan 2025 | RM25m – RM100m                                 |
@@ -243,15 +243,15 @@ A Malaysian MC carries: patient name and NRIC/passport number, doctor's name and
 
 **[INFERRED]** Rough arithmetic: a solo GP seeing ~40 patients/day at ~RM60/visit over ~300 days ≈ RM720k turnover — i.e. **below** the reported RM1m exemption. So the very clinics most likely to still be lightly digitised are also the ones the e-invoice mandate does _not_ force to buy software. The tax lever pushes group practices and chains, not solo GPs. This is my arithmetic, not a sourced figure — do not publish the numbers.
 
-### 4.6 Does Billing Shape the Note More Than Clinical Convention?
+### 4.6 Does Billing Shape The Note More Than Clinical Convention?
 
 **Yes.** The dominant documentation pressures on a Malaysian private GP, ranked:
 
-1. **TPA claim** (~60% of patients) — itemised drugs, doses, quantities, consultation fee, eligibility, pre-approvals
+1. **TPA Claim** (~60% of patients) — itemised drugs, doses, quantities, consultation fee, eligibility, pre-approvals
 2. **MC** — days, NRIC, MMC number
 3. **Dispensing/inventory** — clinic economics depend on it
-4. **Tax e-invoice** — where above threshold
-5. **The clinical narrative:** required professionally, but the least audited of the five
+4. **Tax E-Invoice** — where above threshold
+5. **The Clinical Narrative:** required professionally, but the least audited of the five
 
 **[INFERRED]** CatatMD's SOAP note serves #5 and touches none of #1–#4. This is consistent with the product's stated value of safety and documentation quality. TPA claims, medical certificates, dispensing, and tax invoices do not require this clinical narrative as an exported artifact, which is why the copy-paste boundary is workable and the time-saving claim is not.
 
@@ -261,7 +261,7 @@ A Malaysian MC carries: patient name and NRIC/passport number, doctor's name and
 
 Stated so nobody re-runs this work:
 
-| Gap                                                       | Why it isn't worth chasing                                                                                                  |
+| Gap                                                       | Why It Isn't Worth Chasing                                                                                                  |
 | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Market share of any Malaysian GP CMS                      | No public study exists. Wouldn't change the write-back decision — no vendor is dominant enough to integrate with regardless |
 | Whether panel claims require ICD-10                       | Behind private panel agreements. Does not change the current product scope                                                  |
@@ -277,10 +277,10 @@ Concrete deltas only. Everything here is doable in the current window unless mar
 
 ### PRD — Non-Goals
 
-- **Change the _justification_, keep the non-goal.** "No EMR write-back" should stop reading as MVP triage and start reading as a market fact: _there is no write-back rail in Malaysian private primary care — the market is a long tail of small vendors with no published API standard, and the national interoperability layer (MDHCN / Malaysia Patient Summary, "One Person One Record") reaches private hospitals from January 2027, not GP clinics._ Cite the MOF release. This converts the project's weakest-looking boundary into its most defensible one.
-- **Drop "PDF/print export" from the primary export set, or demote it.** In a clinic under e-invoicing pressure with claims flowing through TPA portals, a printed SOAP note has no consumer and creates an unfiled PHI-bearing artifact. Replace as the second export with **structured JSON** — near-zero build cost, and it is the direct answer to "how would this ever reach an EMR?"
+- **Change The _Justification_, Keep The Non-Goal.** "No EMR write-back" should stop reading as MVP triage and start reading as a market fact: _there is no write-back rail in Malaysian private primary care — the market is a long tail of small vendors with no published API standard, and the national interoperability layer (MDHCN / Malaysia Patient Summary, "One Person One Record") reaches private hospitals from January 2027, not GP clinics._ Cite the MOF release. This converts the project's weakest-looking boundary into its most defensible one.
+- **Drop "PDF/print Export" From The Primary Export Set, Or Demote It.** In a clinic under e-invoicing pressure with claims flowing through TPA portals, a printed SOAP note has no consumer and creates an unfiled PHI-bearing artifact. Replace as the second export with **structured JSON** — near-zero build cost, and it is the direct answer to "how would this ever reach an EMR?"
 
-### PRD / TRD — Export Surface (highest-leverage single change)
+### PRD / TRD — Export Surface (Highest-Leverage Single Change)
 
 - **Replace one "Copy note" button with segmented copy: S / O / A / P individually, plus a one-line encounter summary.** Malaysian GP CMS note fields are small free-text boxes inside dispensing-and-billing-first software; a doctor pasting into one will paste fragments, not a document. This is a small UI change with a large workflow effect.
 
@@ -288,25 +288,25 @@ Concrete deltas only. Everything here is doable in the current window unless mar
 
 - **Stop positioning on time saved; position on documentation quality and the safety net.** For a 3-minute URTI consult against a GP who already writes "URTI, T39, PCM QID, MC 2/7", a review-edit-paste loop plausibly _costs_ time. Red-flag detection and missing-information prompts are the defensible value. Add an explicit acceptance target: **an approved note in under 30 seconds** in the demo.
 
-### PRD — Known Limitations (language)
+### PRD — Known Limitations (Language)
 
 - **Split the single "English-only" limitation into two, because they are not equally serious:**
   - _Output language:_ not a limitation. Malaysian clinical records are written in English regardless of the language spoken in the room.
   - _Input language:_ the real limitation. Malay/Manglish/dialect code-switching degrades ASR, and the transcript is upstream of every safety control in the system.
-- **Do not state a code-switching percentage.** No quantified figure exists for Malaysian GP consultations. Say so — it reads as rigour, not as a gap.
-- **Name `mesolitica/malaysian-whisper-*` as the identified remediation path.** Turns a shrug into a costed roadmap item.
+- **Do Not State A Code-Switching Percentage.** No quantified figure exists for Malaysian GP consultations. Say so — it reads as rigour, not as a gap.
+- **Name `mesolitica/malaysian-whisper-*` as the Identified Remediation Path.** Turns a shrug into a costed roadmap item.
 
-### TRD — ASR and Threat Model
+### TRD — ASR And Threat Model
 
-- **Always pass an explicit `language` parameter to Whisper. Never rely on auto-detect.** Whisper's documented default on code-switched audio without a language parameter is to _translate_ rather than transcribe — producing fluent, plausible English that is not what was said.
-- **Add silent-translation to the TRD threat model.** The de-identification gate, deterministic red-flag engine, and ID-constrained citations all sit downstream of the transcript and cannot detect a paraphrased input. This is a genuine architectural gap worth one paragraph.
+- **Always Pass An Explicit `language` Parameter To Whisper. Never Rely On Auto-Detect.** Whisper's documented default on code-switched audio without a language parameter is to _translate_ rather than transcribe — producing fluent, plausible English that is not what was said.
+- **Add Silent-Translation To The TRD Threat Model.** The de-identification gate, deterministic red-flag engine, and ID-constrained citations all sit downstream of the transcript and cannot detect a paraphrased input. This is a genuine architectural gap worth one paragraph.
 - **Make pasted text the primary demo path; browser ASR is the "also works" path.** Browser-viable Whisper is tiny/small-class (~75–240MB), 30-second-window with boundary hallucination, single-threaded by default. Demoing live ASR on code-switched Malaysian speech is a self-inflicted wound.
-- **Surface a low-confidence indicator on ASR output** so the doctor is cued to check the transcript, not just the note.
+- **Surface A Low-Confidence Indicator On ASR Output** so the doctor is cued to check the transcript, not just the note.
 
-### PRD — Explicitly Out of Scope (name it, don't build it)
+### PRD — Explicitly Out Of Scope (Name It, Don't Build It)
 
-- **A claim/MC-facing output** (one-line reason for encounter, MC days, referral/follow-up flag) would be the single highest-value addition for a real Malaysian GP, because ~6 in 10 patients are panel cases and the MC is often what the patient came for. **Do not build it in this window**, and note the collision risk: generating MC duration or a diagnosis label invites rubber-stamping and cuts against "the system never diagnoses." Recording what the doctor decided is safe; deciding it is not.
-- **Note the TPA constraint in the Plan section's limitations:** referrals, investigations, medication choices and quantities are subject to TPA pre-approval in Malaysian panel practice, so a suggested investigation may be unactionable regardless of clinical merit.
+- **A claim/MC-facing Output** (one-line reason for encounter, MC days, referral/follow-up flag) would be the single highest-value addition for a real Malaysian GP, because ~6 in 10 patients are panel cases and the MC is often what the patient came for. **Do not build it in this window**, and note the collision risk: generating MC duration or a diagnosis label invites rubber-stamping and cuts against "the system never diagnoses." Recording what the doctor decided is safe; deciding it is not.
+- **Note The TPA Constraint In The Plan Section's Limitations:** referrals, investigations, medication choices and quantities are subject to TPA pre-approval in Malaysian panel practice, so a suggested investigation may be unactionable regardless of clinical merit.
 
 ### Nothing Changes For
 

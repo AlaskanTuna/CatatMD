@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# retrieval
+# Retrieval
 
 Ranks guideline chunks with lexical and semantic search and returns validated chunks for clinical suggestions.
 

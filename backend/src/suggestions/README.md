@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# suggestions
+# Suggestions
 
 Generates model suggestion and red-flag candidates, then filters unsafe or unsupported suggestion text.
 

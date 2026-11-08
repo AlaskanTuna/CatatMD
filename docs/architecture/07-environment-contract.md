@@ -47,7 +47,7 @@ A third production guard now exists, symmetric with guard 1: `NODE_ENV === 'prod
 
 Previously `DEID_FAIL_CLOSED` was declared in `EnvSchema` and guarded at boot, but read nowhere in `backend/src/lib/llm/openai-compatible.ts`. It constrained what configuration was _accepted_ at startup without gating _behaviour_ where a request actually leaves the process.
 
-**What "fail closed" now does** (§19 row 2, resolved): when `DEID_FAIL_CLOSED` is true, `OpenAICompatibleClient.generate()` calls `assertNoIdentifiers(request.content, request.operation)` **before** the network call. That re-runs the full §9 detector inventory over the outbound payload, with already-minted `[LABEL_N]` tokens stripped first, so it inspects only what survived the gate, and throws `DeidentificationError` if anything fires. The request is never sent.
+**What "Fail Closed" Now Does** (§19 row 2, resolved): when `DEID_FAIL_CLOSED` is true, `OpenAICompatibleClient.generate()` calls `assertNoIdentifiers(request.content, request.operation)` **before** the network call. That re-runs the full §9 detector inventory over the outbound payload, with already-minted `[LABEL_N]` tokens stripped first, so it inspects only what survived the gate, and throws `DeidentificationError` if anything fires. The request is never sent.
 
 Three properties make this worth more than a duplicate of the first pass:
 
@@ -61,11 +61,11 @@ The guard runs inside the adapter rather than being injected. This widens §2's 
 
 A separate contract, and a smaller one. These are read by `frontend/` at build time and are **not** in `EnvSchema`, which validates the API's environment only. They were undocumented until #2 shipped a configuration knob that a deploying clinic actually needs to know exists.
 
-| Field                 | Purpose                                                                                                                                                                                                                                                                                                                                | Unset behaviour                                                                |
+| Field                 | Purpose                                                                                                                                                                                                                                                                                                                                | Unset Behaviour                                                                |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `VITE_API_URL`        | Origin of the API. **Must stay unset in production since #156**: the SPA calls `/api` on its own origin and `vercel.json` rewrites it to Render, which is what keeps the session cookie first-party. Setting it restores a cross-origin call and silently locks out every mobile browser, so the deploy job asserts it is absent (§17) | Requests resolve against the SPA's own origin, which is now the correct wiring |
 | `VITE_ASR_MODEL_HOST` | Origin for the on-device speech model's weights (§20). Set it to a mirror and the one third-party runtime request disappears                                                                                                                                                                                                           | Falls back to the HuggingFace CDN, which §20 discloses                         |
 
-**Anything prefixed `VITE_` is public.** Vite inlines it into the bundle, so a value with that prefix is shipped to every visitor. No secret may ever carry it, which is why neither field above is a credential and why `.env.example` documents API-side keys separately.
+**Anything Prefixed `VITE_` Is Public.** Vite inlines it into the bundle, so a value with that prefix is shipped to every visitor. No secret may ever carry it, which is why neither field above is a credential and why `.env.example` documents API-side keys separately.
 
 ---

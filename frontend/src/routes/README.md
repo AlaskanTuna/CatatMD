@@ -22,9 +22,9 @@ App.tsx maps URL paths to these pages. Consultation review composes components f
 
 ### Invariants
 
-- **Session gate:** Patient and consultation records render under RequireSession.
-- **Report route:** The report has its own session gate and sits outside AppShell.
-- **API boundary:** Route queries and mutations use lib/api.ts and TanStack Query.
+- **Session Gate:** Patient and consultation records render under RequireSession.
+- **Report Route:** The report has its own session gate and sits outside AppShell.
+- **API Boundary:** Route queries and mutations use lib/api.ts and TanStack Query.
 
 ### Tests
 

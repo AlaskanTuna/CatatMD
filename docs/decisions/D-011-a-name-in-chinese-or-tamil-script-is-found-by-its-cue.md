@@ -26,21 +26,21 @@ A name found by its cue is found again wherever it is repeated in the same text,
 
 Measured against a precision corpus of 134 clinical Mandarin, Cantonese, Tamil and code-switched lines, pinned in `../../backend/src/deid/deid.test.ts`, every one of which must pass unchanged. Four rounds of `phi-boundary-auditor` built it.
 
-- **A Chinese name must open on a listed surname.** "我叫" is as often "I called" (我叫救护车, an ambulance) as "my name is", and the surname is what tells them apart.
+- **A Chinese Name Must Open On A Listed Surname.** "我叫" is as often "I called" (我叫救护车, an ambulance) as "my name is", and the surname is what tells them apart.
 - **The title rule reads the surname alone, and only where it starts a word.** That is after punctuation, a space, or a verb that takes a person (给, 找, 是, 谢). Reading back from the title turned 白天医生 ("daytime, the doctor") into a name, and any other character before the surname usually makes it the end of a word: 体温医生 ("temperature, the doctor"), 主任医生 ("the consultant").
 - **A Latin cue is a whole word and must be followed by a whole name.** "symptoms" contains "Ms", and "Dr 高烧三天" is "doctor, high fever for three days".
-- **Bare 名字是 and 病人叫 are not cues.** They are as often a drug's name or a patient crying out.
-- **One Tamil word after a title.** A second one was as often the symptom that followed (செல்வி கவிதா இருமல், "cough").
+- **Bare 名字是 And 病人叫 Are Not Cues.** They are as often a drug's name or a patient crying out.
+- **One Tamil Word After A Title.** A second one was as often the symptom that followed (செல்வி கவிதா இருமல், "cough").
 
 ## What Still Passes
 
-- **A name said with no cue.** "陈美玲今天咳嗽" reaches the model on the Auto-Detect path. Translated sessions are unaffected: the script never reaches `turn.text` there.
-- **A full name before a title,** as in 陈美玲小姐, and **a given name alone after a bare 我叫**, as in 我叫美玲, both pinned as known gaps. Bare 我叫 is as often "I called" (我叫救护车, an ambulance; 我叫老公, my husband).
-- **A surname outside the list,** a Tamil father's name after a title, and a native-script address.
+- **A Name Said With No Cue.** "陈美玲今天咳嗽" reaches the model on the Auto-Detect path. Translated sessions are unaffected: the script never reaches `turn.text` there.
+- **A Full Name Before A Title,** as in 陈美玲小姐, and **a given name alone after a bare 我叫**, as in 我叫美玲, both pinned as known gaps. Bare 我叫 is as often "I called" (我叫救护车, an ambulance; 我叫老公, my husband).
+- **A Surname Outside The List,** a Tamil father's name after a title, and a native-script address.
 
-- **Minor misreads still accepted:** a surname-led food or object after 我叫 (我叫陈皮水), a verb after a Tamil cue with no name (திருமதி வந்தாங்க), and a given name after a relative (我儿子叫小明), which the audit rated minor against the cost of reading further.
+- **Minor Misreads Still Accepted:** a surname-led food or object after 我叫 (我叫陈皮水), a verb after a Tamil cue with no name (திருமதி வந்தாங்க), and a given name after a relative (我儿子叫小明), which the audit rated minor against the cost of reading further.
 
 ## What This Decision Does Not License
 
-- **No claim that Mandarin or Tamil is de-identified.** Cued names are; the rest is the residual risk recorded in `../DPIA.md`.
-- **No bare surname or given-name list for either script,** and no widening of the cues, without the precision corpus still passing unchanged.
+- **No Claim That Mandarin Or Tamil Is De-Identified.** Cued names are; the rest is the residual risk recorded in `../DPIA.md`.
+- **No Bare Surname Or Given-Name List For Either Script,** and no widening of the cues, without the precision corpus still passing unchanged.

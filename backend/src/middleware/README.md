@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# middleware
+# Middleware
 
 Implements request context, client address resolution, session checks, rate limits, audio parsing and error handling.
 

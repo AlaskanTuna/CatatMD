@@ -6,12 +6,12 @@ Every document in this repository, organised by the question it answers. Start w
 
 | You Are                         | Read, In Order                                                                                                                                                         |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Trying the product**          | [`USER-GUIDE.md`](USER-GUIDE.md), then the [live demo](https://catatmd.vercel.app)                                                                                     |
-| **Reviewing the engineering**   | [`../README.md`](../README.md), [`OVERVIEW.md`](OVERVIEW.md), [`TRD.md`](TRD.md), [`decisions/`](decisions/)                                                           |
-| **Setting up to develop**       | [`GETTING-STARTED.md`](GETTING-STARTED.md), [`DEVELOPMENT.md`](DEVELOPMENT.md), [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)                             |
-| **Operating the deployment**    | [`operations/`](operations/)                                                                                                                                           |
-| **Assessing privacy or safety** | [`DPIA.md`](DPIA.md), [`architecture/09-de-identification-pipeline.md`](architecture/09-de-identification-pipeline.md), [`agents/invariants.md`](agents/invariants.md) |
-| **An AI coding agent**          | [`../AGENTS.md`](../AGENTS.md), then [`agents/documents.md`](agents/documents.md)                                                                                      |
+| **Trying The Product**          | [`USER-GUIDE.md`](USER-GUIDE.md), then the [live demo](https://catatmd.vercel.app)                                                                                     |
+| **Reviewing The Engineering**   | [`../README.md`](../README.md), [`OVERVIEW.md`](OVERVIEW.md), [`TRD.md`](TRD.md), [`decisions/`](decisions/)                                                           |
+| **Setting Up To Develop**       | [`GETTING-STARTED.md`](GETTING-STARTED.md), [`DEVELOPMENT.md`](DEVELOPMENT.md), [`../.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)                             |
+| **Operating The Deployment**    | [`operations/`](operations/)                                                                                                                                           |
+| **Assessing Privacy Or Safety** | [`DPIA.md`](DPIA.md), [`architecture/09-de-identification-pipeline.md`](architecture/09-de-identification-pipeline.md), [`agents/invariants.md`](agents/invariants.md) |
+| **An AI Coding Agent**          | [`../AGENTS.md`](../AGENTS.md), then [`agents/documents.md`](agents/documents.md)                                                                                      |
 
 ## By Question
 
@@ -56,6 +56,6 @@ Every document in this repository, organised by the question it answers. Start w
 
 ## Keeping Docs True
 
-- **Docs describe the system as it is.** Progress and to-dos live in [GitHub Issues](https://github.com/AlaskanTuna/CatatMD/issues); history lives in git.
-- **A change ships with its docs.** A pull request that changes behaviour updates the matching section, module README or decision record.
+- **Docs Describe The System As It Is.** Progress and to-dos live in [GitHub Issues](https://github.com/AlaskanTuna/CatatMD/issues); history lives in git.
+- **A Change Ships With Its Docs.** A pull request that changes behaviour updates the matching section, module README or decision record.
 - **Style:** [`agents/markdown-style.md`](agents/markdown-style.md).

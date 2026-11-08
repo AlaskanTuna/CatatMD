@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# deid
+# Deid
 
 Detects identifiers, replaces them with request-scoped tokens, and provides the vault used to rehydrate responses.
 

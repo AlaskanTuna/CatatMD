@@ -2,7 +2,7 @@
 
 > Research behind the question "can a doctor click a transcript sentence and hear the audio that produced it, and is that worth building?" Gathered 08/09/26. Sources are linked inline and graded for strength. Read this before designing anything that retains, plays back, or links consultation audio.
 
-**This file is orientation, not legal advice.** It summarises published guidance so an agent does not rediscover it. It deliberately **does not set a retention period** and must not be cited to justify one: that decision stays open and belongs to the clinic data controller (`docs/DPIA.md`, "Open Retention Decision").
+**This File Is Orientation, Not Legal Advice.** It summarises published guidance so an agent does not rediscover it. It deliberately **does not set a retention period** and must not be cited to justify one: that decision stays open and belongs to the clinic data controller (`docs/DPIA.md`, "Open Retention Decision").
 
 ---
 
@@ -36,10 +36,10 @@ Every serious vendor persists for a bounded window and states the recording is *
 
 | Finding                                | Detail                                                                                                                                                                                                                                                                         | Grade         |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
-| **Whisper fabricates whole phrases**   | The "Careless Whisper" study found roughly 1% of segments contained invented content, and 40% of hallucinations were judged potentially harmful. Examples included invented medications. The same hallucinations did not appear in Google, Amazon, AssemblyAI or RevAI models. | Strong        |
-| **A fabrication is invisible in text** | Invented sentences read fluently, so nobody flags them. In a clinical note a plausible fabrication is more dangerous than an obvious error.                                                                                                                                    | Strong        |
-| **Code-switching is the worst case**   | Singapore's MediVoice deployment reported quality declining outside English, Mandarin and Malay. Our fixtures are code-switched Malay and English ("saya demam since 3 days ago, sakit tekak"), which is exactly where word error rate is highest.                             | Strong        |
-| **Red flags read the transcript**      | `backend/src/redflags/` evaluates rules over raw transcript text before the LLM runs. A mis-transcription can therefore change a deterministic safety output, not only prose.                                                                                                  | Strong (repo) |
+| **Whisper Fabricates Whole Phrases**   | The "Careless Whisper" study found roughly 1% of segments contained invented content, and 40% of hallucinations were judged potentially harmful. Examples included invented medications. The same hallucinations did not appear in Google, Amazon, AssemblyAI or RevAI models. | Strong        |
+| **A Fabrication Is Invisible In Text** | Invented sentences read fluently, so nobody flags them. In a clinical note a plausible fabrication is more dangerous than an obvious error.                                                                                                                                    | Strong        |
+| **Code-switching Is The Worst Case**   | Singapore's MediVoice deployment reported quality declining outside English, Mandarin and Malay. Our fixtures are code-switched Malay and English ("saya demam since 3 days ago, sakit tekak"), which is exactly where word error rate is highest.                             | Strong        |
+| **Red Flags Read The Transcript**      | `backend/src/redflags/` evaluates rules over raw transcript text before the LLM runs. A mis-transcription can therefore change a deterministic safety output, not only prose.                                                                                                  | Strong (repo) |
 
 ---
 
@@ -52,7 +52,7 @@ Every serious vendor persists for a bounded window and states the recording is *
 | **Nabla**                 | "No audio stored by default", configurable 14 days                | Not stated in sources reviewed                                                        |
 | **MediVoice (Singapore)** | Not disclosed in the published paper                              | Workflow is review, edit, transfer text to the record. No playback feature described  |
 
-**Two things to take from this table.** First, nobody keeps audio indefinitely, and nobody in the reviewed set uses a purely ephemeral model, because note review is often not synchronous with capture. Second, the vendors that persist all draw the same line: the recording is a working artefact, and only the approved note is the record.
+**Two Things To Take From This Table.** First, nobody keeps audio indefinitely, and nobody in the reviewed set uses a purely ephemeral model, because note review is often not synchronous with capture. Second, the vendors that persist all draw the same line: the recording is a working artefact, and only the approved note is the record.
 
 ---
 
@@ -60,10 +60,10 @@ Every serious vendor persists for a bounded window and states the recording is *
 
 Medical liability guidance is the strongest voice here, and it is unambiguous.
 
-- **ProAssurance (liability insurer, Moderate):** "there is scant justification for retaining these audio logs once the AI-assisted note has been accurately added to the electronic medical record."
+- **ProAssurance (Liability Insurer, Moderate):** "there is scant justification for retaining these audio logs once the AI-assisted note has been accurately added to the electronic medical record."
 - **Discoverability:** a retained recording "will undoubtedly be discoverable in litigation", and a note-versus-audio inconsistency could "undermine the accuracy and reliability of the entire medical record".
-- **It cuts both ways (Moderate):** legal commentary notes audio can also corroborate that a clinician addressed every concern raised. The net position most authors reach is that a permanent audio footprint grows discoverable material without reliably improving the clinician's position.
-- **Auditability is the real test (Moderate):** "a retention promise that cannot be audited is not a control." A stated window with no mechanism enforcing it is worse than no claim.
+- **It Cuts Both Ways (Moderate):** legal commentary notes audio can also corroborate that a clinician addressed every concern raised. The net position most authors reach is that a permanent audio footprint grows discoverable material without reliably improving the clinician's position.
+- **Auditability Is The Real Test (Moderate):** "a retention promise that cannot be audited is not a control." A stated window with no mechanism enforcing it is worse than no claim.
 
 ---
 
@@ -95,7 +95,7 @@ Audio and Visual Recordings. Consultation audio is **not** in the clause 16 list
 | **18**      | Separate consent required, with an explanation of why the recording assists care, what form it takes, and an assurance of secure storage           |
 | **19**      | Recordings made for clinical purposes "constitute part of a patient's medical record" and are treated as such                                      |
 
-**The unresolved tension.** Clause 19 pulls a stored recording into the medical record, while vendors position it as a transient working artefact outside the record. Whether a draft-verification recording counts as "made for clinical purposes" is genuinely ambiguous, and it is exactly the local clarification the Frontiers paper says is needed. **Storing nothing avoids the question; storing anything raises it.**
+**The Unresolved Tension.** Clause 19 pulls a stored recording into the medical record, while vendors position it as a transient working artefact outside the record. Whether a draft-verification recording counts as "made for clinical purposes" is genuinely ambiguous, and it is exactly the local clarification the Frontiers paper says is needed. **Storing nothing avoids the question; storing anything raises it.**
 
 ---
 
@@ -119,7 +119,7 @@ Constraints an agent must check before designing anything in this area. All curr
 | New PHI-bearing columns must join the erasure tombstone              | `.claude/rules/security.md`, `backend/src/audit/erasure.ts`             | Stored audio needs a fourth erasure target. Data added inside `Consultation.transcript` does not, since that column is already erased |
 | `media-src 'self' blob:` already in the CSP                          | `vercel.json`                                                           | Local blob playback needs no header change and no sign-off on that axis                                                               |
 
-**Plumbing that already exists and should be reused rather than rebuilt:**
+**Plumbing That Already Exists And Should Be Reused Rather Than Rebuilt:**
 
 - `frontend/src/audio/transcribe.worker.ts` already sets `return_timestamps: true`, so segment times exist on the local Whisper path.
 - `frontend/src/audio/draft-turns.ts` already persists `offsetSeconds` per segment, and deliberately refuses to fabricate one for a split line. **Preserve that rule:** a wrong offset is worse than none, because it makes a doctor doubt a correct transcription or trust an incorrect one.
@@ -128,7 +128,7 @@ Constraints an agent must check before designing anything in this area. All curr
 - `ChecklistPanel.tsx` already renders a linked row as a button and an unlinked row as an inert div. Reuse that idiom rather than inventing a second one.
 - `frontend/src/audio/live/use-segment-recorder.ts` implements per-utterance blob slicing with start and duration metadata. It is currently dead code, imported only by its own test.
 
-**Known technical limit.** Word-level timestamps in `transformers.js` are unreliable under chunking (open upstream issues). Segment-level timestamps are the dependable granularity, and they match a sentence-level interaction anyway.
+**Known Technical Limit.** Word-level timestamps in `transformers.js` are unreliable under chunking (open upstream issues). Segment-level timestamps are the dependable granularity, and they match a sentence-level interaction anyway.
 
 ---
 
@@ -177,8 +177,8 @@ Regulatory:
 
 ## 12. What This Changes
 
-- **A transcript-playback feature is justified**, and the justification to lead with is silent ASR fabrication on code-switched speech, not general convenience.
-- **Timing data is the durable asset, the audio blob is not.** Persisting per-turn start and end times is needed by every version of this feature, is cheap to add now, and is expensive to retrofit. Do that first regardless of the retention decision.
-- **Retention is the expensive half, not playback.** Storing audio pulls in object storage, a purge mechanism, MMC clause 18 consent capture, a fourth erasure target, audit events and a sign-off. Playback from memory pulls in none of those.
-- **Never fabricate a timestamp.** Where alignment is ambiguous, emit no timing. This matches the existing rule in `draft-turns.ts` and is a safety property, not a style choice.
-- **Open question for the data controller:** whether a draft-verification recording falls inside MMC clause 19. Do not resolve this in code or docs; surface it.
+- **A Transcript-Playback Feature Is Justified**, and the justification to lead with is silent ASR fabrication on code-switched speech, not general convenience.
+- **Timing Data Is The Durable Asset, The Audio Blob Is Not.** Persisting per-turn start and end times is needed by every version of this feature, is cheap to add now, and is expensive to retrofit. Do that first regardless of the retention decision.
+- **Retention Is The Expensive Half, Not Playback.** Storing audio pulls in object storage, a purge mechanism, MMC clause 18 consent capture, a fourth erasure target, audit events and a sign-off. Playback from memory pulls in none of those.
+- **Never Fabricate A Timestamp.** Where alignment is ambiguous, emit no timing. This matches the existing rule in `draft-turns.ts` and is a safety property, not a style choice.
+- **Open Question For The Data Controller:** whether a draft-verification recording falls inside MMC clause 19. Do not resolve this in code or docs; surface it.

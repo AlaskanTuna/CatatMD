@@ -5,11 +5,11 @@ Canonical implementation-level reference for developers implementing against Cat
 Sections retain the Built, Specified, and Open status tags: Built means present in the repository, Specified means decided but not implemented, and Open means unresolved.
 Measured findings, citations, issue numbers, and limitations stay with their sections.
 
-**Status: Final for the MVP.** Reconciled 13/08/26 against docs/research/ and closed alongside docs/PRD.md (issue #1).
+**Status: Final For The MVP.** Reconciled 13/08/26 against docs/research/ and closed alongside docs/PRD.md (issue #1).
 
 Two sections carry measured findings rather than design intent, and the controls around them trace to the measurement: §20.1 (ASR model selection for Malaysian code-switched speech) and §21.1 (fabricated clinical negatives on sparse transcripts). §19's Open Decisions Register carries 19 rows, 9 of them still open; resolved rows are struck through and kept so cross-references stay stable. A Specified tag means designed-not-built, and Built means it exists in the repository today.
 
-**Implementation began 13/08/26.** §9, §10, §11 and §14 moved Specified → Built, and register rows 1, 2, 4 and 9 closed against real code. Where implementation contradicted the specification, the section says so and explains which won, see §5 and §7.
+**Implementation Began 13/08/26.** §9, §10, §11 and §14 moved Specified → Built, and register rows 1, 2, 4 and 9 closed against real code. Where implementation contradicted the specification, the section says so and explains which won, see §5 and §7.
 
 | Section                                              | File                                                                                                                                 | What It Covers                                                                                        |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |

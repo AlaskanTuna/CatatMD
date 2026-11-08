@@ -38,7 +38,7 @@ The datasource reads DATABASE_URL for the application connection and DIRECT_URL 
 ## Seeds
 
 - **seed.ts:** bun run db:seed creates the configured seeded doctor accounts and guest account through better-auth.
-- **seed-demo.ts:** bun run db:seed:demo signs in as the guest and creates synthetic fixture consultations through the API. It skips fixtures already present.
+- **Seed-demo.ts:** bun run db:seed:demo signs in as the guest and creates synthetic fixture consultations through the API. It skips fixtures already present.
 
 Both root seed commands build shared/ first.
 

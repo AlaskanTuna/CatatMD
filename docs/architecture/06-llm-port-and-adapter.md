@@ -48,19 +48,19 @@ The sentence above says provider selection is a constructor parameter. That is t
 
 Measured 14/08/26 against `gemini-3.5-flash-lite` on the live OpenAI-compatible endpoint, sending each schema the pipeline actually uses, all with `strict: true`:
 
-| Call                        | JSON Schema size | Depth | Result                                                                                              |
+| Call                        | JSON Schema Size | Depth | Result                                                                                              |
 | --------------------------- | ---------------- | ----- | --------------------------------------------------------------------------------------------------- |
 | `note_and_gaps`             | 686 B            | 7     | HTTP 200, schema-valid                                                                              |
 | `suggestions_and_red_flags` | 1,312 B          | 7     | HTTP 200, schema-valid. Split into `red_flags` and `suggestions` by #340; measured before the split |
-| `clinical_facts`            | 14,240 B         | 10    | **HTTP 400, empty body**                                                                            |
+| `clinical_facts`            | 14,240 B         | 10    | **HTTP 400, Empty Body**                                                                            |
 
 `clinical_facts` is the first call `analyseNote` makes, so the run dies there and nothing downstream is reached.
 
 Three things this is **not**, each ruled out by measurement rather than assumed:
 
 - **Not `strict`.** On a trivial schema, `strict: true`, `strict: false`, and `strict` omitted all return 200.
-- **Not a JSON Schema keyword.** The passing and failing schemas use the same feature set (`$schema`, `enum`, `additionalProperties`).
-- **Not the API key or the endpoint.** Two of the three real calls succeed on the same key in the same run.
+- **Not A JSON Schema Keyword.** The passing and failing schemas use the same feature set (`$schema`, `enum`, `additionalProperties`).
+- **Not The API Key Or The Endpoint.** Two of the three real calls succeed on the same key in the same run.
 
 The remaining difference is scale: `clinical_facts` is roughly 20x larger, three levels deeper, and carries 997 properties against 48. The 400 has an empty body naming neither a size nor a depth cap, and size, depth and property count all co-vary, so **which limit binds is not established**.
 
@@ -72,9 +72,9 @@ Tracked as GitHub issue #96. The fix worth doing is shrinking or splitting `clin
 
 Closes GitHub issue #96. No adapter change and no provider-specific code were required.
 
-**The bisect.** Only `medicationsDispensed.maxItems` was varied, in the real `clinical_facts` schema, with nothing else in the request changed:
+**The Bisect.** Only `medicationsDispensed.maxItems` was varied, in the real `clinical_facts` schema, with nothing else in the request changed:
 
-| `maxItems` | absent | 1   | 2   | 3   | 5   | 10  | 20      |
+| `maxItems` | Absent | 1   | 2   | 3   | 5   | 10  | 20      |
 | ---------- | ------ | --- | --- | --- | --- | --- | ------- |
 | Result     | 200    | 200 | 200 | 200 | 200 | 200 | **400** |
 
@@ -86,24 +86,24 @@ From the other side, varying only `gaps.maxItems` in `note_and_gaps`, the 686 B 
 
 **Gemini expands a bounded array into `maxItems` copies of the item schema before measuring the result against its own budget.** A 686 B schema fails at `maxItems: 100` while a 14,240 B schema passes at `maxItems: 10`, which no explanation in bytes, depth, or authored property count survives. Going from 10 to 20 alters the schema by two bytes, adds no authored property, and flips the result.
 
-**Two corrections to the ruled-out list above.**
+**Two Corrections To The Ruled-Out List Above.**
 
 - **"Not a JSON Schema keyword" is true as written and misleading in effect.** No keyword is rejected. One keyword's _value_ is the multiplier that decides the outcome, so a reader who rules out keywords rules out the cause.
 - **"The remaining difference is scale" is right about the budget and wrong about its units.** What is capped is post-expansion property count. Bytes and depth co-vary with it, which is why they looked causal.
 
 **Fix:** `medicationsDispensed` is bounded at 10 rather than 20 (`shared/src/` (exported from `index.ts`)). That bound already existed as a runaway-decoding guard, and its own comment already argued twenty was far beyond any single GP consultation, so this tightens a Tier 1 control (§21.3) rather than weakening one, and it applies to every provider rather than special-casing Gemini. Pinned by a test in `shared/src/index.test.ts`.
 
-**Verified through the real pipeline**, which is the standard §21.2 sets rather than a toy probe: `analyseNote` and `generateSuggestions` both complete on `gemini-3.5-flash-lite` against a synthetic fixture, returning all 34 checklist fields, a four-section SOAP note, gaps, and corpus-constrained citations. Qwen re-verified unchanged on `qwen3.7-flash`.
+**Verified Through The Real Pipeline**, which is the standard §21.2 sets rather than a toy probe: `analyseNote` and `generateSuggestions` both complete on `gemini-3.5-flash-lite` against a synthetic fixture, returning all 34 checklist fields, a four-section SOAP note, gaps, and corpus-constrained citations. Qwen re-verified unchanged on `qwen3.7-flash`.
 
-**Not closed by this.** Shrinking or splitting `clinical_facts` remains worth doing on its own merits, because it cuts the largest prompt in the system for every provider including the one production runs. The headroom here is thin: the budget is shared across the whole schema, so adding checklist fields can push it back over with no array involved.
+**Not Closed By This.** Shrinking or splitting `clinical_facts` remains worth doing on its own merits, because it cuts the largest prompt in the system for every provider including the one production runs. The headroom here is thin: the budget is shared across the whole schema, so adding checklist fields can push it back over with no array involved.
 
 ### Resolved 15/08/26: Referencing The Repeated Assertion (Issue #109)
 
 Closes GitHub issue #109. `clinical_facts` is now **3,558 B rather than 14,240 B**, a 75% cut, with the checklist contract unchanged: 34 fields, same keys, same states, nothing dropped and nothing defaulted.
 
-**Where the bytes were.** Not nesting, and not the number of fields. The emitted schema inlined one 357 B assertion object 34 times, because `z.toJSONSchema` defaults to `reused: 'inline'`. Extracting it into `definitions` with `$ref` pointers removes the duplication and nothing else.
+**Where The Bytes Were.** Not nesting, and not the number of fields. The emitted schema inlined one 357 B assertion object 34 times, because `z.toJSONSchema` defaults to `reused: 'inline'`. Extracting it into `definitions` with `$ref` pointers removes the duplication and nothing else.
 
-**The two shapes issue #109 proposed were both measured and both rejected**, which is why this is worth recording rather than only fixing:
+**The Two Shapes Issue #109 Proposed Were Both Measured And Both Rejected**, which is why this is worth recording rather than only fixing:
 
 | Shape                          | Size     | Nodes | Depth | Verdict                                                            |
 | ------------------------------ | -------- | ----- | ----- | ------------------------------------------------------------------ |
@@ -112,9 +112,9 @@ Closes GitHub issue #109. `clinical_facts` is now **3,558 B rather than 14,240 B
 | Split into two calls           | 8,363 B  | n/a   | n/a   | Rejected: a fourth concurrent call, and §12 already runs them wide |
 | **Referenced (`definitions`)** | 3,558 B  | 48    | 3     | **Shipped**                                                        |
 
-**Referencing is a provider capability, not a preference.** Measured 15/08/26 against each live endpoint, varying only the schema:
+**Referencing Is A Provider Capability, Not A Preference.** Measured 15/08/26 against each live endpoint, varying only the schema:
 
-| Provider                | Inlined  | `definitions` + `$ref` | `$defs` + `$ref` | Unused `definitions` block |
+| Provider                | Inlined  | `definitions` + `$ref` | `$defs` + `$ref` | Unused `definitions` Block |
 | ----------------------- | -------- | ---------------------- | ---------------- | -------------------------- |
 | `qwen3.7-flash`         | accepted | accepted               | accepted         | accepted                   |
 | `gemini-3.5-flash-lite` | accepted | **HTTP 400**           | **HTTP 400**     | accepted                   |
@@ -122,7 +122,7 @@ Closes GitHub issue #109. `clinical_facts` is now **3,558 B rather than 14,240 B
 
 Gemini accepts a `definitions` block nothing points at and rejects any pointer into one, so it is the **`$ref` it will not resolve, not the keyword**, and renaming to `$defs` does not help. DeepSeek is unmeasured: the configured key returns 401 on every request regardless of schema, so it keeps the inlined form it has always been sent rather than inheriting an assumption.
 
-**The rule is "emit both, send the smaller", not "always reference".** Referencing is not universally smaller, and the counter-example is the call that matters most:
+**The Rule Is "Emit Both, Send The Smaller", Not "Always Reference".** Referencing is not universally smaller, and the counter-example is the call that matters most:
 
 | Operation        | Inlined  | Referenced | Sent       |
 | ---------------- | -------- | ---------- | ---------- |
@@ -131,9 +131,9 @@ Gemini accepts a `definitions` block nothing points at and rejects any pointer i
 
 `note_and_gaps` has one lightly reused shape whose pointers cost more than the duplication saves. It is also the call that writes the prose, so measuring per schema leaves its request **byte-identical to what it has always been**. That is deliberate rather than incidental: a schema change under a generative call is the shape of regression that degrades a note without failing anything, and this change now cannot reach it by construction. Emitting twice costs microseconds against a call measured in tens of seconds.
 
-**Verified through the real pipeline**, the standard §21.2 sets. `analyseNote` on a synthetic consultation, three runs per arm:
+**Verified Through The Real Pipeline**, the standard §21.2 sets. `analyseNote` on a synthetic consultation, three runs per arm:
 
-| Arm                     | Assertions | State distribution                                    |
+| Arm                     | Assertions | State Distribution                                    |
 | ----------------------- | ---------- | ----------------------------------------------------- |
 | Qwen, inlined (control) | 34, 3 of 3 | `PRESENT 6 · NOT_ASSESSED 21 · DENIED 5 · OBSERVED 2` |
 | Qwen, referenced        | 34, 3 of 3 | identical to the control                              |
@@ -141,9 +141,9 @@ Gemini accepts a `definitions` block nothing points at and rejects any pointer i
 
 All 34 fields round-trip in **9 of 9 runs**, and the Qwen state distribution is identical across arms, which is the claim this change has to support.
 
-**One thing measured and deliberately not claimed.** The model-authored gap count varied run to run, 2 to 4 across the nine runs, including between two arms whose `note_and_gaps` request was byte-identical. It is therefore pre-existing nondeterminism in a generative call rather than an effect of this change, and it is recorded as unexplained instead of folded into the result.
+**One Thing Measured And Deliberately Not Claimed.** The model-authored gap count varied run to run, 2 to 4 across the nine runs, including between two arms whose `note_and_gaps` request was byte-identical. It is therefore pre-existing nondeterminism in a generative call rather than an effect of this change, and it is recorded as unexplained instead of folded into the result.
 
-**Remaining headroom.** 48 nodes against the synthetic sweep's observed Gemini pass/fail band of 252 to 302 nodes, so on Qwen there is comfortable room for future checklist fields. It does **not** help Gemini, which still receives the 14,240 B inlined form and keeps exactly the thin margin recorded above.
+**Remaining Headroom.** 48 nodes against the synthetic sweep's observed Gemini pass/fail band of 252 to 302 nodes, so on Qwen there is comfortable room for future checklist fields. It does **not** help Gemini, which still receives the 14,240 B inlined form and keeps exactly the thin margin recorded above.
 
 ## Request Bounds
 
@@ -158,16 +158,16 @@ All 34 fields round-trip in **9 of 9 runs**, and the Qwen state distribution is 
 
 **The ceiling is still reachable, and since #373 that no longer costs the doctor anything.** A long transcript can spend the whole window, and when it does the browser's `fetch` rejects while Render keeps working: nothing cancels it, and it persists before it answers. The review page therefore reads the record's `status` rather than waiting on this response, so a cut-off request now costs a poll interval rather than the analysis (§13, "The Analysis Lease").
 
-**Why the retry went rather than the timeout rising further.** The previous shape spent the whole budget reaching a guaranteed failure: a call needing 70s of decoding needs 70s on the second attempt too, so a slow but healthy call burned 120s and two calls' quota to fail anyway (#340, measured at `durationMs` 120421 and 120467, provider verified healthy in between). Spending the same wall clock on one longer attempt is what lets those calls finish. The cost is that a transient 429 or 5xx now fails immediately, on **every** chat operation and not just analysis.
+**Why The Retry Went Rather Than The Timeout Rising Further.** The previous shape spent the whole budget reaching a guaranteed failure: a call needing 70s of decoding needs 70s on the second attempt too, so a slow but healthy call burned 120s and two calls' quota to fail anyway (#340, measured at `durationMs` 120421 and 120467, provider verified healthy in between). Spending the same wall clock on one longer attempt is what lets those calls finish. The cost is that a transient 429 or 5xx now fails immediately, on **every** chat operation and not just analysis.
 
-**A second client carries its own, shorter bound.** `OpenAICompatibleEmbeddingClient` is 10s with no retries. It shipped with neither option, inheriting 10 minutes and two retries, because every assertion in `openai-compatible.test.ts` read the chat client and nothing read this one. It is shorter than the chat bound because it is not concurrent with what follows it: `runAnalysis` awaits `retrieveGuidelines` and only then calls `generateSuggestions`, so every second spent embedding is a second on the critical path, and retrieval already degrades to the curated corpus on failure.
+**A Second Client Carries Its Own, Shorter Bound.** `OpenAICompatibleEmbeddingClient` is 10s with no retries. It shipped with neither option, inheriting 10 minutes and two retries, because every assertion in `openai-compatible.test.ts` read the chat client and nothing read this one. It is shorter than the chat bound because it is not concurrent with what follows it: `runAnalysis` awaits `retrieveGuidelines` and only then calls `generateSuggestions`, so every second spent embedding is a second on the critical path, and retrieval already degrades to the curated corpus on failure.
 
 Two clarifications, because the adjacent bound is easy to confuse with these:
 
 - `max_tokens` (8192) bounds the response's **size**; these bound its **time**. The runaway generation measured in §19 row 19 was already contained by the former.
 - Neither is a CAP-1 enforcement mechanism. Nothing fails a request at 30s; these bound the pathological case only.
 
-**Not built:** no `AbortController`, so a client disconnect does not cancel an in-flight call. That reclaims quota on abandoned requests rather than bounding a hang, and it would have to be threaded per call site.
+**Not Built:** no `AbortController`, so a client disconnect does not cancel an in-flight call. That reclaims quota on abandoned requests rather than bounding a hang, and it would have to be threaded per call site.
 
 ## Failure Modes
 

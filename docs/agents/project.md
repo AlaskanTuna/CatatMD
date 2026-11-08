@@ -2,10 +2,10 @@
 
 **CatatMD** turns a GP consultation into a reviewable structured clinical note, with missing-information prompts, red-flag detection, cited clinical suggestions and a dictated prescription table. _Catat_ is Malay for "to note down".
 
-- **Clinical scope is deliberately narrow:** adult GP consultations for acute cough, sore throat and other upper respiratory symptoms.
-- **It does not diagnose and does not replace clinical judgement.** The doctor reviews, edits and approves every output, and stays responsible for every medical decision.
-- **All consultation data in this repository is simulated.** No real patient data enters it.
-- **Quality is a deliverable.** Security posture, tests and documentation are first-class, not polish added later.
+- **Clinical Scope Is Deliberately Narrow:** adult GP consultations for acute cough, sore throat and other upper respiratory symptoms.
+- **It Does Not Diagnose And Does Not Replace Clinical Judgement.** The doctor reviews, edits and approves every output, and stays responsible for every medical decision.
+- **All Consultation Data In This Repository Is Simulated.** No real patient data enters it.
+- **Quality Is A Deliverable.** Security posture, tests and documentation are first-class, not polish added later.
 
 ## Architecture
 
@@ -13,10 +13,10 @@ Three tiers: React SPA, Express API, Postgres. The API is the only component tha
 
 | Commitment                        | Where It Lives                                      | What It Guarantees                                                                                                                                                                     |
 | --------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **The PHI boundary**              | `backend/src/deid/`                                 | Identifiers become stable pseudonymous tokens (`[PATIENT_1]`, `[NRIC_1]`) in a request-scoped vault before any text leaves the API; responses are re-hydrated on the way back.         |
-| **One egress point**              | `backend/src/lib/llm/`                              | `LLMClient` is the only path to a model, it refuses input that has not passed the gate, and the provider is a swappable adapter, so a data-residency change is a configuration change. |
-| **Deterministic red flags first** | `backend/src/redflags/`                             | A rules engine over a versioned trigger list runs first; the LLM pass may only _add_ candidates for review, never suppress a rule hit.                                                 |
-| **ID-constrained citations**      | `backend/src/guidelines/`, `backend/src/retrieval/` | The model may cite only guideline IDs it was given; free-text references fail at parse time, so a hallucinated reference is structurally impossible.                                   |
+| **The PHI Boundary**              | `backend/src/deid/`                                 | Identifiers become stable pseudonymous tokens (`[PATIENT_1]`, `[NRIC_1]`) in a request-scoped vault before any text leaves the API; responses are re-hydrated on the way back.         |
+| **One Egress Point**              | `backend/src/lib/llm/`                              | `LLMClient` is the only path to a model, it refuses input that has not passed the gate, and the provider is a swappable adapter, so a data-residency change is a configuration change. |
+| **Deterministic Red Flags First** | `backend/src/redflags/`                             | A rules engine over a versioned trigger list runs first; the LLM pass may only _add_ candidates for review, never suppress a rule hit.                                                 |
+| **ID-Constrained Citations**      | `backend/src/guidelines/`, `backend/src/retrieval/` | The model may cite only guideline IDs it was given; free-text references fail at parse time, so a hallucinated reference is structurally impossible.                                   |
 
 Implementation detail lives in `docs/TRD.md`.
 
@@ -40,7 +40,7 @@ docs/              product, architecture and operations docs
 
 ## Tech Stack
 
-- **Runtime and package manager:** Node 24, Bun workspaces (`bun install`, `bun run`).
+- **Runtime And Package Manager:** Node 24, Bun workspaces (`bun install`, `bun run`).
 - **Shared:** TypeScript 5.9 and Zod. Schemas in `shared/` are the single source of truth for both sides.
 - **Backend:** Express 5, tsx, Prisma 6, better-auth (Prisma adapter), Vitest.
 - **Frontend:** React 19, Vite 7, Tailwind 4, Radix UI, TanStack Query 5, react-router 7.

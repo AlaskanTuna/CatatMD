@@ -1,6 +1,6 @@
 <a id="top"></a>
 
-# Guideline Identity and Serialisation
+# Guideline Identity And Serialisation
 
 The `guidelines` module holds the versioned identity of the citable document
 set and the serialisation that goes into LLM prompts.

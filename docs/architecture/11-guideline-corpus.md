@@ -49,11 +49,11 @@ Three sources anchor the corpus, and every other ingested CPG scopes around them
 
 | Source                                                                                   | Covers                                                                                                  | Licence Posture                                                                     |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **MOH National Antimicrobial Guideline (NAG) 4th ed., 2024**, §A10, §A17, §C1/C3/C4      | Modified Centor scoring, acute pharyngitis, acute cough and bronchitis, acute rhinosinusitis, UTI scope | © MOH Malaysia, **all rights reserved**, summarise + link, `verbatimAllowed: false` |
-| **Abdullah et al. (2024), Malaysian sore-throat Delphi consensus**, _Infect Drug Resist_ | McIsaac scoring, antibiotic thresholds, point-of-care testing, symptomatic treatment                    | **CC BY-NC 3.0**, quotable with attribution, `verbatimAllowed: true`                |
+| **MOH National Antimicrobial Guideline (NAG) 4th Ed., 2024**, §A10, §A17, §C1/C3/C4      | Modified Centor scoring, acute pharyngitis, acute cough and bronchitis, acute rhinosinusitis, UTI scope | © MOH Malaysia, **all rights reserved**, summarise + link, `verbatimAllowed: false` |
+| **Abdullah et al. (2024), Malaysian Sore-Throat Delphi Consensus**, _Infect Drug Resist_ | McIsaac scoring, antibiotic thresholds, point-of-care testing, symptomatic treatment                    | **CC BY-NC 3.0**, quotable with attribution, `verbatimAllowed: true`                |
 | **Ooi et al. (2022)**, _Malaysian Family Physician_                                      | Malaysian URTI presenting patterns and antibiotic use                                                   | **CC BY 4.0**, quotable with attribution, `verbatimAllowed: true`                   |
 
-**NICE is excluded from the corpus.** The NICE UK Open Content Licence states that requests to use NICE content **for artificial intelligence purposes, in the UK and internationally, are not covered by the licence**; international reuse requires a paid agreement, and the licence separately forbids amending or adapting the wording or structure of a published recommendation, which chunking for retrieval arguably is. NICE may still be cited as external context in prose; no NICE recommendation text enters the corpus. This is both the safe answer and the better product answer for a Malaysian GP tool.
+**NICE Is Excluded From The Corpus.** The NICE UK Open Content Licence states that requests to use NICE content **for artificial intelligence purposes, in the UK and internationally, are not covered by the licence**; international reuse requires a paid agreement, and the licence separately forbids amending or adapting the wording or structure of a published recommendation, which chunking for retrieval arguably is. NICE may still be cited as external context in prose; no NICE recommendation text enters the corpus. This is both the safe answer and the better product answer for a Malaysian GP tool.
 
 ## One Source Per Chunk: A Safety Requirement, Not A Style Rule
 
@@ -78,10 +78,10 @@ Merging them into one "Centor threshold" chunk would manufacture a consensus tha
 | Review page  | `frontend/src/review/ScoreCard.tsx`            | Nothing pre-selected; a suggestion shows its sentence and a Use button; answers in component state only; hidden in print                    |
 | Preview stub | `frontend/src/preview/backend.ts`              | Runs the real `scoresFor`, as it runs the real red-flag engine                                                                              |
 
-- **A sentence counts** only if it is not a question, not safety-netting, not about another person or another time. A clause with a negator states nothing, and a denial must govern the finding directly. Said both ways, the item stays empty.
-- **A temperature is a reading,** never a number after "above", "under" or similar, and only within 34 to 43 °C.
-- **The citation is one `doc:` reference,** resolved by the review page from the ingested documents like a red flag's citation.
-- **The offered score and its suggestions persist with the analysis.** The doctor's answers do not.
+- **A Sentence Counts** only if it is not a question, not safety-netting, not about another person or another time. A clause with a negator states nothing, and a denial must govern the finding directly. Said both ways, the item stays empty.
+- **A Temperature Is A Reading,** never a number after "above", "under" or similar, and only within 34 to 43 °C.
+- **The Citation Is One `doc:` Reference,** resolved by the review page from the ingested documents like a red flag's citation.
+- **The Offered Score And Its Suggestions Persist With The Analysis.** The doctor's answers do not.
 
 ## Candidate Set Reaching The Prompt
 
@@ -97,8 +97,8 @@ Retrieval is the only source of a citable corpus for the model. The chunks `retr
 
 A per-consultation corpus is retrieved for each consultation. `docs/README.md` ("Guardrails Against Fabrication", "Guideline Grounding") carries the reader-facing narrative; this subsection is the implementation reference.
 
-- **The full library is the corpus, and it is the only one.** `corpus/cpg/manifest.json` indexes 109 CPG documents from the Academy of Medicine portal, the three anchoring sources above included; the top chunks for each consultation join the `suggestions` candidate set (§12), cited only by the model.
-- **Retrieved ids are not stable identifiers.** They are generated per document, page, and chunk ordinal at ingest and change on re-ingest, so nothing outside the prompt names one. The review UI resolves them from `ConsultationAnalysis.retrievedGuidelines` (§3), persisted with the analysis because re-running retrieval would not be reproducible.
+- **The Full Library Is The Corpus, And It Is The Only One.** `corpus/cpg/manifest.json` indexes 109 CPG documents from the Academy of Medicine portal, the three anchoring sources above included; the top chunks for each consultation join the `suggestions` candidate set (§12), cited only by the model.
+- **Retrieved Ids Are Not Stable Identifiers.** They are generated per document, page, and chunk ordinal at ingest and change on re-ingest, so nothing outside the prompt names one. The review UI resolves them from `ConsultationAnalysis.retrievedGuidelines` (§3), persisted with the analysis because re-running retrieval would not be reproducible.
 
 ### Data Model
 

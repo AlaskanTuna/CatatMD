@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# gaps
+# Gaps
 
 Derives missing-information prompts from the clinical checklist and records where each gap came from.
 

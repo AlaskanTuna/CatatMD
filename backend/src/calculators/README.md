@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# calculators
+# Calculators
 
 Prefills the sore-throat score from transcript evidence and returns the score for a selected clinical profile.
 

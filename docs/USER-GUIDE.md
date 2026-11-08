@@ -18,7 +18,7 @@ This guide is for a GP documenting an adult consultation for acute cough, sore t
 
 **Notes:** A name is the only required patient field. The profile shows the recorded NRIC, age, gender, and visits.
 
-## Starting a Consultation
+## Starting A Consultation
 
 1. From `Consultations`, select `New Consultation`. Choose `New Patient` to register first, or `Existing Patient` to search and select a record. You can also start from a patient's profile with `Start Consultation`.
 2. Before adding a transcript, open `Consultation Settings`. Choose `Ambient` or `Press To Record` under `Capture Mode`. Choose `SOAP` or `Malaysian Medical Record` under `Clinical Note Layout`, then select `Save Settings`.
@@ -26,7 +26,7 @@ This guide is for a GP documenting an adult consultation for acute cough, sore t
    - **Guided Fixture:** On a page outside a consultation review, select the `?` button labelled `Take the guided tour`, then select `Start Tour`. The tour analyzes a bundled synthetic transcript in the current tab. It does not create a saved consultation. The regular capture tabs do not include a fixture picker.
    - **Paste:** Select `Paste`, enter the transcript with speaker labels such as `Doctor:` and `Patient:`, then select `Use This Transcript`.
    - **Transcript File:** Select `Upload` and choose a `.txt` or `.json` transcript file. The file is submitted to the consultation. To revise it, switch to `Paste`, edit the text, and select `Use This Transcript`.
-   - **Record on This Device or Use an Audio File:** Select `Record`. In `Audio`, choose `On this device (whisper-small · WebGPU)`, which is the default. Select `Start Recording`, then `Stop and Transcribe`. Use `Pause Recording` and `Resume Recording` as needed. To transcribe an existing audio file, select `Use an Audio File` in the Record panel.
+   - **Record On This Device Or Use An Audio File:** Select `Record`. In `Audio`, choose `On this device (whisper-small · WebGPU)`, which is the default. Select `Start Recording`, then `Stop and Transcribe`. Use `Pause Recording` and `Resume Recording` as needed. To transcribe an existing audio file, select `Use an Audio File` in the Record panel.
    - **Hosted Speech Recognition:** In `Audio`, choose `ILMU (Malaysia) · ilmu-asr-v4.2` and select `Save`. Read the disclosure, then tick `This patient has agreed to be recorded and transcribed, for this consultation only. This is not remembered.` before selecting `Start Recording` or `Use an Audio File`. The disclosure says: `This recording leaves this device: sent via our server to ILMU, processed in Malaysia.`
    - **Ambient Capture:** In `Consultation Settings`, choose `Ambient` before a transcript exists. Tick the agreement for this consultation, then select `Start Ambient Capture`. Check the live transcript and select `Stop and Finish` when done. If `Refine After Stop` is enabled, the full recording is sent again for transcription; select `Use Live Transcript` to keep the live text instead.
 4. When the transcript is ready, select `Analyse Consultation`.
@@ -42,7 +42,7 @@ This guide is for a GP documenting an adult consultation for acute cough, sore t
 
 ![Consultations list](assets/01-consultation-list.png)
 
-## Reviewing the Note
+## Reviewing The Note
 
 1. Review the three panels: `Transcript`, `Clinical Note`, and `Clinical safety`. On a narrow screen, use `Transcript` and `Hide Transcript` to show or hide the transcript.
 2. Compare the transcript with the note. While the consultation is still a draft, use `Correct the transcript` to review `Suspected mishears`; corrections are only available before analysis. Select `View Conversation` to read the turns in a larger view. If a recording is available, play a turn to check what was heard. In `Clinical Note`, select `Edit`, then `Save` or `Cancel` for each section.
@@ -101,7 +101,7 @@ This guide is for a GP documenting an adult consultation for acute cough, sore t
 
 ![Approval confirmation](assets/06-approval-gate-confirm.png)
 
-## Reports and Export
+## Reports And Export
 
 1. On an approved consultation, select `Copy Note` to copy the note.
 2. Select `Export` to open `Consultation Report`. Review the note and approval details, plus any prescription table and recorded red flags.

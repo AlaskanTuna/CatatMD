@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# lib
+# Lib
 
 Provides backend infrastructure for authentication, ownership checks, persistence, safe logging, LLM egress and ASR adapters.
 

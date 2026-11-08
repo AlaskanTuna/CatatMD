@@ -1,6 +1,6 @@
-# Synthetic consultation fixtures
+# Synthetic Consultation Fixtures
 
-**Every transcript here is invented.** No real patient data, no real NRICs, and
+**Every Transcript Here Is Invented.** No real patient data, no real NRICs, and
 nothing derived from a real clinical system ever enters this repo.
 
 Fixtures deliberately include realistic identifiers (names, NRICs, phone numbers,

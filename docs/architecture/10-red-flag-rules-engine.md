@@ -33,20 +33,20 @@ interface RedFlagTrigger {
 
 Two narrow rules now decide whether a matched span asserts anything. Both default to firing, because the direction this engine must fail in is toward too many flags.
 
-| Rule                    | Applies to                  | Effect                                                                                     |
+| Rule                    | Applies To                  | Effect                                                                                     |
 | ----------------------- | --------------------------- | ------------------------------------------------------------------------------------------ |
-| **Question resolution** | A doctor turn ending in `?` | Contributes a match unless the immediately following patient turn opens with a denial      |
-| **Adjacent negation**   | Any turn                    | A match is skipped when an unambiguous negator sits directly before it, in the same clause |
+| **Question Resolution** | A doctor turn ending in `?` | Contributes a match unless the immediately following patient turn opens with a denial      |
+| **Adjacent Negation**   | Any turn                    | A match is skipped when an unambiguous negator sits directly before it, in the same clause |
 
 A patient turn always asserts, including a question of their own ("is it bad that I am coughing up blood?"). A doctor's statement always asserts, so an observed finding ("I can hear stridor") still fires.
 
-**Why questions are not simply discarded**, which was the obvious fix and a worse one: a patient answering "Yes, since this morning" to "Any chest pain?" never says the words. The question is the only place the symptom is named, so dropping it would lose the flag entirely. That case is covered by a test.
+**Why Questions Are Not Simply Discarded**, which was the obvious fix and a worse one: a patient answering "Yes, since this morning" to "Any chest pain?" never says the words. The question is the only place the symptom is named, so dropping it would lose the flag entirely. That case is covered by a test.
 
-**Negation is scoped deliberately tightly.** Only the run of text since the last clause break counts, and a "but" ends the negation's reach, so "no fever but chest pain" still fires. A denial frequently repeats the phrase it denies, which is why "no pain in the chest" needed handling at all.
+**Negation Is Scoped Deliberately Tightly.** Only the run of text since the last clause break counts, and a "but" ends the negation's reach, so "no fever but chest pain" still fires. A denial frequently repeats the phrase it denies, which is why "no pain in the chest" needed handling at all.
 
-**Residual false-negative risk, stated rather than implied.** A patient who answers a screening question with a bare denial and then contradicts it later in the same turn is not modelled. So is a negator separated from its subject by more than a clause. Both are judged less likely than the failure they replace, which fired on essentially every consultation, because alert fatigue is a false-negative mechanism wearing a false-positive costume: a flag that is always present is a flag nobody reads.
+**Residual False-negative Risk, Stated Rather Than Implied.** A patient who answers a screening question with a bare denial and then contradicts it later in the same turn is not modelled. So is a negator separated from its subject by more than a clause. Both are judged less likely than the failure they replace, which fired on essentially every consultation, because alert fatigue is a false-negative mechanism wearing a false-positive costume: a flag that is always present is a flag nobody reads.
 
-**The rubrics are now executable.** Each `FixtureRubric` carries `expectedRedFlagIds`, derived by reading the transcript against the trigger list rather than by recording output, and a test asserts exact equality for every fixture. The prose alone could not fail a build, which is how three false flags survived a passing suite.
+**The Rubrics Are Now Executable.** Each `FixtureRubric` carries `expectedRedFlagIds`, derived by reading the transcript against the trigger list rather than by recording output, and a test asserts exact equality for every fixture. The prose alone could not fail a build, which is how three false flags survived a passing suite.
 
 ## Merge Rule: The Zero-Suppression Invariant
 

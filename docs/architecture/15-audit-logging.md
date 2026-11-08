@@ -39,7 +39,7 @@ Every row carries `actorId` (the authenticated doctor); every consultation-scope
 
 The `User → Consultation` relation still uses `onDelete: Cascade`. With the audit relation restricted, a user deletion will now fail if it would cascade to a consultation with audit history. No user-deletion path is currently configured in the application or its better-auth integration. Any future account-deletion feature must make an explicit retention decision rather than bypassing this database constraint.
 
-**Why the hosted path writes two kinds of row.** The relay events are **server-observed**: `POST /api/asr/transcriptions` (#154) writes `asr.hosted_relayed` or `asr.hosted_relay_failed` at the moment audio actually egresses, which is before any `Consultation` row exists, and that is why they are actor-only. `consultation.asr_hosted_used` remains the **client-asserted** linkage, and it fires at creation rather than at consent for the original structural reason: consent happens in the browser before a `Consultation` row exists (`docs/PRD.md` §8 step 1 creates the row only once a `Transcript` does), so an event at the moment of consent would have no `consultationId` to hang on, and it is instead written by `POST /api/consultations` on the declared `source` (§3), the first point at which the fact and the consultation id coexist. Neither row substitutes for the other: the relay rows record every attempt and, on success, how many seconds were billed, the creation row ties a consultation to the doctor's declared choice, and nothing ties a specific relayed recording to a specific consultation, so that linkage stays client-asserted and is stated plainly as such.
+**Why The Hosted Path Writes Two Kinds Of Row.** The relay events are **server-observed**: `POST /api/asr/transcriptions` (#154) writes `asr.hosted_relayed` or `asr.hosted_relay_failed` at the moment audio actually egresses, which is before any `Consultation` row exists, and that is why they are actor-only. `consultation.asr_hosted_used` remains the **client-asserted** linkage, and it fires at creation rather than at consent for the original structural reason: consent happens in the browser before a `Consultation` row exists (`docs/PRD.md` §8 step 1 creates the row only once a `Transcript` does), so an event at the moment of consent would have no `consultationId` to hang on, and it is instead written by `POST /api/consultations` on the declared `source` (§3), the first point at which the fact and the consultation id coexist. Neither row substitutes for the other: the relay rows record every attempt and, on success, how many seconds were billed, the creation row ties a consultation to the doctor's declared choice, and nothing ties a specific relayed recording to a specific consultation, so that linkage stays client-asserted and is stated plainly as such.
 
 ## Clinical Content Versioning
 
@@ -66,7 +66,7 @@ interface ClinicalArtefactVersion {
 
 `id` and `effectiveDate` are separate because they answer different questions. `id` must stay stable once a run has recorded it; `effectiveDate` is editorial and may be set ahead of the authoring date.
 
-**One stamping path.** `backend/src/clinical-versions/index.ts` collects the five into `ACTIVE_CLINICAL_VERSIONS`, which is what the analyse route writes. **`medicationLexicon` is registered ahead of any consumer, and no consumer exists yet**: nothing in the analysis pipeline reads it, because dictated prescription capture (`docs/decisions/` D-001) will run on its own route once #312 and #313 land. It is stamped here anyway, because this registry is the one home a version constant may have and the alternative is a clinical artefact whose version nothing records. Until those land, an analysis stamp carries a version that analysis did not use, so read the stamp as the clinical content active at the time rather than a claim that each artefact was exercised. The metadata on `consultation.analysis_completed` as built:
+**One Stamping Path.** `backend/src/clinical-versions/index.ts` collects the five into `ACTIVE_CLINICAL_VERSIONS`, which is what the analyse route writes. **`medicationLexicon` is registered ahead of any consumer, and no consumer exists yet**: nothing in the analysis pipeline reads it, because dictated prescription capture (`docs/decisions/` D-001) will run on its own route once #312 and #313 land. It is stamped here anyway, because this registry is the one home a version constant may have and the alternative is a clinical artefact whose version nothing records. Until those land, an analysis stamp carries a version that analysis did not use, so read the stamp as the clinical content active at the time rather than a claim that each artefact was exercised. The metadata on `consultation.analysis_completed` as built:
 
 ```
 {
@@ -92,7 +92,7 @@ Because `AuditEvent` is append-only, a past analysis keeps the versions it ran u
 
 **Enforcement.** `backend/src/clinical-versions/no-stray-clinical-constants.test.ts` scans `backend/src` and `frontend/src` and fails the build on either a whole single-quoted literal equal to a trigger or checklist id, or a guideline scoring-system name, outside the three data files. Tests and `backend/src/fixtures/` are exempt. The id set is read from the data at runtime, never listed in the test, so it cannot go stale. The second check exists because the scoring systems carry the thresholds the two Malaysian sources disagree on (§11): a hard-coded one is a manufactured consensus with nothing citing it.
 
-**Not versioned data, deliberately.** Per-chunk source versions are not modelled. `GuidelineChunk` (§11) carries `year`, and the edition sits inside `title` ("4th Edition"). Adding a structured `sourceVersion` would change a `@shared/types` schema and is raised on issue #31 rather than assumed.
+**Not Versioned Data, Deliberately.** Per-chunk source versions are not modelled. `GuidelineChunk` (§11) carries `year`, and the edition sits inside `title` ("4th Edition"). Adding a structured `sourceVersion` would change a `@shared/types` schema and is raised on issue #31 rather than assumed.
 
 ## Clinical Workflow Profiles
 
@@ -107,7 +107,7 @@ Each rule, checklist entry, and guideline chunk carries its own `profiles` membe
 
 The second profile is adult acute uncomplicated urinary tract infection. It is a useful proof because it is a different body system while remaining within acute adult primary care, and it uses the MOH National Antimicrobial Guideline 2024 source already represented in the corpus. Its deterministic rules deliberately over-trigger for fever or rigors, flank or back pain, systemic deterioration, pregnancy, urinary retention, potentially complicating context, and concerning vital signs. Its five gap entries are limited to the existing structured schema's safety-relevant observations and drug-allergy field. The shared schema does not yet capture urinary symptoms, pregnancy status, renal history, or catheter status, so this is a constrained workflow proof rather than a clinically complete urinary assessment.
 
-**No clinician has reviewed this content.** The second profile is not clinically validated and must not be presented as such.
+**No Clinician Has Reviewed This Content.** The second profile is not clinically validated and must not be presented as such.
 
 ## Profile Persistence And Migration Path
 
@@ -132,33 +132,33 @@ hash = sha256( prevHash | id | action | actorId | consultationId | createdAt )
 
 | Decision                                                | Why                                                                                                                                                                                                         |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`metadata` is not a hash input**                      | It is the one column that could ever hold more than a label. Keeping it out means the chain can never become a second copy of anything sensitive. The cost is stated below.                                 |
-| **Genesis is the string `'genesis'`, not `null`**       | Postgres lets any number of `null`s through a unique index, so a nullable root would silently permit a second chain beside the first.                                                                       |
-| **`prevHash` is `@unique`**                             | Two concurrent appends that read the same head fail loudly instead of forking the chain. Verified against the live database: the second insert raises `Unique constraint failed on the fields: (prevHash)`. |
-| **`id` and `createdAt` are minted in application code** | Both are hash inputs, and their column defaults would not produce a value until after the hash had to be computed.                                                                                          |
-| **Verification follows links, not `createdAt`**         | Two rows written in the same millisecond must not be read back in the wrong order and reported as tampering. A false alarm in an integrity check costs nearly as much as a missed one.                      |
+| **`metadata` Is Not A Hash Input**                      | It is the one column that could ever hold more than a label. Keeping it out means the chain can never become a second copy of anything sensitive. The cost is stated below.                                 |
+| **Genesis Is The String `'genesis'`, Not `null`**       | Postgres lets any number of `null`s through a unique index, so a nullable root would silently permit a second chain beside the first.                                                                       |
+| **`prevHash` Is `@unique`**                             | Two concurrent appends that read the same head fail loudly instead of forking the chain. Verified against the live database: the second insert raises `Unique constraint failed on the fields: (prevHash)`. |
+| **`id` And `createdAt` Are Minted In Application Code** | Both are hash inputs, and their column defaults would not produce a value until after the hash had to be computed.                                                                                          |
+| **Verification Follows Links, Not `createdAt`**         | Two rows written in the same millisecond must not be read back in the wrong order and reported as tampering. A false alarm in an integrity check costs nearly as much as a missed one.                      |
 
 `verifyAuditChainFromDatabase()` walks the chain and reports the first row that does not hold up: `hash_mismatch` for an edited row, `orphaned` for one whose predecessor was deleted or rewritten, `unexpected_head` when the chain is intact but ends somewhere other than a head hash the auditor already held.
 
-**What this does not do.** Stated plainly, because the property is narrower than "tamper-proof" and the difference matters:
+**What This Does Not Do.** Stated plainly, because the property is narrower than "tamper-proof" and the difference matters:
 
 - It is **not** a defence against an attacker with write access who recomputes the whole chain. It makes tampering **detectable by an auditor holding a head hash from an earlier point in time**, not impossible.
-- **A `metadata` rewrite is not detectable**, because `metadata` is deliberately excluded from the hash.
-- **Truncation of the newest rows is not self-detecting.** Deleting from the end leaves a shorter chain that is internally valid; only a previously recorded head hash reveals it. `verifyAuditChain` takes that head as an optional argument, and `chain.test.ts` asserts this limitation rather than only documenting it.
-- **Rows written before the migration are not chained.** 19 such rows exist. Integrity cannot be retrofitted onto history that was not recorded while it happened, so they carry no hash and verification skips them.
+- **A `metadata` Rewrite Is Not Detectable**, because `metadata` is deliberately excluded from the hash.
+- **Truncation Of The Newest Rows Is Not Self-Detecting.** Deleting from the end leaves a shorter chain that is internally valid; only a previously recorded head hash reveals it. `verifyAuditChain` takes that head as an optional argument, and `chain.test.ts` asserts this limitation rather than only documenting it.
+- **Rows Written Before The Migration Are Not Chained.** 19 such rows exist. Integrity cannot be retrofitted onto history that was not recorded while it happened, so they carry no hash and verification skips them.
 - No blockchain, no distributed ledger, no external anchoring. Immutability was rejected on 13/08/26 because it conflicts directly with PDPA rights to correction and withdrawal of consent.
 
-## One Writer, Enforced (issue #55)
+## One Writer, Enforced (Issue #55)
 
 `recordAuditEvent` is the only thing permitted to write `audit_event`, and `backend/src/audit/no-stray-audit-writes.test.ts` fails the build when anything else does.
 
 That invariant was a doc comment until #55, and the comment was **wrong**. The better-auth session hook wrote `prisma.auditEvent.create` directly, so every `auth.session.created` row landed with no `prevHash` and sat permanently outside the chain. It was found in production, not in review, because nothing executable was checking. The guard scans `backend/src` and `prisma/` for every write verb, not only `create`: on an append-only table an `update` or `delete` reaching it is worse than a bypassed insert.
 
-## Losing the Race for the Chain Head
+## Losing The Race For The Chain Head
 
 Login writes to the chain now, and the guest account is shared by design (`docs/PRD.md` §6), so two appends reading the same head is a normal event rather than a fault. `recordAuditEvent` retries the transaction up to three times on the `prevHash` unique violation, re-reading the head each attempt. Anything that is not that violation rethrows untouched.
 
-**One call site fails open, and only one.** Every consultation path propagates a failed append, because a note whose approval was not recorded must not read as approved. The better-auth session hook is the exception: after the retry is exhausted it logs under `audit_write_error` and lets sign-in proceed. Locking a doctor out of a clinical system because an audit row lost a race is the worse failure. The `catch` sits at the hook rather than inside `recordAuditEvent`, so the asymmetry is visible at the call site instead of hidden in the shared path, and the gap is logged rather than swallowed.
+**One Call Site Fails Open, And Only One.** Every consultation path propagates a failed append, because a note whose approval was not recorded must not read as approved. The better-auth session hook is the exception: after the retry is exhausted it logs under `audit_write_error` and lets sign-in proceed. Locking a doctor out of a clinical system because an audit row lost a race is the worse failure. The `catch` sits at the hook rather than inside `recordAuditEvent`, so the asymmetry is visible at the call site instead of hidden in the shared path, and the gap is logged rather than swallowed.
 
 ## Forbidden Content
 
