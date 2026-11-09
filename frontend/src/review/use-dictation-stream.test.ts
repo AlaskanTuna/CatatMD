@@ -25,7 +25,10 @@ import {
  */
 
 const mocks = vi.hoisted(() => ({ createLiveSession: vi.fn() }))
+const startPcmCapture = vi.hoisted(() => vi.fn())
+const pcmStop = vi.hoisted(() => vi.fn(async () => {}))
 vi.mock('../lib/api.js', () => ({ api: { createLiveSession: mocks.createLiveSession } }))
+vi.mock('../audio/live/pcm-capture.js', () => ({ startPcmCapture }))
 
 const recorders: FakeMediaRecorder[] = []
 const sockets: FakeWebSocket[] = []
@@ -108,6 +111,25 @@ const session = {
   config: {},
 }
 
+const pcmSession = {
+  ...session,
+  provider: 'qwen',
+  region: 'sg',
+  websocketUrl: 'wss://catatmd-api.onrender.com/api/asr/live-relay',
+  config: {
+    model: 'qwen3-asr-flash-realtime',
+    languageHints: ['en', 'ms'],
+    languageIdentification: false,
+    speakerDiarization: false,
+    endpointDetection: true,
+    context: { general: [{ key: 'domain', value: 'Healthcare' }] },
+    audioFormat: 'pcm_s16le',
+    sampleRate: 16000,
+  },
+}
+
+let pcmOnFrame: ((frame: ArrayBuffer) => void) | null = null
+
 let getUserMedia: ReturnType<typeof vi.fn>
 let tracks: { stop: ReturnType<typeof vi.fn> }[]
 
@@ -129,6 +151,12 @@ beforeEach(() => {
   recorders.length = 0
   sockets.length = 0
   mocks.createLiveSession.mockReset().mockResolvedValue(session)
+  pcmOnFrame = null
+  pcmStop.mockClear()
+  startPcmCapture.mockReset().mockImplementation(async (_mic: unknown, onFrame: unknown) => {
+    pcmOnFrame = onFrame as (frame: ArrayBuffer) => void
+    return { stop: pcmStop }
+  })
 
   tracks = [{ stop: vi.fn() }]
   getUserMedia = vi.fn().mockResolvedValue({ getTracks: () => tracks } as unknown as MediaStream)
@@ -227,6 +255,36 @@ describe('while streaming', () => {
     // surface here, and a second `createObjectURL` holder would fail the
     // audio-persistence guard.
     expect(socket.sent.length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('PCM dictation', () => {
+  it('sends binary frames, creates no streaming recorder, and stops the capture before finishing', async () => {
+    mocks.createLiveSession.mockResolvedValue(pcmSession)
+    const onComplete = vi.fn()
+    const view = renderHook(() => useDictationStream({ onComplete }))
+    await act(async () => {
+      await view.result.current.start()
+    })
+    const socket = sockets[0]
+    if (!socket) throw new Error('no socket was opened')
+    await act(async () => socket.open())
+
+    expect(recorders).toHaveLength(0)
+    expect(startPcmCapture).toHaveBeenCalledTimes(1)
+    const frame = new ArrayBuffer(3_200)
+    act(() => pcmOnFrame?.(frame))
+    expect(socket.sent[1]).toBe(frame)
+
+    await act(async () => socket.deliver([{ text: 'paracetamol 1 g', is_final: true }]))
+    await act(async () => {
+      view.result.current.stop()
+    })
+    expect(pcmStop).toHaveBeenCalledTimes(1)
+    await act(async () => socket.deliver([], true))
+
+    await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1))
+    expect(onComplete).toHaveBeenCalledWith(expect.stringContaining('paracetamol'), null)
   })
 })
 

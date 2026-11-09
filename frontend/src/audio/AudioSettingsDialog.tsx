@@ -1,3 +1,4 @@
+import type { LiveAsrProvider } from '@shared/types'
 import { Cpu, Radio, Server } from 'lucide-react'
 import { type Ref, useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '../lib/cn.js'
@@ -120,6 +121,7 @@ export function AudioSettingsDialog({
   onApply,
   ambient,
   refinementAvailable = false,
+  liveProvider = 'soniox',
 }: {
   ref: Ref<HTMLDialogElement>
   settings: AudioSettings
@@ -132,6 +134,8 @@ export function AudioSettingsDialog({
    * never governs nothing.
    */
   refinementAvailable?: boolean
+  /** The provider the deployment's live config reports, named on the ambient card. */
+  liveProvider?: LiveAsrProvider
 }) {
   const [draft, setDraft] = useState(settings)
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([])
@@ -189,10 +193,10 @@ export function AudioSettingsDialog({
           </legend>
           <div className="grid gap-2">
             {/*
-              First, and not a control. Ambient streams to Soniox whatever is
-              picked below, so this states what is running rather than offering
-              a choice: no button, no `aria-pressed`, nothing to press that
-              would do nothing.
+              First, and not a control. Ambient streams to the provider the
+              deployment's live config reports, whatever is picked below, so
+              this states what is running rather than offering a choice: no
+              button, no `aria-pressed`, nothing to press that would do nothing.
 
               While this row is showing, it is the only filled card in the list.
               A green fill here means one thing, that the engine is running, and
@@ -203,11 +207,11 @@ export function AudioSettingsDialog({
               the fill is what the eye reads (#291).
 
               It names the provider but not the region or the model, which the
-              ILMU option does name. Both come from `api.liveAsrConfig()`, which
-              `AmbientCapture` holds; a second copy here would be a residency
-              claim made by a component that cannot see the socket, and this
-              dialog has already shipped a claim that outlived what it
-              described. **No surface names the region for ambient any more**
+              ILMU option does name. The provider comes from
+              `api.liveAsrConfig()`, which `AmbientCapture` holds and passes
+              in; a second copy here would be a residency claim made by a
+              component that cannot see the socket, and this dialog has
+              already shipped a claim that outlived what it described. **No surface names the region for ambient any more**
               (`docs/DECISIONS.md` D-004), so this card must not point at one:
               it says the audio leaves and stops there, which is true.
             */}
@@ -215,7 +219,9 @@ export function AudioSettingsDialog({
               <div className="flex gap-2.5 rounded-card border border-accent/30 bg-accent-soft p-3 text-left">
                 <div className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="font-semibold text-sm">Soniox (streaming)</span>
+                    <span className="font-semibold text-sm">
+                      {liveProvider === 'qwen' ? 'Qwen (streaming)' : 'Soniox (streaming)'}
+                    </span>
                     <span className="rounded-pill bg-surface px-2 py-0.5 font-medium text-2xs text-accent">
                       In Use
                     </span>

@@ -1,4 +1,10 @@
-import type { DraftTurn, InterpretedLanguage, LiveAsrConfig, LiveSession } from '@shared/types'
+import type {
+  DraftTurn,
+  InterpretedLanguage,
+  LiveAsrConfig,
+  LiveAsrProvider,
+  LiveSession,
+} from '@shared/types'
 import { MAX_BATCH_RECORDING_SECONDS, MAX_DRAFT_TEXT_CHARACTERS } from '@shared/types'
 import { Loader2, Maximize2, Mic, Minimize2, Square } from 'lucide-react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
@@ -39,6 +45,7 @@ import {
   tokensToSegments,
   tokensToText,
 } from './live-tokens.js'
+import { type PcmCapture, startPcmCapture } from './pcm-capture.js'
 import { openSonioxStream, type SonioxStream, TIMESLICE_MS } from './soniox-stream.js'
 
 /**
@@ -189,6 +196,7 @@ export function AmbientCapture({
   patientName,
   refineAfterStop = true,
   onRefinementAvailable,
+  onProviderAvailable,
 }: {
   onTranscript: (result: {
     text: string
@@ -286,6 +294,8 @@ export function AmbientCapture({
    * Audio dialog shows its switch only where it does something.
    */
   onRefinementAvailable?: (available: boolean) => void
+  /** The live provider the config probe reports, so the Audio dialog can name it. */
+  onProviderAvailable?: (provider: LiveAsrProvider) => void
 }) {
   const [availability, setAvailability] = useState<Availability>({ status: 'loading' })
   const [phase, setPhase] = useState<Phase>('idle')
@@ -384,6 +394,9 @@ export function AmbientCapture({
   const attempt = useRef(0)
   const agreedRef = useRef(false)
   const stream = useRef<SonioxStream | null>(null)
+  const pcmCapture = useRef<PcmCapture | null>(null)
+  const pcmSink = useRef<((frame: ArrayBuffer) => void) | null>(null)
+  const pcmActive = useRef(false)
   /** The recorder feeding the socket now. A reconnect gives it a fresh one. */
   const recorder = useRef<MediaRecorder | null>(null)
   /**
@@ -438,6 +451,7 @@ export function AmbientCapture({
   const onLiveSegmentsRef = useRef(onLiveSegments)
   const onUnavailableRef = useRef(onUnavailable)
   const onRefinementAvailableRef = useRef(onRefinementAvailable)
+  const onProviderAvailableRef = useRef(onProviderAvailable)
   /** Whether the API offers refinement after Stop (#436), from the config probe. */
   const batchAvailable = useRef(false)
   /** `refineAfterStop` for `deliver`, which must not wait for a render. */
@@ -457,6 +471,7 @@ export function AmbientCapture({
     onLiveSegmentsRef.current = onLiveSegments
     onUnavailableRef.current = onUnavailable
     onRefinementAvailableRef.current = onRefinementAvailable
+    onProviderAvailableRef.current = onProviderAvailable
     refineRef.current = refineAfterStop
   })
 
@@ -484,6 +499,7 @@ export function AmbientCapture({
         if (attempt.current !== id) return
         batchAvailable.current = config.batchRefinement === true
         onRefinementAvailableRef.current?.(batchAvailable.current)
+        onProviderAvailableRef.current?.(config.provider)
         setAvailability({ status: 'ready', config })
       })
       .catch((cause: unknown) => {
@@ -521,6 +537,11 @@ export function AmbientCapture({
 
   const teardown = useCallback(() => {
     generation.current += 1
+    pcmSink.current = null
+    const pcm = pcmCapture.current
+    pcmCapture.current = null
+    pcmActive.current = false
+    if (pcm) void pcm.stop()
     // Detached first: a stop this component initiated must not re-enter the
     // delivery path through a handler that is about to be discarded.
     discardRecorder(recorder.current)
@@ -798,6 +819,11 @@ export function AmbientCapture({
     if (stopping.current) return
     attempt.current += 1
     generation.current += 1
+    pcmSink.current = null
+    const pcm = pcmCapture.current
+    pcmCapture.current = null
+    pcmActive.current = false
+    if (pcm) void pcm.stop()
     discardRecorder(recorder.current)
     discardRecorder(archive.current)
     recorder.current = null
@@ -860,27 +886,44 @@ export function AmbientCapture({
       settled.current = absorb({ final: settled.current.final, interim: [] }, [boundary])
       setLive(settled.current)
 
-      const queued: Blob[] = []
+      const queued: (Blob | ArrayBuffer)[] = []
       let target: SonioxStream | null = null
-      const media = buildRecorder(microphone)
-      media.ondataavailable = (event) => {
-        if (attempt.current !== id || event.data.size === 0) return
-        // Ahead of the generation check on purpose: a stop bumps it before the
-        // drain, and the live socket still needs this recorder's last chunk.
-        if (target?.state === 'streaming') {
-          target.send(event.data)
-          return
+      if (pcmActive.current) {
+        // The worklet capture survives the drop; only its destination changes.
+        pcmSink.current = (frame) => {
+          if (attempt.current !== id) return
+          if (target?.state === 'streaming') {
+            target.send(frame)
+            return
+          }
+          if (generation.current !== gen) return
+          if (Date.now() - lostAt > MAX_BEHIND_MS) {
+            onStreamFailure()
+            return
+          }
+          queued.push(frame)
         }
-        if (generation.current !== gen) return
-        // Held no longer than the bound, however slow the mint or the connect.
-        if (Date.now() - lostAt > MAX_BEHIND_MS) {
-          onStreamFailure()
-          return
+      } else {
+        const media = buildRecorder(microphone)
+        media.ondataavailable = (event) => {
+          if (attempt.current !== id || event.data.size === 0) return
+          // Ahead of the generation check on purpose: a stop bumps it before the
+          // drain, and the live socket still needs this recorder's last chunk.
+          if (target?.state === 'streaming') {
+            target.send(event.data)
+            return
+          }
+          if (generation.current !== gen) return
+          // Held no longer than the bound, however slow the mint or the connect.
+          if (Date.now() - lostAt > MAX_BEHIND_MS) {
+            onStreamFailure()
+            return
+          }
+          queued.push(event.data)
         }
-        queued.push(event.data)
+        media.start(TIMESLICE_MS)
+        recorder.current = media
       }
-      media.start(TIMESLICE_MS)
-      recorder.current = media
       const offsetMs = lostAt - startedAt.current
       connection.current += 1
       const heard = connection.current
@@ -971,6 +1014,7 @@ export function AmbientCapture({
     setDownSince(null)
     setNotice(null)
     connection.current = 0
+    pcmActive.current = false
     setLive(EMPTY_LIVE_TRANSCRIPT)
     settled.current = EMPTY_LIVE_TRANSCRIPT
     // Cleared with the transcript, not after delivery: a session that failed
@@ -1057,6 +1101,39 @@ export function AmbientCapture({
         onOpen: () => {
           if (attempt.current !== id) return
           streaming = true
+          if (session.config.audioFormat === 'pcm_s16le') {
+            pcmActive.current = true
+            // The archive recorder keeps the playback copy; it sends nothing.
+            const media = buildRecorder(microphone)
+            media.ondataavailable = (event) => {
+              if (attempt.current !== id) return
+              if (event.data.size === 0) return
+              chunks.current.push(event.data)
+            }
+            mime.current = media.mimeType
+            recorder.current = media
+            archive.current = media
+            startedAt.current = Date.now()
+            capMs.current =
+              session.maxSessionSeconds === undefined ? null : session.maxSessionSeconds * 1_000
+            media.start(TIMESLICE_MS)
+            pcmSink.current = (frame) => opened.send(frame)
+            void startPcmCapture(microphone, (frame) => pcmSink.current?.(frame))
+              .then((capture) => {
+                if (attempt.current !== id || stopping.current) {
+                  void capture.stop()
+                  return
+                }
+                pcmCapture.current = capture
+              })
+              .catch(() => {
+                if (attempt.current === id && !stopping.current) onStreamFailure()
+              })
+            setMicStream(microphone)
+            setPhase('listening')
+            onLiveChangeRef.current(true)
+            return
+          }
           const media = buildRecorder(microphone)
           media.ondataavailable = (event) => {
             if (attempt.current !== id) return
@@ -1144,6 +1221,12 @@ export function AmbientCapture({
     await Promise.all([stopRecorder(active), kept === active ? undefined : stopRecorder(kept)])
     recorder.current = null
     archive.current = null
+    // Flush the last partial PCM frame before the end frame, on this path only.
+    const pcm = pcmCapture.current
+    pcmCapture.current = null
+    if (pcm) await pcm.stop()
+    pcmSink.current = null
+    pcmActive.current = false
     // The length of the recording the archive holds, which is what refinement
     // would upload. Rounded up, so the bound is never understated.
     const durationSeconds = Math.max(1, Math.ceil((Date.now() - startedAt.current) / 1_000))
