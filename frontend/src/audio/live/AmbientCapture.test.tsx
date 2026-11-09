@@ -10,6 +10,8 @@ const draftHostedTurns = vi.hoisted(() => vi.fn())
 const createBatchSession = vi.hoisted(() => vi.fn())
 const refinementCheck = vi.hoisted(() => vi.fn())
 const transcribeRecording = vi.hoisted(() => vi.fn())
+const startPcmCapture = vi.hoisted(() => vi.fn())
+const pcmStop = vi.hoisted(() => vi.fn(async () => {}))
 const toast = vi.hoisted(() => vi.fn())
 
 vi.mock('../../lib/api.js', async () => {
@@ -29,6 +31,7 @@ vi.mock('../../lib/api.js', async () => {
 // The upload itself is pinned by `elevenlabs-batch.test.ts`; here it is the
 // seam the component drives.
 vi.mock('./elevenlabs-batch.js', () => ({ transcribeRecording }))
+vi.mock('./pcm-capture.js', () => ({ startPcmCapture }))
 
 vi.mock('react-hot-toast', () => ({ default: toast }))
 
@@ -156,6 +159,30 @@ const config = {
   config: session.config,
 }
 
+const pcmSession = {
+  ...session,
+  provider: 'qwen' as const,
+  region: 'sg' as const,
+  websocketUrl: 'wss://catatmd-api.onrender.com/api/asr/live-relay',
+  apiKey: 'relay-token',
+  config: {
+    ...session.config,
+    model: 'qwen3-asr-flash-realtime',
+    speakerDiarization: false,
+    audioFormat: 'pcm_s16le' as const,
+    sampleRate: 16000 as const,
+  },
+}
+
+const pcmConfig = {
+  provider: pcmSession.provider,
+  region: pcmSession.region,
+  websocketUrl: pcmSession.websocketUrl,
+  config: pcmSession.config,
+}
+
+let pcmOnFrame: ((frame: ArrayBuffer) => void) | null = null
+
 const BATCH_SESSION = {
   provider: 'elevenlabs' as const,
   uploadUrl: 'https://api.elevenlabs.io/v1/speech-to-text' as const,
@@ -210,6 +237,12 @@ beforeEach(() => {
   createBatchSession.mockReset().mockResolvedValue(BATCH_SESSION)
   transcribeRecording.mockReset().mockResolvedValue({ ok: true, sent: true, words: REFINED_WORDS })
   refinementCheck.mockReset().mockResolvedValue([])
+  pcmOnFrame = null
+  pcmStop.mockClear()
+  startPcmCapture.mockReset().mockImplementation(async (_mic: unknown, onFrame: unknown) => {
+    pcmOnFrame = onFrame as (frame: ArrayBuffer) => void
+    return { stop: pcmStop }
+  })
   toast.mockReset()
   FakeMediaRecorder.isTypeSupported.mockReset().mockReturnValue(true)
   tracks = [{ stop: vi.fn() }]
@@ -672,6 +705,92 @@ describe('listening', () => {
     const { onLiveChange } = await startSession()
 
     expect(onLiveChange).toHaveBeenCalledWith(true)
+  })
+})
+
+describe('PCM sessions', () => {
+  async function startPcm() {
+    liveAsrConfig.mockResolvedValue(pcmConfig)
+    createLiveSession.mockResolvedValue(pcmSession)
+    const view = renderAmbient()
+    await settle()
+    await act(async () => tick().click())
+    await act(async () => startButton().click())
+    await settle()
+    await act(async () => socket().open())
+    await settle()
+    return view
+  }
+
+  it('sends binary PCM frames and no MediaRecorder stream chunks, while the archive still records', async () => {
+    await startPcm()
+
+    expect(startPcmCapture).toHaveBeenCalledTimes(1)
+    // One archive recorder only; it is not the streaming transport on this path.
+    expect(recorders).toHaveLength(1)
+    await act(async () => recorder().emit())
+    expect(socket().sent).toHaveLength(1)
+
+    const frame = new ArrayBuffer(3_200)
+    await act(async () => pcmOnFrame?.(frame))
+    expect(socket().sent[1]).toBe(frame)
+  })
+
+  it('renders speaker-less phrases separated by <end> as turns and labels them after Stop', async () => {
+    draftHostedTurns.mockResolvedValue([
+      { speaker: 'doctor', text: 'What brings you in' },
+      { speaker: 'patient', text: 'I have a cough' },
+    ])
+    const { onTranscript } = await startPcm()
+
+    await act(async () =>
+      socket().message({
+        tokens: [
+          { text: 'What brings you in', start_ms: 0, end_ms: 900, is_final: true },
+          { text: '<end>', start_ms: 900, end_ms: 900, is_final: true },
+          { text: ' I have a cough', start_ms: 1_000, end_ms: 2_000, is_final: true },
+          { text: '<end>', start_ms: 2_000, end_ms: 2_000, is_final: true },
+        ],
+      }),
+    )
+    expect(screen.getByText('What brings you in')).toBeTruthy()
+    expect(screen.getByText('I have a cough')).toBeTruthy()
+
+    const stopped = act(async () => {
+      screen.getByRole('button', { name: /stop and finish/i }).click()
+    })
+    await settle()
+    expect(pcmStop).toHaveBeenCalledTimes(1)
+    await act(async () => socket().message({ tokens: [], finished: true }))
+    await stopped
+    await settle()
+
+    expect(onTranscript).toHaveBeenCalledTimes(1)
+    const delivered = onTranscript.mock.calls[0]?.[0]
+    expect(delivered.segments).toHaveLength(2)
+    expect(delivered.draftTurns).toEqual([
+      { speaker: 'doctor', text: 'What brings you in' },
+      { speaker: 'patient', text: 'I have a cough' },
+    ])
+    expect(socket().sent.at(-1)).toBe('')
+  })
+
+  it('queues PCM frames across a reconnect and reuses the one capture', async () => {
+    await startPcm()
+    await act(async () => socket().drop())
+    await settle()
+
+    expect(createLiveSession).toHaveBeenCalledTimes(2)
+    expect(recorders).toHaveLength(1)
+    const frame = new ArrayBuffer(3_200)
+    await act(async () => pcmOnFrame?.(frame))
+    const reopened = sockets[1]
+    if (!reopened) throw new Error('no second socket')
+    await act(async () => reopened.open())
+    await settle()
+
+    expect(startPcmCapture).toHaveBeenCalledTimes(1)
+    expect(reopened.sent[1]).toBe(frame)
   })
 })
 

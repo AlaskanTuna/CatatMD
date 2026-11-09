@@ -42,7 +42,11 @@ afterEach(cleanup)
  * not implement. The attribute is what the UA stylesheet keys on, which is the
  * only part of the difference these assertions can see.
  */
-function renderDialog(ambient = false, refinementAvailable = false) {
+function renderDialog(
+  ambient = false,
+  refinementAvailable = false,
+  liveProvider: 'soniox' | 'qwen' = 'soniox',
+) {
   const ref = createRef<HTMLDialogElement>()
   const onApply = vi.fn()
   render(
@@ -52,6 +56,7 @@ function renderDialog(ambient = false, refinementAvailable = false) {
       onApply={onApply}
       ambient={ambient}
       refinementAvailable={refinementAvailable}
+      liveProvider={liveProvider}
     />,
   )
   act(() => ref.current?.setAttribute('open', ''))
@@ -137,6 +142,14 @@ describe('the Audio dialog and the control it describes', () => {
     // Stated, not offered. Ambient streams to Soniox whatever is selected
     // below, so a control here would be one that does nothing.
     expect(screen.getByText(/soniox \(streaming\)/i).closest('button')).toBeNull()
+  })
+
+  it('names Qwen while the consultation is ambient on a Qwen deployment', () => {
+    renderDialog(true, false, 'qwen')
+
+    expect(screen.getByText(/qwen \(streaming\)/i)).toBeTruthy()
+    expect(screen.queryByText(/soniox \(streaming\)/i)).toBeNull()
+    expect(screen.getByText('In Use')).toBeTruthy()
   })
 
   it('leaves the press-to-record engines usable while the consultation is ambient', () => {

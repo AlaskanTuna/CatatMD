@@ -86,6 +86,22 @@ const session: LiveSession = {
   },
 }
 
+const pcmSession: LiveSession = {
+  provider: 'qwen',
+  region: 'sg',
+  websocketUrl: 'wss://catatmd-api.onrender.com/api/asr/live-relay',
+  apiKey: 'relay-token',
+  expiresAt: '2026-09-06T12:01:00Z',
+  config: {
+    ...session.config,
+    model: 'qwen3-asr-flash-realtime',
+    speakerDiarization: false,
+    endpointDetection: false,
+    audioFormat: 'pcm_s16le',
+    sampleRate: 16000,
+  },
+}
+
 let onOpen: ReturnType<typeof vi.fn>
 let onTokens: ReturnType<typeof vi.fn>
 let onFailure: ReturnType<typeof vi.fn>
@@ -206,6 +222,38 @@ describe('sending audio', () => {
     stream.send(blob(0))
 
     expect(socket().sent).toHaveLength(1)
+  })
+})
+
+describe('PCM sessions', () => {
+  it('accepts a relay session URL and sends the PCM first frame', () => {
+    openSonioxStream(pcmSession, handlers())
+
+    expect(socket().url).toBe('wss://catatmd-api.onrender.com/api/asr/live-relay')
+    socket().open()
+
+    expect(JSON.parse(String(socket().sent[0]))).toEqual(
+      expect.objectContaining({
+        api_key: 'relay-token',
+        model: 'qwen3-asr-flash-realtime',
+        audio_format: 'pcm_s16le',
+        sample_rate: 16000,
+        num_channels: 1,
+      }),
+    )
+    expect(JSON.parse(String(socket().sent[0]))).not.toHaveProperty('audio_format', 'auto')
+  })
+
+  it('forwards binary PCM frames and drops empty ones', () => {
+    const stream = openSonioxStream(pcmSession, handlers())
+    socket().open()
+    const frame = new ArrayBuffer(3_200)
+
+    stream.send(frame)
+    stream.send(new ArrayBuffer(0))
+
+    expect(socket().sent[1]).toBe(frame)
+    expect(socket().sent).toHaveLength(2)
   })
 })
 

@@ -2,6 +2,7 @@ import type {
   CaptureMode,
   DraftTurn,
   InterpretedLanguage,
+  LiveAsrProvider,
   TextRange,
   Transcript,
   TranscriptSource,
@@ -158,6 +159,7 @@ export function CapturePanel({
    * the switch does something.
    */
   const [refinementAvailable, setRefinementAvailable] = useState(false)
+  const [ambientProvider, setAmbientProvider] = useState<LiveAsrProvider>('soniox')
   const showAmbient = (captureMode === 'ambient' && !ambientUnavailable) || ambientLive
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>(TABS[0].id)
   const audioDialog = useRef<HTMLDialogElement>(null)
@@ -511,6 +513,7 @@ export function CapturePanel({
           onApply={setAudio}
           ambient={showAmbient}
           refinementAvailable={refinementAvailable}
+          liveProvider={ambientProvider}
         />
       )}
 
@@ -563,6 +566,7 @@ export function CapturePanel({
                 deviceId={audio.deviceId}
                 refineAfterStop={audio.refineAfterStop}
                 onRefinementAvailable={setRefinementAvailable}
+                onProviderAvailable={setAmbientProvider}
                 conversationExpanded={conversationExpanded}
                 onConversationExpandedChange={onConversationExpandedChange}
                 prompter={prompter}

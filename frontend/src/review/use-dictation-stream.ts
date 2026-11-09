@@ -7,6 +7,7 @@ import {
   type LiveTranscript,
   tokensToText,
 } from '../audio/live/live-tokens.js'
+import { type PcmCapture, startPcmCapture } from '../audio/live/pcm-capture.js'
 import { openSonioxStream, type SonioxStream, TIMESLICE_MS } from '../audio/live/soniox-stream.js'
 import { api } from '../lib/api.js'
 
@@ -82,6 +83,7 @@ export function useDictationStream({
   const attempt = useRef(0)
   const stream = useRef<SonioxStream | null>(null)
   const recorder = useRef<MediaRecorder | null>(null)
+  const pcmCapture = useRef<PcmCapture | null>(null)
   const tracks = useRef<MediaStream | null>(null)
   const inflight = useRef<AbortController | null>(null)
   const settled = useRef<LiveTranscript>(EMPTY_LIVE_TRANSCRIPT)
@@ -110,6 +112,9 @@ export function useDictationStream({
     const socket = stream.current
     stream.current = null
     socket?.abort()
+    const pcm = pcmCapture.current
+    pcmCapture.current = null
+    if (pcm) void pcm.stop()
     const media = recorder.current
     recorder.current = null
     if (media !== null) {
@@ -149,6 +154,10 @@ export function useDictationStream({
           media.stop()
         })
       }
+
+      const pcm = pcmCapture.current
+      pcmCapture.current = null
+      if (pcm) await pcm.stop()
 
       const socket = stream.current
       stream.current = null
@@ -216,6 +225,28 @@ export function useDictationStream({
         onOpen: () => {
           if (attempt.current !== id) return
           streaming = true
+          if (session.config.audioFormat === 'pcm_s16le') {
+            void startPcmCapture(microphone, (frame) => opened.send(frame))
+              .then((capture) => {
+                if (attempt.current !== id || stopping.current) {
+                  void capture.stop()
+                  return
+                }
+                pcmCapture.current = capture
+              })
+              .catch(() => {
+                if (attempt.current !== id || stopping.current) return
+                attempt.current += 1
+                stream.current = null
+                opened.abort()
+                releaseMicrophone()
+                setPhase(null)
+                setError(START_FAILED_ERROR)
+              })
+            setMicStream(microphone)
+            setPhase('streaming')
+            return
+          }
           const supported =
             typeof MediaRecorder !== 'undefined' &&
             MediaRecorder.isTypeSupported?.('audio/webm;codecs=opus')
