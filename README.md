@@ -415,8 +415,6 @@ See the [open issues](https://github.com/AlaskanTuna/CatatMD/issues) for the ful
 
 ## Team
 
-<p align="center">The four founding members of CatatMD.</p>
-
 <div align="center">
 <table>
   <tr>
@@ -425,7 +423,7 @@ See the [open issues](https://github.com/AlaskanTuna/CatatMD/issues) for the ful
       <b>Hee Zi Jie</b><br />
       <a href="https://github.com/AlaskanTuna"><sub>@AlaskanTuna</sub></a><br />
       <sub><i>Project Lead</i></sub><br />
-      <sub>&bull; Architecture and the PHI boundary<br />&bull; Review screen, note templates, consultation and patient flows<br />&bull; The API and hosting</sub>
+      <sub>&bull; Architecture, the PHI boundary and the single LLM egress, with a guard test on each clinical invariant<br />&bull; The doctor's workspace: review screen, CatatAI copilot, prescriptions, patient records, report export and Demo Mode<br />&bull; Retrieval-grounded citations, the evals harness, audit and erasure, and CI/CD across Vercel, Render and Supabase</sub>
     </td>
     <td align="center" valign="top" width="50%">
       <a href="https://github.com/Andersonnn7788"><img src="https://contrib.rocks/image?repo=Andersonnn7788/Andersonnn7788" width="88" alt="Ling Jing Jie" /></a><br />
