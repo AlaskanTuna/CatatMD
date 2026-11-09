@@ -58,13 +58,24 @@ const MAX_RETRIES = 0
 export class OpenAICompatibleClient implements LLMClient {
   private readonly client: OpenAI
   private readonly resolvesSchemaRefs: boolean
+  private readonly streamReasoningBudget: number | undefined
 
   constructor(
     readonly provider: LLMProvider,
     readonly model: string,
-    options: { apiKey: string; baseURL: string; resolvesSchemaRefs: boolean },
+    options: {
+      apiKey: string
+      baseURL: string
+      resolvesSchemaRefs: boolean
+      /**
+       * A cap on the reasoning tokens a streamed turn may spend before it answers (#479), sent as Model Studio's
+       * `thinking_budget`. On the constructor for the reason the time bounds are: it covers every stream.
+       */
+      streamReasoningBudget?: number
+    },
   ) {
     this.resolvesSchemaRefs = options.resolvesSchemaRefs
+    this.streamReasoningBudget = options.streamReasoningBudget
     this.client = new OpenAI({
       apiKey: options.apiKey,
       baseURL: options.baseURL,
@@ -136,6 +147,11 @@ export class OpenAICompatibleClient implements LLMClient {
         temperature: request.temperature ?? 0.3,
         max_tokens: request.maxTokens ?? 1_024,
         stream: true,
+        // `max_tokens` does not bound reasoning on this provider, which streams it on a channel this adapter never
+        // forwards, so an unbounded turn shows the doctor nothing until a proxy cuts it (#479).
+        ...(this.streamReasoningBudget !== undefined && {
+          thinking_budget: this.streamReasoningBudget,
+        }),
         messages: [
           { role: 'system', content: request.system },
           ...request.turns.map((turn) => ({ role: turn.role, content: turn.content })),
