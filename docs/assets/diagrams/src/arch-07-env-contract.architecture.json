@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Environment Contract",
+    "output": "docs/assets/diagrams/rendered/arch-07-env-contract.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": { "label": "API Runtime" },
+        "security": { "label": "Validation Gate" },
+        "frontend": { "label": "Browser Build" },
+        "cloud": { "label": "Optional Service" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "process",
+      "type": "cloud",
+      "label": "Environment Values",
+      "sublabel": "deployment and dotenv",
+      "pos": [40, 150],
+      "size": [180, 64]
+    },
+    {
+      "id": "schema",
+      "type": "security",
+      "label": "EnvSchema",
+      "sublabel": "Zod parse at import",
+      "pos": [294, 150],
+      "size": [180, 64]
+    },
+    {
+      "id": "guards",
+      "type": "security",
+      "label": "Production Guards",
+      "sublabel": "provider and de-id",
+      "pos": [582, 150],
+      "size": [190, 64]
+    },
+    {
+      "id": "runtime",
+      "type": "backend",
+      "label": "API Runtime",
+      "sublabel": "clients use config",
+      "pos": [880, 150],
+      "size": [170, 64]
+    },
+    {
+      "id": "asr",
+      "type": "cloud",
+      "label": "Hosted ASR",
+      "sublabel": "key enables route",
+      "pos": [1158, 150],
+      "size": [170, 64]
+    },
+    {
+      "id": "vite",
+      "type": "frontend",
+      "label": "VITE_* Build",
+      "sublabel": "public bundle values",
+      "pos": [40, 330],
+      "size": [180, 64]
+    },
+    {
+      "id": "browser",
+      "type": "frontend",
+      "label": "Browser SPA",
+      "sublabel": "same-origin /api",
+      "pos": [347, 330],
+      "size": [190, 64]
+    }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "API Process", "wraps": ["schema", "guards", "runtime"] },
+    { "kind": "region", "label": "Frontend Build And Browser", "wraps": ["vite", "browser"] }
+  ],
+  "connections": [
+    { "id": "parse", "from": "process", "to": "schema", "label": "raw values" },
+    { "id": "validate", "from": "schema", "to": "guards", "label": "parsed config" },
+    { "id": "boot", "from": "guards", "to": "runtime", "label": "valid config" },
+    {
+      "id": "optional-asr",
+      "from": "runtime",
+      "to": "asr",
+      "label": "ASR request",
+      "variant": "security"
+    },
+    {
+      "id": "vite-values",
+      "from": "process",
+      "to": "vite",
+      "label": "build-time values",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    { "id": "bundle", "from": "vite", "to": "browser", "label": "inlined public values" }
+  ]
+}

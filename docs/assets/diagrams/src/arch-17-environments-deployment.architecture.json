@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Environments And Deployment",
+    "output": "docs/assets/diagrams/arch-17-environments-deployment.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "frontend": { "label": "Web App" },
+        "backend": { "label": "API" },
+        "database": { "label": "Data Store" },
+        "cloud": { "label": "Platform" },
+        "external": { "label": "Caller" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "github",
+      "type": "cloud",
+      "label": "GitHub",
+      "sublabel": "source and workflow",
+      "pos": [40, 100],
+      "size": [150, 64]
+    },
+    {
+      "id": "actions",
+      "type": "cloud",
+      "label": "CI Workflow",
+      "sublabel": "verify before deploy",
+      "pos": [315, 100],
+      "size": [160, 64]
+    },
+    {
+      "id": "vercel",
+      "type": "frontend",
+      "label": "Vercel SPA",
+      "sublabel": "static, no region pin",
+      "pos": [630, 100],
+      "size": [160, 64]
+    },
+    {
+      "id": "browser",
+      "type": "external",
+      "label": "Browser",
+      "sublabel": "SPA and direct ASR",
+      "pos": [630, 300],
+      "size": [150, 64]
+    },
+    {
+      "id": "render",
+      "type": "backend",
+      "label": "Render API",
+      "sublabel": "Node, Singapore",
+      "pos": [1010, 100],
+      "size": [160, 64]
+    },
+    {
+      "id": "supabase",
+      "type": "database",
+      "label": "Supabase",
+      "sublabel": "Postgres, Singapore",
+      "pos": [1280, 100],
+      "size": [160, 64]
+    },
+    {
+      "id": "asr",
+      "type": "cloud",
+      "label": "ASR Providers",
+      "sublabel": "browser audio egress",
+      "pos": [630, 500],
+      "size": [160, 64]
+    },
+    {
+      "id": "qwen",
+      "type": "cloud",
+      "label": "Qwen Endpoint",
+      "sublabel": "Singapore API target",
+      "pos": [1280, 500],
+      "size": [160, 64]
+    },
+    {
+      "id": "scheduler",
+      "type": "external",
+      "label": "Health Scheduler",
+      "sublabel": "off platform, 10 min",
+      "pos": [1010, 300],
+      "size": [160, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Singapore API And Data",
+      "wraps": ["render", "supabase"],
+      "pad": 20
+    }
+  ],
+  "connections": [
+    { "id": "github-actions", "from": "github", "to": "actions", "label": "push or pull request" },
+    {
+      "id": "github-render",
+      "from": "github",
+      "to": "render",
+      "label": "Render Git deploy",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "top",
+      "via": [[115, 20], [1090, 20]]
+    },
+    {
+      "id": "actions-vercel",
+      "from": "actions",
+      "to": "vercel",
+      "label": "verified production deploy",
+      "variant": "emphasis"
+    },
+    { "id": "browser-vercel", "from": "browser", "to": "vercel", "label": "HTTPS" },
+    { "id": "vercel-render", "from": "vercel", "to": "render", "label": "/api rewrite" },
+    { "id": "render-db", "from": "render", "to": "supabase", "label": "pooled Postgres" },
+    {
+      "id": "render-qwen",
+      "from": "render",
+      "to": "qwen",
+      "label": "de-identified text",
+      "variant": "security"
+    },
+    {
+      "id": "browser-asr",
+      "from": "browser",
+      "to": "asr",
+      "label": "audio, provider token",
+      "variant": "security"
+    },
+    {
+      "id": "scheduler-render",
+      "from": "scheduler",
+      "to": "render",
+      "label": "GET /api/health",
+      "variant": "dashed"
+    },
+    {
+      "id": "scheduler-vercel",
+      "from": "scheduler",
+      "to": "vercel",
+      "label": "frontend origin",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "right",
+      "via": [[840, 332], [840, 132]]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Deployment Controls",
+      "items": [
+        "Vercel Git deploys are disabled; CI owns the frontend production deploy.",
+        "Render deploys from its Git integration, independently of Vercel CI.",
+        "Production database migrations remain a manual apply."
+      ]
+    }
+  ]
+}

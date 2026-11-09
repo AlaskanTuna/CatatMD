@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "De-Identification And Model Egress",
+    "output": "docs/assets/diagrams/arch-05-phi-egress.html",
+    "quality_profile": "showcase",
+    "viewBox": [940, 500],
+    "legend": {
+      "entries": {
+        "security": {
+          "label": "Trust Gate"
+        },
+        "dashed": {
+          "label": "Return Path"
+        },
+        "database": {
+          "label": "Request Data"
+        },
+        "default": {
+          "label": "Data Flow"
+        }
+      }
+    }
+  },
+  "stages": [
+    {
+      "label": "API Input"
+    },
+    {
+      "label": "De-Identification"
+    },
+    {
+      "label": "Provider Egress"
+    },
+    {
+      "label": "Response Handling"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "transcript",
+      "type": "external",
+      "label": "Transcript",
+      "sublabel": "identifiable text",
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "detect",
+      "type": "security",
+      "label": "Detect And Tokenise",
+      "sublabel": "deid/index.ts",
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "vault",
+      "type": "database",
+      "label": "Request Vault",
+      "sublabel": "memory only",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "branded",
+      "type": "security",
+      "label": "Deidentified",
+      "sublabel": "branded string",
+      "stage": 1,
+      "row": 2
+    },
+    {
+      "id": "client",
+      "type": "security",
+      "label": "LLMClient",
+      "sublabel": "re-scans payload",
+      "stage": 2,
+      "row": 2
+    },
+    {
+      "id": "provider",
+      "type": "cloud",
+      "label": "Model Provider",
+      "sublabel": "tokenised content",
+      "stage": 2,
+      "row": 1
+    },
+    {
+      "id": "output",
+      "type": "backend",
+      "label": "Model Output",
+      "sublabel": "schema-checked",
+      "stage": 3,
+      "row": 1
+    },
+    {
+      "id": "rehydrate",
+      "type": "backend",
+      "label": "Re-hydrate",
+      "sublabel": "request vault lookup",
+      "stage": 3,
+      "row": 0
+    }
+  ],
+  "flows": [
+    {
+      "from": "transcript",
+      "to": "detect",
+      "label": "serialised turns"
+    },
+    {
+      "from": "detect",
+      "to": "vault",
+      "label": "token map",
+      "variant": "dashed"
+    },
+    {
+      "from": "detect",
+      "to": "branded",
+      "label": "tokens replace identifiers",
+      "labelDy": 25
+    },
+    {
+      "from": "branded",
+      "to": "client",
+      "label": "typed input"
+    },
+    {
+      "from": "client",
+      "to": "provider",
+      "label": "guarded egress",
+      "variant": "security"
+    },
+    {
+      "from": "provider",
+      "to": "output",
+      "label": "response",
+      "variant": "dashed"
+    },
+    {
+      "from": "output",
+      "to": "rehydrate",
+      "label": "validated text"
+    },
+    {
+      "from": "vault",
+      "to": "rehydrate",
+      "label": "restore originals",
+      "variant": "dashed"
+    }
+  ]
+}

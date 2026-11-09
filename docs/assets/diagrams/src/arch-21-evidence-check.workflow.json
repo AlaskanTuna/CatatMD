@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Evidence-Bound Assertion Check",
+    "quality_profile": "showcase",
+    "output": "docs/assets/diagrams/arch-21-evidence-check.html",
+    "viewBox": [1203, 776],
+    "legend": {
+      "entries": {
+        "backend": { "label": "Analysis" },
+        "security": { "label": "Validation Gate" },
+        "database": { "label": "Transcript And Audit Data" },
+        "external": { "label": "Model Output" }
+      }
+    }
+  },
+  "lanes": [
+    { "id": "model", "label": "Model Output" },
+    { "id": "evidence", "label": "Evidence Source" },
+    { "id": "analysis", "label": "API Analysis" },
+    { "id": "fallback", "label": "04 Safe Downgrade", "variant": "exception" },
+    { "id": "audit", "label": "Audit" }
+  ],
+  "mainPath": ["output", "parse", "check", "keep", "reparse", "assemble"],
+  "nodes": [
+    {
+      "id": "output",
+      "lane": "model",
+      "col": 1,
+      "type": "external",
+      "label": "Structured Facts",
+      "sublabel": "states and evidence",
+      "width": 150
+    },
+    {
+      "id": "parse",
+      "lane": "analysis",
+      "col": 1,
+      "type": "backend",
+      "label": "Zod Parse",
+      "sublabel": "shared response schema",
+      "width": 150
+    },
+    {
+      "id": "check",
+      "lane": "analysis",
+      "col": 2,
+      "type": "security",
+      "label": "Evidence Check",
+      "sublabel": "PRESENT and DENIED",
+      "width": 150
+    },
+    {
+      "id": "keep",
+      "lane": "analysis",
+      "col": 3,
+      "type": "backend",
+      "label": "Keep Assertion",
+      "sublabel": "span matches transcript",
+      "width": 155
+    },
+    {
+      "id": "downgrade",
+      "lane": "fallback",
+      "col": 3,
+      "type": "security",
+      "label": "Set NOT_ASSESSED",
+      "sublabel": "missing or unmatched span",
+      "width": 165
+    },
+    {
+      "id": "reparse",
+      "lane": "analysis",
+      "col": 4,
+      "type": "security",
+      "label": "Strict Re-Parse",
+      "sublabel": "fail before assembly",
+      "width": 155
+    },
+    {
+      "id": "assemble",
+      "lane": "analysis",
+      "col": 5,
+      "type": "backend",
+      "label": "Note Assembly",
+      "sublabel": "checked facts only",
+      "width": 150
+    },
+    {
+      "id": "audit",
+      "lane": "audit",
+      "col": 3,
+      "type": "database",
+      "label": "Discarded Field IDs",
+      "sublabel": "no evidence text",
+      "width": 165
+    },
+    {
+      "id": "transcript",
+      "lane": "evidence",
+      "col": 2,
+      "type": "database",
+      "label": "Deidentified Transcript",
+      "sublabel": "span comparison source",
+      "width": 170
+    }
+  ],
+  "edges": [
+    { "from": "output", "to": "parse", "label": "model response" },
+    { "from": "parse", "to": "check", "label": "parsed facts" },
+    { "from": "check", "to": "keep", "label": "matching span" },
+    {
+      "from": "check",
+      "to": "downgrade",
+      "label": "no matching span",
+      "role": "branch",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    { "from": "keep", "to": "reparse" },
+    { "from": "downgrade", "to": "reparse" },
+    { "from": "reparse", "to": "assemble", "label": "schema valid", "variant": "emphasis" },
+    {
+      "from": "check",
+      "to": "audit",
+      "label": "discarded IDs",
+      "variant": "dashed",
+      "role": "async"
+    },
+    { "from": "transcript", "to": "check", "label": "match evidence span", "variant": "dashed" }
+  ]
+}

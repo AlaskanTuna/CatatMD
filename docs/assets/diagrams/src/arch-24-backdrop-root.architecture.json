@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Dropover Portal And Backdrop Root",
+    "quality_profile": "showcase",
+    "output": "docs/assets/diagrams/arch-24-backdrop-root.html",
+    "legend": {
+      "entries": {
+        "frontend": { "label": "DOM Element" },
+        "backend": { "label": "Browser Behavior" },
+        "security": { "label": "Backdrop Root" },
+        "database": { "label": "Portal Destination" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "cluster",
+      "type": "security",
+      "label": "ChromeCluster",
+      "sublabel": ".glass backdrop root",
+      "pos": [50, 80],
+      "size": [190, 64]
+    },
+    {
+      "id": "trigger",
+      "type": "frontend",
+      "label": "Dropover Trigger",
+      "sublabel": "inside cluster",
+      "pos": [300, 80],
+      "size": [190, 64]
+    },
+    {
+      "id": "portal",
+      "type": "backend",
+      "label": "createPortal",
+      "sublabel": "panel leaves wrapper",
+      "pos": [560, 80],
+      "size": [190, 64]
+    },
+    {
+      "id": "body",
+      "type": "database",
+      "label": "document.body",
+      "sublabel": "page backdrop",
+      "pos": [830, 80],
+      "size": [190, 64]
+    },
+    {
+      "id": "panel",
+      "type": "frontend",
+      "label": "Dropover Panel",
+      "sublabel": "frost samples page",
+      "pos": [830, 240],
+      "size": [190, 64]
+    },
+    {
+      "id": "position",
+      "type": "backend",
+      "label": "Anchor Position",
+      "sublabel": "scroll and resize",
+      "pos": [560, 350],
+      "size": [190, 64]
+    },
+    {
+      "id": "dismiss",
+      "type": "backend",
+      "label": "Dismissal",
+      "sublabel": "panel, wrapper, Escape",
+      "pos": [830, 400],
+      "size": [190, 64]
+    }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Original Backdrop Root", "wraps": ["cluster", "trigger"] }
+  ],
+  "connections": [
+    { "from": "cluster", "to": "trigger", "label": "contains" },
+    { "from": "trigger", "to": "portal", "label": "opens" },
+    { "from": "portal", "to": "body", "label": "mount panel" },
+    { "from": "body", "to": "panel", "label": "outside root" },
+    {
+      "from": "trigger",
+      "to": "position",
+      "label": "measure anchor",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    { "from": "position", "to": "panel", "label": "fixed coordinates" },
+    { "from": "panel", "to": "dismiss", "label": "inside clicks stay open", "variant": "dashed" }
+  ]
+}

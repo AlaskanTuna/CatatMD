@@ -4,9 +4,16 @@ Part of the [Technical Reference](../TRD.md).
 
 **Status: `Built`:** implemented 13/08/26 (issue #8) as 11 hand-written chunks, then retired in favour of a single retrieval-only pipeline on 09/09/26 (`docs/decisions/` D-002). Nothing is hand-written today; every citable document, the three originally curated ones included, is ingested through the same pipeline.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-11-guideline-corpus-dark.svg" />
+    <img src="../assets/diagrams/arch-11-guideline-corpus-light.svg" alt="This diagram shows a de-identified consultation passing through profile-scoped lexical and semantic retrieval. Retrieved chunks form the request-time citation set for suggestions. The model provider sits outside the API trust boundary, and citation IDs are constrained to the retrieved set before the result reaches review." width="100%" />
+  </picture>
+</p>
+
 - The stable document references and the prompt serialisation live in `backend/src/guidelines/documents.ts` and `backend/src/guidelines/prompt.ts`; the retrieval algorithm lives in `backend/src/retrieval/`.
-- The full CPG library, the three originally curated sources included, is indexed in `corpus/cpg/manifest.json` and stored in `guideline_document` and `guideline_chunk`.
-- Clinician review of the corrected summaries remains required.
+- The CPG library, including the three originally curated sources, is indexed in `corpus/cpg/manifest.json`; the ingestion pipeline persists processed documents and chunks in `guideline_document` and `guideline_chunk`.
+- Clinician review of the ingested corpus content remains required.
 - No `quote` reaches the model because `serialiseCorpusForPrompt` emits only `id`, `title`, and `summary`.
 
 ## Two Citable Vocabularies, Not Two Tiers
@@ -29,7 +36,7 @@ interface GuidelineChunk {
   publisher: string
   year: number
   url: string
-  summary: string    // short, non-verbatim summary shown in the UI
+  summary: string    // retrieved chunk text, used in the prompt and UI when permitted
   sourceLicence: string       // e.g. 'MOH-ARR' | 'CC-BY-4.0' | 'CC-BY-NC-3.0'
   verbatimAllowed: boolean    // gates whether `quote` may be populated at all
   quote?: string      // short verbatim excerpt, only permitted when verbatimAllowed
@@ -41,7 +48,7 @@ interface GuidelineChunk {
 
 The corpus as a whole carries `GUIDELINE_CORPUS_VERSION`, one of the five versioned clinical artefacts stamped on each analysis; see §15 (Clinical Content Versioning). Per-chunk source versions are not modelled, and the reason is recorded there.
 
-`sourceLicence` and `verbatimAllowed` were added 13/08/26 because the licensing difference between sources is legally load-bearing and the schema previously had no way to express it. `verbatimAllowed: false` means the chunk may be summarised and linked but never quoted; a `quote` present on such a chunk is a corpus-authoring defect and `GuidelineChunkSchema`'s refinement fails it at parse time before it reaches a route. The review UI (`frontend/src/review/SafetyCards.tsx`) renders such a chunk **attribution only**: title, publisher, year, page, a deep link to the source PDF at that page, and the licence line, with no summary and no quote span shown, matching the rendering a `doc:` reference gets, because neither carries a retrieved span the licence permits displaying.
+`sourceLicence` and `verbatimAllowed` were added 13/08/26 because the licensing difference between sources is legally load-bearing and the schema previously had no way to express it. `verbatimAllowed: false` suppresses the retrieved chunk text and quote in the review UI; the UI shows attribution only. A `quote` on such a chunk is a corpus-authoring defect, and `GuidelineChunkSchema` rejects it before it reaches a route. This display rule does not remove the chunk from the model's request-time candidate set; that egress decision remains open under issue #250.
 
 ## Source Selection: Resolved 13/08/26 (§19 Row 3, Closed)
 
@@ -97,7 +104,7 @@ Retrieval is the only source of a citable corpus for the model. The chunks `retr
 
 A per-consultation corpus is retrieved for each consultation. `docs/README.md` ("Guardrails Against Fabrication", "Guideline Grounding") carries the reader-facing narrative; this subsection is the implementation reference.
 
-- **The Full Library Is The Corpus, And It Is The Only One.** `corpus/cpg/manifest.json` indexes 109 CPG documents from the Academy of Medicine portal, the three anchoring sources above included; the top chunks for each consultation join the `suggestions` candidate set (§12), cited only by the model.
+- **The Full Library Is The Corpus, And It Is The Only One.** The 09/09/26 retrieval build recorded 109 Academy of Medicine CPG documents; the current `corpus/cpg/manifest.json` lists 112, including the three anchoring sources above. The manifest currently tags 7 documents with at least one profile; untagged documents are not eligible for retrieval. The top chunks for each consultation join the `suggestions` candidate set (§12), cited only by the model.
 - **Retrieved Ids Are Not Stable Identifiers.** They are generated per document, page, and chunk ordinal at ingest and change on re-ingest, so nothing outside the prompt names one. The review UI resolves them from `ConsultationAnalysis.retrievedGuidelines` (§3), persisted with the analysis because re-running retrieval would not be reproducible.
 
 ### Data Model
@@ -115,7 +122,7 @@ Two Prisma models, added by migrations `20260909000000_add_guideline_retrieval`,
 
 `retrieveGuidelines(content: Deidentified, { profileId })` in `backend/src/retrieval/retrieve.ts` runs six steps:
 
-1. **Guard.** Count chunks in the requested jurisdiction (default `'MY'`) whose document is tagged with the active `profileId`; nothing in scope returns `[]` before any other work. A document with no profile tag is never retrievable, which is the default for every manifest entry until an operator scopes it.
+1. **Guard.** Count chunks in the requested jurisdiction (default `'MY'`) whose document is tagged with the active `profileId`; nothing in scope returns `[]` before any other work. A document with no matching profile tag is not retrievable.
 2. **Lexical.** `buildLexicalQuery` reduces the text to its 12 most frequent non-stopword terms (English and Malay stop lists, de-id tokens stripped) and ORs them into `to_tsquery('english')`, ranked by `ts_rank_cd` over `tsv`, top 20, then floored at `ts_rank_cd >= 0.2` (at least two query terms).
 3. **Semantic.** The content, truncated to 6,000 characters, is embedded through the gated `EmbeddingClient` (below) and matched by pgvector cosine distance (`<=>`) against `embedding`, top 20, then floored at cosine similarity `>= 0.42` (calibrated 09/09/26 on the scoped CPGs).
 4. **Fuse.** Reciprocal rank fusion over both floored lists with `k = 60`; the fused order supplies up to 6 ids. The floors are what keep the citation constraint meaningful: without them retrieval always returns six chunks, and the `z.enum` would guarantee only that an id exists, not that it applies.
@@ -124,16 +131,16 @@ Two Prisma models, added by migrations `20260909000000_add_guideline_retrieval`,
 
 ### Embedding Egress
 
-`backend/src/lib/llm/embeddings.ts` exports a second egress point beside `LLMClient`, gated the same way: `embed()` accepts only `readonly Deidentified[]`. It is always Qwen regardless of `LLM_PROVIDER`, because the stored vectors were produced by one model and a query embedded by another would silently match nothing; it shares `QWEN_API_KEY` and `QWEN_BASE_URL` and selects the model from `QWEN_EMBEDDING_MODEL` (default `text-embedding-v4`).
+`backend/src/lib/llm/embeddings.ts` exports a second egress point beside `LLMClient`, gated the same way: `embed()` accepts only `readonly Deidentified[]`. It is always Qwen regardless of `LLM_PROVIDER`, because the stored vectors were produced by one model and a query embedded by another would silently match nothing; it shares `QWEN_API_KEY` and `QWEN_BASE_URL` and selects the model from `QWEN_EMBEDDING_MODEL` (default `text-embedding-v4`). `OpenAICompatibleEmbeddingClient` limits each request to 10 inputs, enforces 1024 dimensions, and uses a 10-second timeout with no retries (`backend/src/lib/llm/openai-compatible.ts`).
 
 ### Failure Behaviour
 
-| Condition                              | Behaviour                                                                                                                                                                                                                                            |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chunk table empty for the jurisdiction | Returns `[]` before any embedding call; no citable corpus is available, so `generateSuggestions()` forces zero suggestions (`outOfScope: true`) while red flags and gaps, which cite `doc:` references rather than the retrieved set, run unaffected |
-| Embedding call fails                   | Logs `embedding_unavailable` and continues lexical-only                                                                                                                                                                                              |
-| `retrieveGuidelines` throws            | The `/analyze` handler logs `retrieval_error` and proceeds with no citable corpus, the same forced-empty behaviour as above; analysis never fails on retrieval                                                                                       |
-| Nothing ranks                          | Returns `[]`; `retrievedGuidelines` is omitted from the persisted analysis rather than stored empty, and the same forced-empty behaviour applies                                                                                                     |
+| Condition                              | Behaviour                                                                                                                                                                                                                                                                                                        |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chunk table empty for the jurisdiction | Returns `[]` before any embedding call; no citable corpus is available, so `generateSuggestions()` skips the suggestions call; the `red_flags` call still runs and supplies its explicit `outOfScope` value while red flags and gaps, which cite `doc:` references rather than the retrieved set, run unaffected |
+| Embedding call fails                   | Logs `embedding_unavailable` and continues lexical-only                                                                                                                                                                                                                                                          |
+| `retrieveGuidelines` throws            | The `/analyze` handler logs `retrieval_error` and proceeds with no citable corpus, an empty retrieved set; the `red_flags` call still runs, suggestions are skipped, and analysis does not fail on retrieval                                                                                                     |
+| Nothing ranks                          | Returns `[]`; `retrievedGuidelines` is omitted from the persisted analysis rather than stored empty, and the `red_flags` call still supplies `outOfScope`                                                                                                                                                        |
 
 ### Ingestion Pipeline
 
@@ -158,7 +165,7 @@ Flags: `--dry-run` (match, extract, and chunk with no writes), `--only <id>`, `-
 
 ### Licence Status
 
-AMM/MOH reuse terms for the CPG library are unconfirmed (issue #250); every ingested document carries `sourceLicence: 'MOH-CPG-unconfirmed'`. This is a private prototype and nothing is redistributed.
+AMM/MOH reuse terms for the broader CPG library are unconfirmed (issue #250). Most manifest entries inherit `sourceLicence: 'MOH-CPG-unconfirmed'`; the three anchored sources retain their per-document licence values from the table above. This is a private prototype and nothing is redistributed.
 
 Issue #250 also covers a narrower, still-open question: whether MOH-ARR spans (the NAG document) may be sent to the model for grounding at all, distinct from whether they may be displayed. The current posture, stated rather than assumed, is that they are sent, de-identified like every other retrieved span, and display is off: `verbatimAllowed: false` suppresses the summary and quote in the review UI (above) but does not remove the chunk from the model's candidate set. §19 row 23 tracks this as open.
 

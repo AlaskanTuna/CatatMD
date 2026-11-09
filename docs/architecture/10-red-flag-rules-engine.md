@@ -2,6 +2,13 @@
 
 Part of the [Technical Reference](../TRD.md).
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-10-red-flag-engine-dark.svg" />
+    <img src="../assets/diagrams/arch-10-red-flag-engine-light.svg" alt="The API evaluates the versioned deterministic trigger list against the transcript and turns each match into a rule-sourced red flag with evidence and citation IDs. Model candidates are produced separately and concatenated after rule evaluation. The merge preserves every deterministic hit, while transcript correction paths compare fired rule IDs before and after an edit." width="100%" />
+  </picture>
+</p>
+
 **Status: `Built`**, implemented 13/08/26 (issue #7). The concrete trigger content is in `backend/src/redflags/triggers.ts`; see the note under "What Stays Undecided" for the one threshold that could not be sourced.
 
 Read `.claude/skills/healthcare-cdss-patterns/SKILL.md` before implementing this module, its posture is adopted here without modification: a pure function library, zero side effects, zero tolerance for false negatives.
@@ -15,7 +22,9 @@ interface RedFlagTrigger {
   severity: 'emergency' | 'urgent' | 'advisory'
   matcher: (transcript: Transcript) => string | null  // matched evidence span, or null
   clinicalSource: string // citation for where this trigger comes from (Q7)
+  guidelineIds: readonly string[] // citable corpus documents, may be empty
   listVersion: string    // version of the trigger list this entry belongs to
+  profiles: readonly ProfileId[] // clinical profiles that include the trigger
 }
 ```
 
@@ -26,6 +35,7 @@ interface RedFlagTrigger {
 - `evaluateRedFlags(transcript: Transcript): RedFlag[]`, a pure function over the transcript directly. It runs in-process and never leaves the API, so it does not need to pass through `deid/` first (§9 exists for the LLM egress path only).
 - Runs independently of, and is never gated by, the LLM call, `docs/PRD.md` §8 (Primary Flow) step 3 states rules run "regardless of model output."
 - Every trigger whose `matcher` returns non-null becomes a `RedFlag` with `source: 'rule'`, `ruleId: trigger.id`, `evidence` set to the matched span.
+- Each emitted flag also carries `guidelineIds`; trigger records are scoped by `profiles` and carry the shared `listVersion`. `firedRuleIds` exposes matched IDs to transcript-correction guards, which reject proposed edits that remove a fired ID.
 
 ## Whose Words Assert The Symptom (Issue #70)
 

@@ -4,6 +4,13 @@ Part of the [Technical Reference](../TRD.md).
 
 **Audience:** implementers, anyone picking up a module directory and building against a contract.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-01-doc-map-dark.svg" />
+    <img src="../assets/diagrams/arch-01-doc-map-light.svg" alt="The product requirements define the work, the technical reference describes the contracts implemented by the shared schemas and application code, and the design document governs the browser's visual system. The technical reference links those contracts to their implementation sections." width="100%" />
+  </picture>
+</p>
+
 This document does not restate what `README.md` already carries (the capability table, the PHI-boundary narrative, the provider table, the repo tree, getting-started steps, the commit convention). Where a topic overlaps, this document either goes deeper or omits it entirely.
 
 `docs/PRD.md` owns product requirements, acceptance criteria, and scope. This document owns the contracts that realise them: module boundaries, schemas, data models, API surface, and the security and deployment posture.

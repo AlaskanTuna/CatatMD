@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "HTTP Request Middleware And Routing",
+    "output": "docs/assets/diagrams/arch-08-http-request.html",
+    "quality_profile": "showcase"
+  },
+  "participants": [
+    { "id": "client", "type": "frontend", "label": "Client" },
+    { "id": "context", "type": "backend", "label": "Context" },
+    { "id": "middleware", "type": "backend", "label": "CORS Guard" },
+    { "id": "auth", "type": "security", "label": "Auth And JSON" },
+    { "id": "guard", "type": "security", "label": "Session Guard" },
+    { "id": "router", "type": "backend", "label": "Route Guard" },
+    { "id": "error", "type": "backend", "label": "Error Handler" }
+  ],
+  "messages": [
+    { "from": "client", "to": "context", "y": 180, "label": "HTTP request" },
+    { "from": "context", "to": "middleware", "y": 240, "label": "request ID and client IP" },
+    { "from": "middleware", "to": "auth", "y": 300, "label": "Helmet, compression, CORS" },
+    { "from": "auth", "to": "guard", "y": 360, "label": "auth router, then JSON parser" },
+    { "from": "guard", "to": "router", "y": 420, "label": "protected prefix, limiter" },
+    { "from": "router", "to": "error", "y": 480, "label": "route error" },
+    { "from": "error", "to": "client", "y": 540, "label": "error envelope", "variant": "return" }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Red-Flag Rules Engine",
+    "output": "docs/assets/diagrams/rendered/arch-10-red-flag-engine.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": { "label": "API Module" },
+        "database": { "label": "Versioned Data" },
+        "security": { "label": "Safety Invariant" },
+        "cloud": { "label": "Model Provider" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "transcript",
+      "type": "database",
+      "label": "Transcript",
+      "sublabel": "raw turns in API",
+      "pos": [30, 300],
+      "size": [160, 64]
+    },
+    {
+      "id": "triggers",
+      "type": "database",
+      "label": "Trigger List",
+      "sublabel": "version and profiles",
+      "pos": [510, 120],
+      "size": [170, 64]
+    },
+    {
+      "id": "evaluate",
+      "type": "backend",
+      "label": "evaluateRedFlags",
+      "sublabel": "pure transcript matcher",
+      "pos": [500, 300],
+      "size": [190, 64]
+    },
+    {
+      "id": "ruleflags",
+      "type": "security",
+      "label": "Rule Flags",
+      "sublabel": "evidence and guideline IDs",
+      "pos": [798, 300],
+      "size": [190, 64]
+    },
+    {
+      "id": "model",
+      "type": "cloud",
+      "label": "LLM Candidates",
+      "sublabel": "separate candidate call",
+      "pos": [500, 480],
+      "size": [190, 64]
+    },
+    {
+      "id": "merge",
+      "type": "security",
+      "label": "mergeRedFlags",
+      "sublabel": "concatenate, no suppression",
+      "pos": [798, 480],
+      "size": [190, 64]
+    },
+    {
+      "id": "corrections",
+      "type": "backend",
+      "label": "Correction Guards",
+      "sublabel": "compare fired rule IDs",
+      "pos": [1090, 300],
+      "size": [190, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Inside The API",
+      "wraps": ["transcript", "triggers", "evaluate", "ruleflags", "merge", "corrections"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "transcript-evaluate",
+      "from": "transcript",
+      "to": "evaluate",
+      "label": "evaluate directly"
+    },
+    { "id": "trigger-evaluate", "from": "triggers", "to": "evaluate", "label": "matchers" },
+    {
+      "id": "evaluate-flags",
+      "from": "evaluate",
+      "to": "ruleflags",
+      "label": "non-null evidence",
+      "variant": "emphasis"
+    },
+    {
+      "id": "flags-merge",
+      "from": "ruleflags",
+      "to": "merge",
+      "label": "authoritative hits",
+      "variant": "security"
+    },
+    {
+      "id": "model-merge",
+      "from": "model",
+      "to": "merge",
+      "label": "add candidates",
+      "variant": "dashed"
+    },
+    {
+      "id": "flags-corrections",
+      "from": "ruleflags",
+      "to": "corrections",
+      "label": "fired IDs",
+      "variant": "dashed"
+    }
+  ]
+}

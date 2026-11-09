@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "API Request And Response Contracts",
+    "output": "docs/assets/diagrams/arch-13-api-contracts.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Browser Request"
+        },
+        "frontend": {
+          "label": "Origin Routing"
+        },
+        "security": {
+          "label": "Request Guard"
+        },
+        "backend": {
+          "label": "API Routes"
+        },
+        "database": {
+          "label": "Persistent Data"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "browser",
+      "type": "external",
+      "label": "React SPA",
+      "sublabel": "same-origin /api calls",
+      "pos": [40, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "vercel",
+      "type": "frontend",
+      "label": "Vercel Rewrite",
+      "sublabel": "proxies /api/*",
+      "pos": [340, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "express",
+      "type": "backend",
+      "label": "Express App",
+      "sublabel": "JSON limit 1 MB",
+      "pos": [640, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "guards",
+      "type": "security",
+      "label": "Shared Middleware",
+      "sublabel": "session and rate limits",
+      "pos": [940, 40],
+      "size": [200, 64]
+    },
+    {
+      "id": "routes",
+      "type": "backend",
+      "label": "Route Modules",
+      "sublabel": "consultations, ASR, patients",
+      "pos": [940, 260],
+      "size": [200, 64]
+    },
+    {
+      "id": "contracts",
+      "type": "security",
+      "label": "Zod Contracts",
+      "sublabel": "shared request and response",
+      "pos": [940, 450],
+      "size": [200, 64]
+    },
+    {
+      "id": "prisma",
+      "type": "backend",
+      "label": "Prisma",
+      "sublabel": "ownership-scoped queries",
+      "pos": [1300, 260],
+      "size": [200, 64]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "Postgres",
+      "sublabel": "consultations and accounts",
+      "pos": [1300, 450],
+      "size": [200, 64]
+    },
+    {
+      "id": "errors",
+      "type": "security",
+      "label": "Error Envelope",
+      "sublabel": "fixed public messages",
+      "pos": [640, 450],
+      "size": [200, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Express API Boundary",
+      "wraps": ["express", "guards", "routes", "contracts", "prisma", "errors"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "browser-vercel",
+      "from": "browser",
+      "to": "vercel",
+      "label": "HTTP request"
+    },
+    {
+      "id": "vercel-express",
+      "from": "vercel",
+      "to": "express",
+      "label": "same-origin path"
+    },
+    {
+      "id": "express-guards",
+      "from": "express",
+      "to": "guards",
+      "label": "request context",
+      "toSide": "left"
+    },
+    {
+      "id": "guards-routes",
+      "from": "guards",
+      "to": "routes",
+      "label": "authorized request",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "express-routes",
+      "from": "express",
+      "to": "routes",
+      "label": "dispatch"
+    },
+    {
+      "id": "routes-contracts",
+      "from": "routes",
+      "to": "contracts",
+      "label": "parse and serialize"
+    },
+    {
+      "id": "routes-prisma",
+      "from": "routes",
+      "to": "prisma",
+      "label": "scoped read or write"
+    },
+    {
+      "id": "prisma-db",
+      "from": "prisma",
+      "to": "postgres",
+      "label": "SQL"
+    },
+    {
+      "id": "routes-errors",
+      "from": "routes",
+      "to": "errors",
+      "label": "mapped failures",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "errors-browser",
+      "from": "errors",
+      "to": "browser",
+      "label": "ErrorEnvelopeSchema",
+      "variant": "security",
+      "fromSide": "left",
+      "toSide": "bottom"
+    }
+  ]
+}

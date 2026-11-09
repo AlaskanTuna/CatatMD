@@ -2,9 +2,16 @@
 
 Part of the [Technical Reference](../TRD.md).
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-06-llm-port-dark.svg" />
+    <img src="../assets/diagrams/arch-06-llm-port-light.svg" alt="The LLM port routes structured generation and streamed tool conversations through the OpenAI-compatible adapter. It checks outbound content when fail-closed mode is enabled, then calls the selected provider. A separate embedding client handles retrieval vectors, while the provider factory caches the chat client." width="100%" />
+  </picture>
+</p>
+
 **Status: `Built`**
 
-Source: `backend/src/lib/llm/{types,openai-compatible,index}.ts`.
+Source: `backend/src/lib/llm/{types,openai-compatible,index,embeddings}.ts`.
 
 ## Port (`LLMClient`)
 
@@ -13,8 +20,11 @@ interface LLMClient {
   readonly provider: 'qwen' | 'gemini' | 'deepseek'
   readonly model: string
   generate<T>(request: GenerateRequest<T>): Promise<T>
+  stream(request: StreamRequest): AsyncGenerator<StreamChunk>
 }
 ```
+
+`stream` serves conversational tool use. Its system prompt and every user turn are `Deidentified`; tool arguments arrive reassembled as `unknown` for caller-side schema validation. The doctor can require a tool call for a proposal, and an `AbortSignal` cancels the provider call when the panel closes. Streamed prose does not pass through a closed response schema.
 
 ## `GenerateRequest<T>`
 
@@ -26,19 +36,23 @@ interface LLMClient {
 | `schema`       | `z.ZodType<T>` | Validated against on return                             |
 | `schemaName`   | `string`       | Name given to the provider's structured-output schema   |
 | `temperature?` | `number`       | Defaults to `0.2` at the adapter, not the port          |
+| `maxTokens?`   | `number`       | Defaults to `8192` at the adapter                       |
 
 ## `LLMResponseError`
 
-`extends Error`, carries `operation`. Thrown for all three adapter failure modes below.
+`extends Error`, carries `operation`. Thrown for empty responses, token-limit truncation, malformed JSON, and schema-validation failure.
 
 ## Adapter Mechanism (`OpenAICompatibleClient`)
 
 One adapter class implements `LLMClient` for all three providers, Qwen, Gemini, and DeepSeek each expose OpenAI-compatible chat completions, so provider selection is a constructor parameter (`provider`, `model`, `apiKey`, `baseURL`), not a branch in call logic.
 
 1. Calls `client.chat.completions.create` with `messages: [{ role: 'system', content: request.system }, { role: 'user', content: request.content }]`.
-2. Requests structured output via `response_format: { type: 'json_schema', json_schema: { name: request.schemaName, strict: true, schema: z.toJSONSchema(request.schema, { target: 'draft-7' }) } }`.
-3. `temperature` defaults to `0.2` when `request.temperature` is not supplied.
-4. Validates the response with `request.schema.safeParse(parsed)` before returning, a non-conforming response is never returned as partially-trusted data.
+2. When `DEID_FAIL_CLOSED` is true, re-scans `request.content` with `assertNoIdentifiers` immediately before the network call. A hit throws `DeidentificationError` and blocks egress.
+3. Emits inline and `$ref` JSON Schema forms, then sends the smaller form only when the provider resolves references; Gemini receives the inline form.
+4. Requests structured output with `strict: true`; `temperature` defaults to `0.2` and `max_tokens` to `8192`.
+5. Empty content, truncation at the token limit, malformed JSON, and schema failure throw `LLMResponseError`. Successful output is returned only after `request.schema.safeParse` succeeds.
+
+`stream` uses the same 90-second, zero-retry adapter client and applies `assertNoIdentifiers` to the system prompt and every turn before sending. Its defaults are temperature `0.3` and `max_tokens` `1024`; it omits the `tools` field when the list is empty. Tool deltas are assembled before being yielded; malformed argument JSON is dropped while text chunks remain available, and callers validate tool arguments before acting on them.
 
 ### Measured Limit: Gemini Cannot Complete The Pipeline
 
@@ -143,7 +157,7 @@ All 34 fields round-trip in **9 of 9 runs**, and the Qwen state distribution is 
 
 **One Thing Measured And Deliberately Not Claimed.** The model-authored gap count varied run to run, 2 to 4 across the nine runs, including between two arms whose `note_and_gaps` request was byte-identical. It is therefore pre-existing nondeterminism in a generative call rather than an effect of this change, and it is recorded as unexplained instead of folded into the result.
 
-**Remaining Headroom.** 48 nodes against the synthetic sweep's observed Gemini pass/fail band of 252 to 302 nodes, so on Qwen there is comfortable room for future checklist fields. It does **not** help Gemini, which still receives the 14,240 B inlined form and keeps exactly the thin margin recorded above.
+**Remaining Headroom.** 48 nodes against the synthetic sweep's observed Gemini pass/fail band of 252 to 302 nodes, so on Qwen there is comfortable room for future checklist fields. Gemini still receives the 14,240 B inline form because it cannot resolve `$ref`; the dated measurements above record successful Gemini pipeline runs after the `maxItems` reduction.
 
 ## Request Bounds
 
@@ -167,18 +181,23 @@ Two clarifications, because the adjacent bound is easy to confuse with these:
 - `max_tokens` (8192) bounds the response's **size**; these bound its **time**. The runaway generation measured in §19 row 19 was already contained by the former.
 - Neither is a CAP-1 enforcement mechanism. Nothing fails a request at 30s; these bound the pathological case only.
 
-**Not Built:** no `AbortController`, so a client disconnect does not cancel an in-flight call. That reclaims quota on abandoned requests rather than bounding a hang, and it would have to be threaded per call site.
+**Generate Is Not Cancellable:** `generate` has no per-request abort signal, so a client disconnect does not cancel that in-flight call. `stream` does accept an `AbortSignal`, used when the doctor closes the copilot panel.
 
 ## Failure Modes
 
 | Failure                   | Trigger                                                                                                                 |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Empty response            | `completion.choices[0]?.message.content` is falsy                                                                       |
+| Token-limit truncation    | `finish_reason === 'length'`                                                                                            |
 | Malformed JSON            | `JSON.parse(raw)` throws                                                                                                |
 | Schema-validation failure | `request.schema.safeParse(parsed)` returns `success: false`, the error message includes `z.prettifyError(result.error)` |
 
-All three throw `LLMResponseError` with the operation name attached; there is no partial-success return path.
+All four throw `LLMResponseError` with the operation name attached; there is no partial-success return path.
 
 `getLLMClient()` (`backend/src/lib/llm/index.ts`) builds and caches a singleton client from `env.LLM_PROVIDER`, throwing on first client construction if the matching provider's API key is missing.
+
+`getEmbeddingClient()` is a separate port and cached client for retrieval. The Qwen embedding client uses `QWEN_EMBEDDING_MODEL`, checks each de-identified input when fail-closed mode is enabled, batches at most 10 inputs, and requires vectors of 1,024 dimensions. It has a 10-second timeout and no retries; retrieval falls back to the curated corpus on embedding failure.
+
+`getLLMDescriptor()` returns the configured provider and model for audit stamps without constructing the client, so audit recording does not fail because an API key is missing.
 
 ---

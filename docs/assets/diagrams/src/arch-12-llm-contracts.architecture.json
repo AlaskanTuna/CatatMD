@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "LLM Prompt And Response Contracts",
+    "output": "docs/assets/diagrams/arch-12-llm-contracts.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Consultation Input"
+        },
+        "backend": {
+          "label": "Analysis Logic"
+        },
+        "security": {
+          "label": "Validation Gate"
+        },
+        "cloud": {
+          "label": "Model Provider"
+        },
+        "database": {
+          "label": "Persisted Review"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "transcript",
+      "type": "external",
+      "label": "Consultation Text",
+      "sublabel": "raw input",
+      "pos": [40, 150],
+      "size": [200, 64]
+    },
+    {
+      "id": "deid",
+      "type": "security",
+      "label": "De-identification",
+      "sublabel": "request-scoped tokens",
+      "pos": [400, 150],
+      "size": [200, 64]
+    },
+    {
+      "id": "note",
+      "type": "backend",
+      "label": "Note Calls",
+      "sublabel": "facts and note plus gaps",
+      "pos": [760, 40],
+      "size": [200, 64]
+    },
+    {
+      "id": "retrieval",
+      "type": "backend",
+      "label": "Guideline Retrieval",
+      "sublabel": "runs beside note calls",
+      "pos": [400, 260],
+      "size": [200, 64]
+    },
+    {
+      "id": "suggest",
+      "type": "backend",
+      "label": "Flag And Suggest Calls",
+      "sublabel": "suggestions need chunks",
+      "pos": [1120, 260],
+      "size": [200, 64]
+    },
+    {
+      "id": "llm",
+      "type": "security",
+      "label": "LLMClient",
+      "sublabel": "90 s, no retries",
+      "pos": [1120, 40],
+      "size": [200, 64]
+    },
+    {
+      "id": "provider",
+      "type": "cloud",
+      "label": "Model Provider",
+      "sublabel": "structured JSON output",
+      "pos": [1480, 150],
+      "size": [200, 64]
+    },
+    {
+      "id": "checks",
+      "type": "security",
+      "label": "Schema And Evidence",
+      "sublabel": "invalid output rejected",
+      "pos": [1480, 430],
+      "size": [200, 64]
+    },
+    {
+      "id": "persist",
+      "type": "database",
+      "label": "Review Analysis",
+      "sublabel": "doctor approval required",
+      "pos": [1120, 430],
+      "size": [200, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Inside The API Trust Boundary",
+      "wraps": ["transcript", "deid", "note", "retrieval", "suggest", "llm", "checks", "persist"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "text-deid",
+      "from": "transcript",
+      "to": "deid",
+      "label": "raw text"
+    },
+    {
+      "id": "deid-note",
+      "from": "deid",
+      "to": "note",
+      "label": "de-identified",
+      "toSide": "left"
+    },
+    {
+      "id": "deid-retrieval",
+      "from": "deid",
+      "to": "retrieval",
+      "label": "de-identified",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "retrieval-suggest",
+      "from": "retrieval",
+      "to": "suggest",
+      "label": "retrieved chunks"
+    },
+    {
+      "id": "note-llm",
+      "from": "note",
+      "to": "llm",
+      "label": "facts and note requests"
+    },
+    {
+      "id": "suggest-llm",
+      "from": "suggest",
+      "to": "llm",
+      "label": "flags and suggestions",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "llm-provider",
+      "from": "llm",
+      "to": "provider",
+      "label": "guarded prompt",
+      "variant": "security"
+    },
+    {
+      "id": "provider-checks",
+      "from": "provider",
+      "to": "checks",
+      "label": "structured response",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "checks-persist",
+      "from": "checks",
+      "to": "persist",
+      "label": "validated analysis"
+    }
+  ]
+}

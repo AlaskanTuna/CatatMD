@@ -4,18 +4,25 @@ Part of the [Technical Reference](../TRD.md).
 
 **Status: `Built`**
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-02-system-boundary-dark.svg" />
+    <img src="../assets/diagrams/arch-02-system-boundary-light.svg" alt="The React browser calls the Express API, which owns authenticated consultation workflows, shared-contract validation, and Prisma access to Postgres. The API uses de-identification before the LLM client sends model requests, while speech audio has separate browser, relay, and provider paths described in the ASR contract." width="100%" />
+  </picture>
+</p>
+
 Per-module contract, read as "owns / may import / must never import":
 
-| Module                    | Owns                                                                                                                        | May Import                                                                     | Must Never Import                                                     |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `shared/`                 | Zod schemas and inferred types (`@shared/types`), the single source of truth for both sides                                 | Zod only                                                                       | Anything backend- or frontend-specific                                |
-| `backend/src/deid/`       | PHI detection, tokenisation, the request-scoped rehydration vault, the only module permitted to mint a `Deidentified` value | `@shared/types`                                                                | Any LLM provider SDK                                                  |
-| `backend/src/lib/llm/`    | `LLMClient` port + the OpenAI-compatible adapter, the only egress point to any provider                                     | `openai` SDK, `@shared/types`, `deid/types.js` (type-only, for `Deidentified`) | Nothing outside `lib/llm/` may import an LLM provider SDK directly    |
-| `backend/src/redflags/`   | Deterministic escalation-trigger rules engine, currently an intent-stating README only                                      | `@shared/types`                                                                | An LLM provider SDK; must remain a pure function library              |
-| `backend/src/guidelines/` | Curated citation corpus, currently an intent-stating README only                                                            | `@shared/types`                                                                | ,                                                                     |
-| `backend/src/routes/`     | HTTP surface, currently `health.ts` only                                                                                    | `express`, `lib/prisma.js`, `config/env.js`                                    | An LLM provider SDK; PHI must reach `deid/` before any LLM call       |
-| `frontend/`               | React SPA, consultation intake, review, and approval UI. Rendering constraints that dictate structure are in §24            | `@shared/types`, the backend HTTP API                                          | A provider SDK or the de-identification vault (both are backend-only) |
+| Module                    | Owns                                                                                                                            | May Import                                                         | Must Never Import                                                     |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `shared/`                 | Zod request, response, persistence-projection and model-output schemas with inferred types, exported from `shared/src/index.ts` | Zod and sibling `shared/src/` modules                              | Backend- or frontend-specific modules                                 |
+| `backend/src/deid/`       | Identifier detection, tokenisation, request-scoped vault and re-hydration; the only module that mints `Deidentified`            | `@shared/types`                                                    | Any LLM provider SDK                                                  |
+| `backend/src/lib/llm/`    | `LLMClient`, OpenAI-compatible adapter and embeddings access; the only provider SDK boundary                                    | `openai` SDK, `@shared/types`, `deid/types.js` (type-only)         | Provider SDK imports outside `lib/llm/`                               |
+| `backend/src/redflags/`   | Deterministic red-flag evaluation, live windows, mishear proposals and trigger data                                             | `@shared/types`, clinical versions and guideline document identity | Any LLM provider SDK                                                  |
+| `backend/src/guidelines/` | Versioned citable document identities and legacy corpus; retrieval is in `backend/src/retrieval/`                               | `@shared/types`                                                    | Unvalidated free-text citations                                       |
+| `backend/src/routes/`     | Health, auth and protected consultation, patient, ASR, copilot, reference, notification and settings endpoints                  | Express, domain modules, Prisma and configuration                  | Direct LLM provider SDK imports; model text must pass through `deid/` |
+| `frontend/`               | React SPA for consultation capture, transcript review, note editing, findings, prescriptions and approval; see §24              | `@shared/types`, backend HTTP API                                  | Provider SDKs or the backend de-identification vault                  |
 
-The load-bearing rule that cuts across the table: **no module outside `backend/src/lib/llm/` may import an LLM provider SDK directly.** This is what makes the provider swappable and is stated as a module constraint, not a convention, see §5 for the compile-time mechanism that backs the PHI half of it.
+The load-bearing rule that cuts across the table: **no module outside `backend/src/lib/llm/` may import an LLM provider SDK directly.** The repository's `no-stray-provider-sdk` guard checks this boundary. §5 describes the branded input type and runtime re-scan that protect model egress.
 
 ---

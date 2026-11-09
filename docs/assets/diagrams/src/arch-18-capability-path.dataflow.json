@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Capability Traceability Path",
+    "output": "docs/assets/diagrams/arch-18-capability-path.html",
+    "quality_profile": "showcase",
+    "viewBox": [940, 500],
+    "legend": {
+      "entries": {
+        "database": {
+          "label": "Stored Record"
+        },
+        "default": {
+          "label": "Traceability Link"
+        }
+      }
+    }
+  },
+  "stages": [
+    {
+      "label": "Product Requirement"
+    },
+    {
+      "label": "Shared Contract"
+    },
+    {
+      "label": "Backend Behavior"
+    },
+    {
+      "label": "Persistent Review"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "prd",
+      "type": "external",
+      "label": "PRD CAPs",
+      "sublabel": "acceptance criteria",
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "note",
+      "type": "backend",
+      "label": "Note And Gaps",
+      "sublabel": "schemas and analysis",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "flags",
+      "type": "backend",
+      "label": "Red Flags",
+      "sublabel": "rules and candidates",
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "citations",
+      "type": "backend",
+      "label": "Citations",
+      "sublabel": "constrained guideline IDs",
+      "stage": 1,
+      "row": 2
+    },
+    {
+      "id": "routes",
+      "type": "backend",
+      "label": "API Routes",
+      "sublabel": "analyze, patch, approve",
+      "stage": 2,
+      "row": 1
+    },
+    {
+      "id": "record",
+      "type": "database",
+      "label": "Consultation",
+      "sublabel": "analysis and edit state",
+      "stage": 3,
+      "row": 0
+    },
+    {
+      "id": "audit",
+      "type": "database",
+      "label": "Audit Events",
+      "sublabel": "approval and review trail",
+      "stage": 3,
+      "row": 2
+    },
+    {
+      "id": "doctor",
+      "type": "frontend",
+      "label": "Doctor Review",
+      "sublabel": "explicit approval",
+      "stage": 3,
+      "row": 1
+    }
+  ],
+  "flows": [
+    {
+      "from": "prd",
+      "to": "note",
+      "label": "CAP-1 and CAP-2"
+    },
+    {
+      "from": "prd",
+      "to": "flags",
+      "label": "CAP-3",
+      "labelAt": [258, 233]
+    },
+    {
+      "from": "prd",
+      "to": "citations",
+      "label": "CAP-4"
+    },
+    {
+      "from": "note",
+      "to": "routes",
+      "label": "validated shape"
+    },
+    {
+      "from": "flags",
+      "to": "routes",
+      "label": "finding contract",
+      "labelAt": [478, 233]
+    },
+    {
+      "from": "citations",
+      "to": "routes",
+      "label": "citation IDs"
+    },
+    {
+      "from": "routes",
+      "to": "record",
+      "label": "persisted analysis and edits",
+      "labelAt": [620, 210]
+    },
+    {
+      "from": "routes",
+      "to": "audit",
+      "label": "review and approval events"
+    },
+    {
+      "from": "record",
+      "to": "doctor",
+      "label": "CAP-5 review",
+      "labelAt": [745, 215]
+    }
+  ]
+}

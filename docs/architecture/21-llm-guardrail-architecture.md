@@ -103,10 +103,19 @@ The finding in §21.1 was produced _with_ a Tier-4 instruction in place. Tier 4 
 
 The mechanism that closes §21.1, specified here and depending on the structured clinical-fact schema (§3, §19 row 10):
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-21-evidence-check-dark.svg" />
+    <img src="../assets/diagrams/arch-21-evidence-check-light.svg" alt="The diagram shows the evidence check between parsed model output and clinical analysis results. It compares each PRESENT or DENIED assertion's evidence span with the de-identified transcript after case and whitespace normalisation. Unsupported assertions become NOT_ASSESSED, and the checked result is parsed again against the shared schemas before it can reach note assembly." width="100%" />
+  </picture>
+</p>
+
 - Every clinical fact the model returns carries an `assertion` state **and** an `evidence` string.
 - `evidence` must be a **verbatim span from the de-identified transcript**, not a paraphrase.
 - After §6's `safeParse` and before assembly, each fact is checked in code: is `evidence` present in the transcript, under whitespace-and-case normalisation?
 - **A Fact Whose Evidence Does Not Match Is Forced To `NOT_ASSESSED`**, and the discard is counted in the audit event (§15) by field id, never by content.
+
+`applyEvidenceCheck` checks every field in `clinicalFacts` (symptoms, history, observations and examination) and `operational` (diagnosis, medications dispensed, MC days, referral and follow-up). Only `PRESENT` and `DENIED` require a matching evidence span; other assertion states pass through. The result is parsed against the strict shared schemas again, so a check/schema mismatch fails analysis before assembly. `backend/src/analysis/live.ts` applies the same check to each live-analysis window before folding facts.
 
 **Scoped To Assertion State, Not Concept Vocabulary.** The span requirement binds the `state` field (`PRESENT` and `DENIED` each require one); the `value` field may carry a **normalised concept label**. "Throat irritation" in the transcript may become `value: "pharyngeal discomfort"` with the transcript's own words as `evidence`.
 

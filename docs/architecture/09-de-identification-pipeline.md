@@ -2,20 +2,29 @@
 
 Part of the [Technical Reference](../TRD.md).
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-09-deid-pipeline-dark.svg" />
+    <img src="../assets/diagrams/arch-09-deid-pipeline-light.svg" alt="The API serializes the transcript and detects identifiers across the full text, replacing matches with stable request-scoped tokens held in a vault. The branded result is checked again at LLM egress, with existing tokens excluded from rescanning. Validated model strings are rehydrated from the vault before persistence or display, then the request-scoped vault is discarded." width="100%" />
+  </picture>
+</p>
+
 **Status: `Built`**, implemented 13/08/26 (issue #9). This section specified the detection, tokenisation and vault mechanics; `backend/src/deid/` now implements all of them.
 
 ## Detector Inventory
 
-| Detector      | Label     | Matches                                                               | Approach                                                                                                                                                                                                                               |
-| ------------- | --------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Person Name   | `PATIENT` | The patient's name and any other named individual (family, caregiver) | Pattern-based: capitalised word sequences adjacent to a name cue, honorifics (`Mr`, `Mrs`, `Puan`, `Encik`, `Dr`), Malaysian patronymics (`bin`, `binti`, `a/l`, `a/p`), or immediately after "my name is" / "patient's name is"       |
-| NRIC          | `NRIC`    | Malaysian NRIC, `YYMMDD-PB-###G`                                      | Regex on the 12-digit hyphenated format                                                                                                                                                                                                |
-| Phone         | `PHONE`   | Malaysian mobile/landline numbers                                     | Regex on `01X-XXXXXXX` / `0X-XXXXXXXX`, with or without country code                                                                                                                                                                   |
-| Address       | `ADDRESS` | Postal address fragments                                              | Regex/keyword: a 5-digit postcode co-located with a street-type keyword (`Jalan`, `Lorong`, `Taman`)                                                                                                                                   |
-| Date Of Birth | `DOB`     | Explicit birth dates                                                  | Date pattern co-located with a DOB cue ("born on", "DOB", "d.o.b."), distinguished from other clinical dates in the transcript                                                                                                         |
-| Record Number | `MRN`     | Medical/registration record numbers                                   | Alphanumeric pattern co-located with a record cue ("MRN", "IC no", "registration no")                                                                                                                                                  |
-| Email         | `EMAIL`   | Email addresses                                                       | Standard email regex                                                                                                                                                                                                                   |
-| Script        | `SCRIPT`  | Any run of Bengali, Arabic (Urdu) or Devanagari script (#391)         | Every other detector reads Latin script only, so a whole run in one of these becomes one token at the gate. Chinese and Tamil are deliberately excluded: ambient capture hints both, and tokenising them would blind the note (§20.12) |
+| Detector      | Label     | Matches                                                               | Approach                                                                                                                                                                                                                                                                                                  |
+| ------------- | --------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Person Name   | `PATIENT` | The patient's name and any other named individual (family, caregiver) | Pattern-based: capitalised word sequences adjacent to a name cue, honorifics (`Mr`, `Mrs`, `Puan`, `Encik`, `Dr`), Malaysian patronymics (`bin`, `binti`, `a/l`, `a/p`), or after a name introducer. A gazetteer catches some uncued Latin names; Chinese and Tamil names require language-specific cues. |
+| NRIC          | `NRIC`    | Malaysian NRIC, `YYMMDD-PB-###G`                                      | Regex on the 12-digit hyphenated format                                                                                                                                                                                                                                                                   |
+| Phone         | `PHONE`   | Malaysian mobile/landline numbers                                     | Regex on `01X-XXXXXXX` / `0X-XXXXXXXX`, with or without country code                                                                                                                                                                                                                                      |
+| Address       | `ADDRESS` | Postal address fragments                                              | Regex/keyword: a 5-digit postcode co-located with a street-type keyword (`Jalan`, `Lorong`, `Taman`)                                                                                                                                                                                                      |
+| Date Of Birth | `DOB`     | Explicit birth dates                                                  | Date pattern co-located with a DOB cue ("born on", "DOB", "d.o.b."), distinguished from other clinical dates in the transcript                                                                                                                                                                            |
+| Record Number | `MRN`     | Medical/registration record numbers                                   | Alphanumeric pattern co-located with a record cue ("MRN", "IC no", "registration no")                                                                                                                                                                                                                     |
+| Email         | `EMAIL`   | Email addresses                                                       | Standard email regex                                                                                                                                                                                                                                                                                      |
+| Script        | `SCRIPT`  | Any run of Bengali, Arabic (Urdu) or Devanagari script (#391)         | Every other detector reads Latin script only, so a whole run in one of these becomes one token at the gate. Chinese and Tamil are deliberately excluded: ambient capture hints both, and tokenising them would blind the note (§20.12)                                                                    |
+
+Chinese and Tamil are excluded from the `SCRIPT` detector, but not wholly excluded from name detection: `detectNativeScriptNames` in `backend/src/deid/detectors.ts` handles cue-led names in both scripts.
 
 This inventory satisfies Q7/Q8's honest-limitations posture, not a clinical-grade NER system, see the recall note below.
 
@@ -57,7 +66,7 @@ Recorded as a decision with evidence rather than left as silence, because de-ide
 
 ## Fail-Closed Semantics
 
-The de-identification function is specified to throw, not return a partial result, if any detector step fails internally, a caller must never fall back to sending original text. `.env.example`'s own comment states the intent: "fail-closed: when true, `LLMClient` refuses any payload that did not pass through the de-identification gate." Whether that refusal is actually wired into `OpenAICompatibleClient` is the separate, already-recorded gap in §7, referenced here, not restated.
+The de-identification function throws rather than returning partial output if detection fails. When `DEID_FAIL_CLOSED` is true, `OpenAICompatibleClient.generate()` and `.stream()` call `assertNoIdentifiers` on outbound text immediately before the provider call. The embedding client applies the same guard to each input. Production boot rejects `DEID_FAIL_CLOSED=false`; egress-block errors carry detector labels, not matched values.
 
 ## Audit Surface
 

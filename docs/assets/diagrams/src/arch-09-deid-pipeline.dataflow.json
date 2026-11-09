@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "De-Identification Pipeline",
+    "output": "docs/assets/diagrams/rendered/arch-09-deid-pipeline.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "security": {
+          "label": "Trust Gate"
+        },
+        "database": {
+          "label": "Request Data"
+        },
+        "emphasis": {
+          "label": "Primary Flow"
+        },
+        "dashed": {
+          "label": "Return Data"
+        }
+      }
+    },
+    "viewBox": [940, 720]
+  },
+  "stages": [
+    {
+      "label": "Input"
+    },
+    {
+      "label": "Detect And Tokenise"
+    },
+    {
+      "label": "Guarded Egress"
+    },
+    {
+      "label": "Return And Restore"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "raw",
+      "type": "database",
+      "label": "Transcript",
+      "sublabel": "speaker-labelled raw text",
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "scan",
+      "type": "backend",
+      "label": "Detector Set",
+      "sublabel": "repeat to fixed point",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "tokens",
+      "type": "security",
+      "label": "Tokenised Text",
+      "sublabel": "branded Deidentified",
+      "stage": 2,
+      "row": 0
+    },
+    {
+      "id": "vault",
+      "type": "database",
+      "label": "Request Vault",
+      "sublabel": "token to original span",
+      "stage": 1,
+      "row": 4
+    },
+    {
+      "id": "egress",
+      "type": "security",
+      "label": "Egress Rescan",
+      "sublabel": "tokens excluded",
+      "stage": 2,
+      "row": 2
+    },
+    {
+      "id": "model",
+      "type": "cloud",
+      "label": "LLM Provider",
+      "sublabel": "guarded text only",
+      "stage": 2,
+      "row": 3
+    },
+    {
+      "id": "rehydrate",
+      "type": "backend",
+      "label": "Rehydrate",
+      "sublabel": "validated strings",
+      "stage": 3,
+      "row": 4
+    },
+    {
+      "id": "output",
+      "type": "database",
+      "label": "Analysis Output",
+      "sublabel": "before persist or display",
+      "stage": 3,
+      "row": 2
+    }
+  ],
+  "flows": [
+    {
+      "id": "raw-scan",
+      "from": "raw",
+      "to": "scan",
+      "label": "whole transcript",
+      "classification": "identifiable input",
+      "variant": "security"
+    },
+    {
+      "id": "scan-tokens",
+      "from": "scan",
+      "to": "tokens",
+      "label": "replace matches",
+      "classification": "pseudonymous text",
+      "variant": "security"
+    },
+    {
+      "id": "token-vault",
+      "from": "scan",
+      "to": "vault",
+      "label": "stable token map",
+      "classification": "request-scoped",
+      "variant": "dashed",
+      "labelAt": [315, 201]
+    },
+    {
+      "id": "tokens-egress",
+      "from": "tokens",
+      "to": "egress",
+      "label": "outbound payload",
+      "classification": "de-identified text",
+      "variant": "security",
+      "labelAt": [530, 201]
+    },
+    {
+      "id": "guard-model",
+      "from": "egress",
+      "to": "model",
+      "label": "passes rescan",
+      "classification": "external egress",
+      "variant": "security",
+      "labelAt": [530, 441]
+    },
+    {
+      "id": "model-return",
+      "from": "model",
+      "to": "rehydrate",
+      "label": "schema-valid response",
+      "classification": "model output",
+      "variant": "dashed"
+    },
+    {
+      "id": "vault-restore",
+      "from": "vault",
+      "to": "rehydrate",
+      "label": "token lookup",
+      "classification": "request-scoped",
+      "variant": "dashed",
+      "route": "straight"
+    },
+    {
+      "id": "restore-output",
+      "from": "rehydrate",
+      "to": "output",
+      "label": "restored strings",
+      "classification": "API output",
+      "variant": "emphasis",
+      "labelAt": [745, 500]
+    }
+  ]
+}
