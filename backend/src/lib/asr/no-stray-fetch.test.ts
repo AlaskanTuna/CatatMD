@@ -220,3 +220,181 @@ describe('only the ASR relay egresses with fetch (issue #172)', () => {
     ).toEqual(Object.fromEntries([...EXPECTED_FETCH_CALLS].sort()))
   })
 })
+
+/**
+ * Issue #487: the live relay is an audio egress that `fetch` cannot see, and the
+ * second one built on a socket rather than a call.
+ *
+ * The API now holds a WebSocket to Qwen3-ASR realtime and accepts one from the
+ * browser, so the two questions this file asks of `fetch` have to be asked of
+ * sockets too: where can the API open one, and which host can it name. Both are
+ * resolved from the AST for the reason the first decision above gives, and both
+ * are pinned per file.
+ *
+ * **The global `WebSocket` is covered, not just the `ws` import.** Node 24 ships
+ * one, so a module could open a socket with no import for the provider-SDK guard
+ * to notice, exactly as `fetch` needs no dependency. A construction of either
+ * name is counted wherever it appears.
+ *
+ * **A `dashscope` host is a string, not a call**, so it is found as a string
+ * literal. Two files may hold one: the adapter, which pins the realtime address
+ * as a literal, and `config/env.ts`, whose `QWEN_BASE_URL` default is the text
+ * adapter's address and is read through `env` everywhere else. Nothing may build
+ * either from configuration, which is the property worth the guard.
+ */
+const EXPECTED_SOCKET_SITES: ReadonlyMap<string, number> = new Map([
+  ['backend/src/lib/asr/qwen-realtime.ts', 2],
+  ['backend/src/lib/asr/live-relay.ts', 2],
+])
+
+const EXPECTED_DASHSCOPE_HOSTS: ReadonlyMap<string, number> = new Map([
+  ['backend/src/lib/asr/qwen-realtime.ts', 1],
+  ['backend/src/config/env.ts', 1],
+])
+
+/** `import ... from 'ws'`, `import('ws')` and `require('ws')`. */
+function isWsSpecifier(node: ts.Node): boolean {
+  const literal = (candidate: ts.Node | undefined) =>
+    candidate !== undefined && ts.isStringLiteralLike(candidate) && candidate.text === 'ws'
+
+  if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
+    return literal(node.moduleSpecifier)
+  }
+  if (ts.isCallExpression(node)) {
+    const callee = node.expression
+    const loads =
+      callee.kind === ts.SyntaxKind.ImportKeyword ||
+      (ts.isIdentifier(callee) && callee.text === 'require')
+    return loads && literal(node.arguments[0])
+  }
+  return false
+}
+
+/** `new WebSocket(...)` and `new WebSocketServer(...)`, whichever way they were obtained. */
+function isSocketConstruction(node: ts.Node): boolean {
+  if (!ts.isNewExpression(node)) return false
+  const callee = node.expression
+  const name = ts.isIdentifier(callee)
+    ? callee.text
+    : ts.isPropertyAccessExpression(callee)
+      ? callee.name.text
+      : ''
+  return name === 'WebSocket' || name === 'WebSocketServer'
+}
+
+function isSocketSite(node: ts.Node): boolean {
+  return isWsSpecifier(node) || isSocketConstruction(node)
+}
+
+/** Any string that names a dashscope host, in a literal or in the text of a template. */
+function isDashscopeHost(node: ts.Node): boolean {
+  const text =
+    ts.isStringLiteralLike(node) ||
+    ts.isTemplateHead(node) ||
+    ts.isTemplateMiddle(node) ||
+    ts.isTemplateTail(node)
+      ? node.text
+      : undefined
+  return text !== undefined && /(^|[/.])dashscope[\w-]*\./.test(text)
+}
+
+function countSites(paths: readonly string[], matches: (node: ts.Node) => boolean) {
+  const found: string[] = []
+
+  for (const path of paths) {
+    const text = readFileSync(join(REPO_ROOT, path), 'utf8')
+    const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true)
+
+    const visit = (node: ts.Node) => {
+      if (matches(node))
+        found.push(
+          `${path}:${source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1}`,
+        )
+      ts.forEachChild(node, visit)
+    }
+
+    visit(source)
+  }
+
+  return Object.fromEntries([...countByFile(found)].sort())
+}
+
+function hits(form: string, matches: (node: ts.Node) => boolean): number {
+  const source = ts.createSourceFile('probe.ts', form, ts.ScriptTarget.Latest, true)
+  let count = 0
+  const visit = (node: ts.Node) => {
+    if (matches(node)) count += 1
+    ts.forEachChild(node, visit)
+  }
+  visit(source)
+  return count
+}
+
+describe('only the Qwen relay opens or accepts a socket, and only it names a dashscope host (issue #487)', () => {
+  it('resolves the forms that open a socket', () => {
+    for (const form of [
+      "import { WebSocket } from 'ws'",
+      "import WebSocket from 'ws'",
+      "import 'ws'",
+      "export { WebSocketServer } from 'ws'",
+      "const { WebSocket } = require('ws')",
+      "const ws = await import('ws')",
+      "const s = new WebSocket('wss://example.test')",
+      'const s = new globalThis.WebSocket(url)',
+      'const s = new WebSocketServer({ noServer: true })',
+    ]) {
+      expect(hits(form, isSocketSite), `${JSON.stringify(form)} should be caught`).toBe(1)
+    }
+  })
+
+  it('does not fire on prose, lookalikes or the type of a socket', () => {
+    for (const form of [
+      '// opens a WebSocket to the vendor with new WebSocket(url)',
+      'const note = "import { WebSocket } from \'ws\'"',
+      "import { x } from 'wss-utils'",
+      "import type { Server } from 'node:http'",
+      'const socket: WebSocket = open()',
+      'const sockets = new Set<WebSocket>()',
+      'const s = new WebSocketPool()',
+    ]) {
+      expect(hits(form, isSocketSite), `${JSON.stringify(form)} should not be caught`).toBe(0)
+    }
+  })
+
+  it('resolves a dashscope host in a literal or a template, and not in prose or a lookalike', () => {
+    for (const form of [
+      "const a = 'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime'",
+      // `\u0024` keeps the placeholder out of the source text of a plain string.
+      'const a = `https://dashscope-intl.aliyuncs.com/\u0024{path}`',
+      'const a = `\u0024{scheme}://dashscope.aliyuncs.com/x`',
+    ]) {
+      expect(hits(form, isDashscopeHost), `${JSON.stringify(form)} should be caught`).toBe(1)
+    }
+    for (const form of [
+      '// the host is dashscope-intl.aliyuncs.com',
+      "const a = 'the dashscope team'",
+      "const a = 'https://example.test/dashscope'",
+    ]) {
+      expect(hits(form, isDashscopeHost), `${JSON.stringify(form)} should not be caught`).toBe(0)
+    }
+  })
+
+  it('keeps every `ws` import and socket construction in the relay and its adapter', () => {
+    expect(
+      countSites(sourceFiles(), isSocketSite),
+      'A WebSocket was opened or accepted somewhere other than the Qwen relay. ' +
+        'Audio cannot be de-identified, so the only sockets that may carry it are ' +
+        'qwen-realtime.ts (the upstream) and live-relay.ts (the browser side). ' +
+        'Adding a file here is the reviewable decision this test exists to force.',
+    ).toEqual(Object.fromEntries([...EXPECTED_SOCKET_SITES].sort()))
+  })
+
+  it('keeps a dashscope host to the adapter and the text model address it shares', () => {
+    expect(
+      countSites(sourceFiles(), isDashscopeHost),
+      'A dashscope host appeared in backend/src outside qwen-realtime.ts (the ' +
+        'realtime address) and config/env.ts (the QWEN_BASE_URL default the text ' +
+        'adapter reads). Route text through LLMClient and audio through the relay.',
+    ).toEqual(Object.fromEntries([...EXPECTED_DASHSCOPE_HOSTS].sort()))
+  })
+})

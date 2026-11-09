@@ -141,8 +141,8 @@ function sourceFiles(): string[] {
   return found
 }
 
-/** Every provider import in the scanned trees, as `path:line: specifier`. */
-function providerImports(): string[] {
+/** Every import in the scanned trees that `wanted` names, as `path:line: specifier`. */
+function importsOf(wanted: (specifier: string) => boolean): string[] {
   const found: string[] = []
 
   for (const path of sourceFiles()) {
@@ -153,7 +153,7 @@ function providerImports(): string[] {
 
         for (const match of line.matchAll(SPECIFIER)) {
           const specifier = match[1]
-          if (specifier !== undefined && isProviderSdk(specifier)) {
+          if (specifier !== undefined && wanted(specifier)) {
             found.push(`${path}:${index + 1}: ${specifier}`)
           }
         }
@@ -162,6 +162,9 @@ function providerImports(): string[] {
 
   return found
 }
+
+/** Every provider import in the scanned trees, as `path:line: specifier`. */
+const providerImports = () => importsOf(isProviderSdk)
 
 describe('only lib/llm imports a provider SDK (issue #81)', () => {
   it('finds source to scan in every tree, so an empty pass means something', () => {
@@ -250,5 +253,50 @@ describe('only lib/llm imports a provider SDK (issue #81)', () => {
         'egress path that the deid gate and this guard were built to prevent. ' +
         'Add configuration to OpenAICompatibleClient instead.',
     ).toEqual(['openai'])
+  })
+})
+
+/**
+ * Issue #487: `ws` is not a provider SDK and is deliberately not in
+ * `PROVIDER_PACKAGES`: it speaks no vendor's protocol, and the repo-wide count
+ * of one above means one SDK. What it is, is the library that carries audio out
+ * of the API, so it gets the same treatment from the other direction. The Qwen
+ * relay is built on it, `qwen-realtime.ts` is the only place that may open a
+ * socket to a vendor with it, and `live-relay.ts` the only place that may accept
+ * one, so a third import is a third audio path.
+ *
+ * All four trees are scanned for the reason the first scope choice gives. The
+ * SPA has the browser's own `WebSocket` and no use for this package, and a
+ * bundle that pulled it in would be carrying a server library to the public.
+ * Test files are exempt, since a fake vendor in a test describes the boundary
+ * rather than crossing it.
+ */
+const WS_MODULES = ['backend/src/lib/asr/qwen-realtime.ts', 'backend/src/lib/asr/live-relay.ts']
+
+function wsImports(): string[] {
+  return importsOf((specifier) => packageName(specifier) === 'ws').filter(
+    (entry) => !/\.test\.tsx?:/.test(entry),
+  )
+}
+
+describe('only the Qwen relay imports a socket library (issue #487)', () => {
+  it('recognises `ws` and its subpaths without firing on lookalikes', () => {
+    for (const specifier of ['ws', 'ws/wrapper.mjs']) {
+      expect(packageName(specifier) === 'ws', `${specifier} should be caught`).toBe(true)
+    }
+    for (const specifier of ['wss', 'ws-utils', '@types/ws', './ws.js', '../lib/ws', 'uws']) {
+      expect(packageName(specifier) === 'ws', `${specifier} should not be caught`).toBe(false)
+    }
+  })
+
+  it('keeps `ws` inside the relay and its adapter, one import each', () => {
+    const imports = wsImports()
+
+    expect(
+      imports.map((entry) => entry.split(':')[0]).sort(),
+      'ws is imported outside backend/src/lib/asr/qwen-realtime.ts and live-relay.ts. ' +
+        'It is the library that carries audio out of the API, so a third importer is ' +
+        'a third audio path. Adding one is the reviewable decision this test exists to force.',
+    ).toEqual([...WS_MODULES].sort())
   })
 })
