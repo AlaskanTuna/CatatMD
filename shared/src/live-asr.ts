@@ -74,8 +74,9 @@ export const LIVE_ASR_RELAY_PATH = '/api/asr/live-relay'
 
 /**
  * The relay address the API may hand out: `wss://` on any host, or `ws://` on loopback for local development, and
- * always this exact path. The host is not pinned here because it is the API's own; the SPA additionally requires it
- * to equal the API origin it already talks to, so a tampered response cannot point audio anywhere else.
+ * always this exact path. The host is not pinned here because it is the API's own, and it is not the SPA's origin:
+ * a WebSocket cannot pass the Vercel rewrite, so the browser opens the Render host directly. The CSP `connect-src` in
+ * `vercel.json` pins that host, so a tampered response cannot point audio anywhere else.
  */
 export const LIVE_ASR_RELAY_URL =
   /^(?:wss:\/\/[a-z0-9.-]+(?::\d{2,5})?|ws:\/\/(?:localhost|127\.0\.0\.1)(?::\d{2,5})?)\/api\/asr\/live-relay$/
