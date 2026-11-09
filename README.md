@@ -15,6 +15,8 @@
     <br />
     <a href="https://catatmd.vercel.app"><strong>Live Demo &rarr;</strong></a>
     &middot;
+    <a href="#walkthrough-film">Watch the Walkthrough</a>
+    &middot;
     <a href="docs/README.md">Documentation</a>
     &middot;
     <a href="docs/USER-GUIDE.md">User Guide</a>
@@ -50,6 +52,7 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#links">Links</a></li>
+        <li><a href="#walkthrough-film">Walkthrough Film</a></li>
         <li><a href="#screenshots">Screenshots</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#features">Features</a></li>
@@ -98,11 +101,27 @@ Clinical scope is deliberately narrow: **adult GP consultations for acute cough,
 | Resource             | Link                                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------ |
 | Live Demo            | <https://catatmd.vercel.app>, with a guest account and a guided tour                             |
+| Walkthrough Film     | [`docs/assets/video/catatmd-walkthrough.mp4`](docs/assets/video/catatmd-walkthrough.mp4)         |
 | API Health           | <https://catatmd-api.onrender.com/api/health> (free tier: the first request after idle is slow)  |
 | Documentation        | [`docs/README.md`](docs/README.md), an index of every document by the question it answers        |
 | Product Requirements | [`docs/PRD.md`](docs/PRD.md)                                                                     |
 | Technical Reference  | [`docs/TRD.md`](docs/TRD.md), one file per section in [`docs/architecture/`](docs/architecture/) |
 | Privacy Assessment   | [`docs/DPIA.md`](docs/DPIA.md)                                                                   |
+
+<p align="right"><a href="#readme-top">&uarr;</a></p>
+
+<a id="walkthrough-film"></a>
+
+### Walkthrough Film
+
+A GP takes one synthetic consultation through the live app: sign-in, ambient capture, review, a dictated prescription and approval, ending on the exported report. Select the poster to play the film (2:25, with burned-in captions).
+
+<a href="docs/assets/video/catatmd-walkthrough.mp4">
+  <img src="docs/assets/video/catatmd-walkthrough-poster.jpg" alt="CatatMD walkthrough film: select to play" width="100%">
+</a>
+
+- **Captions:** [`catatmd-walkthrough.srt`](docs/assets/video/catatmd-walkthrough.srt).
+- **Production:** Playwright takes recorded on the deployed app, edited in Remotion, and narrated by Kokoro-82M, an open-weight text-to-speech model. Every patient, transcript and prescription in it is synthetic.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 

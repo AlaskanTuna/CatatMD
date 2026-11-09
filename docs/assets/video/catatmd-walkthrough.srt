@@ -1,0 +1,127 @@
+1
+00:00:00,900 --> 00:00:02,550
+This is CatatMD.
+
+2
+00:00:02,600 --> 00:00:07,510
+It turns a GP consultation into a clinical
+note the doctor can review.
+
+3
+00:00:08,000 --> 00:00:12,128
+Everything you'll see here is synthetic:
+no real patient appears.
+
+4
+00:00:14,600 --> 00:00:19,081
+The doctor registers a patient and starts
+a consultation from the profile.
+
+5
+00:00:23,200 --> 00:00:26,368
+With the patient's consent, given for this
+visit only,
+
+6
+00:00:26,418 --> 00:00:28,963
+the doctor records the consultation.
+
+7
+00:00:31,700 --> 00:00:37,600
+Patient: …this morning there were a few
+streaks of blood in my phlegm.
+
+8
+00:00:38,000 --> 00:00:41,987
+When the doctor stops, a speech service in
+Malaysia transcribes it.
+
+9
+00:00:45,900 --> 00:00:48,099
+One click analyses the visit.
+
+10
+00:00:49,900 --> 00:00:55,066
+Before any text leaves the server, names
+and identity numbers become tokens.
+
+11
+00:00:55,200 --> 00:00:57,310
+The model only ever sees the tokens,
+
+12
+00:00:57,360 --> 00:01:00,761
+and the real details come back on the
+return trip.
+
+13
+00:01:05,900 --> 00:01:08,496
+The doctor reviews three panels side by
+side:
+
+14
+00:01:08,546 --> 00:01:12,050
+the transcript, the structured note, and
+clinical safety.
+
+15
+00:01:12,100 --> 00:01:15,150
+Red flags come from deterministic rules
+first.
+
+16
+00:01:15,200 --> 00:01:20,034
+The model can add candidates for review,
+but it can never remove a rule's hit.
+
+17
+00:01:27,100 --> 00:01:30,551
+The checklist ties each field to the words
+that support it.
+
+18
+00:01:32,500 --> 00:01:35,572
+Suggestions cite guideline IDs from a
+fixed corpus,
+
+19
+00:01:35,622 --> 00:01:38,900
+so a made-up reference cannot reach the
+screen.
+
+20
+00:01:40,600 --> 00:01:43,573
+The doctor writes the prescription in
+plain words.
+
+21
+00:01:46,400 --> 00:01:50,698
+CatatMD parses each line into dose,
+frequency and duration,
+
+22
+00:01:50,748 --> 00:01:54,465
+and saves only the lines the doctor
+confirms.
+
+23
+00:01:57,300 --> 00:01:59,650
+Nothing is ever approved by default.
+
+24
+00:01:59,700 --> 00:02:03,479
+The doctor acknowledges the red flags and
+approves the note.
+
+25
+00:02:11,100 --> 00:02:14,683
+The finished record exports as a
+consultation report.
+
+26
+00:02:19,500 --> 00:02:21,050
+CatatMD drafts.
+
+27
+00:02:21,100 --> 00:02:22,749
+The doctor decides.

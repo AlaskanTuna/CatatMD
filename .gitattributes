@@ -6,5 +6,6 @@
 *.jpg binary
 *.webp binary
 *.woff2 binary
+*.mp4 binary
 graphify-out/** linguist-generated
 bun.lock linguist-generated
