@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "CatatMD Documentation Map",
+    "output": "docs/assets/diagrams/arch-01-doc-map.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Product Scope"
+        },
+        "backend": {
+          "label": "Architecture Contract"
+        },
+        "database": {
+          "label": "Implementation"
+        },
+        "frontend": {
+          "label": "Interface Rules"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "product",
+      "label": "Product And Technical Docs"
+    },
+    {
+      "id": "implementation",
+      "label": "Implementation And Interface"
+    }
+  ],
+  "mainPath": ["requirements", "contracts", "schemas", "code"],
+  "nodes": [
+    {
+      "id": "requirements",
+      "lane": "product",
+      "col": 0,
+      "type": "external",
+      "label": "PRD",
+      "sublabel": "scope and acceptance"
+    },
+    {
+      "id": "contracts",
+      "lane": "product",
+      "col": 1,
+      "type": "backend",
+      "label": "Technical Docs",
+      "sublabel": "contracts and rationale"
+    },
+    {
+      "id": "schemas",
+      "lane": "implementation",
+      "col": 2,
+      "type": "database",
+      "label": "Shared Schemas",
+      "sublabel": "runtime contracts"
+    },
+    {
+      "id": "code",
+      "lane": "implementation",
+      "col": 3,
+      "type": "backend",
+      "label": "App Code",
+      "sublabel": "built behavior"
+    },
+    {
+      "id": "design",
+      "lane": "implementation",
+      "col": 1,
+      "type": "frontend",
+      "label": "DESIGN.md",
+      "sublabel": "visual system"
+    },
+    {
+      "id": "browser",
+      "lane": "implementation",
+      "col": 4,
+      "type": "frontend",
+      "label": "Browser Flow",
+      "sublabel": "documented in §24"
+    }
+  ],
+  "edges": [
+    {
+      "from": "requirements",
+      "to": "contracts",
+      "label": "realized by",
+      "role": "main"
+    },
+    {
+      "from": "contracts",
+      "to": "schemas",
+      "label": "defines contracts",
+      "role": "main"
+    },
+    {
+      "from": "schemas",
+      "to": "code",
+      "label": "validated in",
+      "role": "main"
+    },
+    {
+      "from": "design",
+      "to": "browser",
+      "label": "governs appearance",
+      "role": "branch"
+    },
+    {
+      "from": "contracts",
+      "to": "browser",
+      "label": "describes behavior",
+      "role": "branch"
+    }
+  ]
+}

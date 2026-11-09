@@ -2,9 +2,16 @@
 
 Part of the [Technical Reference](../TRD.md).
 
-**Status: `Built`.** The three operations ship in `backend/src/analysis/` and `backend/src/suggestions/`, run concurrently from `analyseNote`, and are measured at 8 of 8 runs inside the CAP-1 budget (§19 rows 8 and 19, both closed). **Re-measured 08/09/26 (#224):** the end-to-end analyse pipeline on a 4-minute synthetic consultation takes a median of 53.9 s, outside that 30 s figure and inside the 3-minute clinic envelope. See _Measured Workflow Timing_ at the end of this section.
+**Status: `Built`.** Note generation lives in `backend/src/analysis/`; guideline-backed red flags and suggestions live in `backend/src/suggestions/`, coordinated by `runAnalysis` in `backend/src/consultations/analysis.ts`. The 8-of-8 result inside the CAP-1 budget applies to the 13/08/26 `analyseNote` measurement (§19 rows 8 and 19, both closed). **Re-measured 08/09/26 (#224):** the end-to-end analyse pipeline on a 4-minute synthetic consultation took a median of 53.9 s, outside that 30 s measurement and inside the 3-minute clinic envelope. See _Measured Workflow Timing_ at the end of this section.
 
-Two operations per analyse request (Q15, decomposition by capability, not one call producing the whole `ConsultationAnalysis`). Both run after de-identification (§9) and before the rule engine's output is merged in (§10), the model never sees the rule engine's hits, so it cannot suppress them by construction, not merely by instruction.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-12-llm-contracts-dark.svg" />
+    <img src="../assets/diagrams/arch-12-llm-contracts-light.svg" alt="This diagram shows de-identification feeding the note-generation calls and the retrieval branch. Retrieval supplies chunks to the red-flag and suggestion calls, and the guarded LLM client sends de-identified prompts to the provider. Schema and evidence checks run before analysis is persisted for doctor review." width="100%" />
+  </picture>
+</p>
+
+Up to four model calls can run per analyse request: `clinical_facts`, `note_and_gaps`, `red_flags`, and, when retrieval returns chunks, `suggestions`. The note calls run concurrently, while note generation runs alongside retrieval; after retrieval, `red_flags` runs with `suggestions` when chunks exist. All model inputs pass through de-identification (§9). Deterministic red-flag results are merged outside the model path (§10), so the model cannot suppress them.
 
 ## Operation 1: `clinical_facts` + `note_and_gaps`
 
@@ -76,6 +83,8 @@ Splitting the prompt was a second, unbudgeted gain: each half now carries only t
 
 **This Call Is Skipped Entirely When Retrieval Returned Nothing.** The citable set is the retrieved chunks and nothing else (D-002), so a consultation that retrieved nothing can support no cited suggestion. That used to be a model call whose answer was discarded and replaced with `[]`; it is now no call at all, which is the larger of the split's two savings on those consultations. `makeSuggestionsSchema` takes a **non-empty tuple**, so an empty corpus cannot produce a schema rather than producing one that widens `guidelineId` back to a plain `string`.
 
+After schema validation, `filterUnsafeModelSuggestions()` removes suggestion text or citation quotes that match the diagnostic-language or direct medication-order guards, and records the suppressed item IDs (`backend/src/suggestions/safety.ts`). This post-filter does not remove red-flag candidates or deterministic red-flag hits.
+
 ### Where `outOfScope` Lives, And Why
 
 On 2a, the half that cannot be skipped. Deriving it from an empty corpus instead would report "outside the guideline scope" for a perfectly in-scope consultation that simply retrieved nothing, and the review screen renders those as two different sentences (below, and §19 row 7).
@@ -84,9 +93,9 @@ The consequence is that 2b never learns the verdict, because the two run concurr
 
 ## Scope Notice For Non-URTI Presentations
 
-`docs/PRD.md` §6 (Scope) requires that, for a transcript outside acute cough / sore throat / other upper-respiratory presentations, the system still runs `note_and_gaps` and the rule engine (§10) as normal but does not attempt guideline-cited suggestions, and the review screen must carry a visible scope notice. The `suggestions` system prompt instructs the model to return an empty array when the presentation falls outside the corpus's coverage, which is schema-valid (§11's `citations.min(1)` constrains items present in the array, not the array's length), and `generateSuggestions` drops the array outright when the `red_flags` half returns `outOfScope: true`.
+`docs/PRD.md` §6 (Scope) requires that, for a transcript outside acute cough / sore throat / other upper-respiratory presentations, the system still runs `note_and_gaps` and the rule engine (§10), does not surface guideline-cited suggestions, and shows a scope notice. The `suggestions` prompt instructs the model to return an empty array outside corpus coverage, which is schema-valid because §11's `citations.min(1)` constrains items in the array, not the array itself. In the current implementation, `red_flags` and `suggestions` run concurrently when chunks were retrieved, so the suggestion call may still run before the scope result is known; `generateSuggestions` discards its output when `red_flags` returns `outOfScope: true`.
 
-**Open**, how the review screen decides whether to show the scope notice is unresolved: inferring it from an empty `suggestions` array conflates "out of scope, suggestions suppressed" with "in scope, nothing to suggest," so a dedicated signal (e.g. an `outOfScope: boolean` alongside the analysis) may be needed instead. See §19.
+**Resolved.** `analysis.outOfScope` is persisted from the `red_flags` response in `backend/src/consultations/analysis.ts`. The review page distinguishes `outOfScope: true`, `false` with no retrieved chunks, and older analyses where the field is absent in `frontend/src/routes/consultation-review/ReviewPanes.tsx`.
 
 ## Gap Assembly: Deterministic First, Model Strictly Additive
 
@@ -100,13 +109,13 @@ The two operations still run **concurrently**, not sequentially: `generateSugges
 
 ## Retry / Failure Behaviour
 
-No automatic retry inside `LLMClient` (§6, `Built`), a failure on either call throws `LLMResponseError`, which the `/analyze` route (§13) catches and translates into a reverted `Consultation.status` plus an error response. That revert targets the status the record held before the press rather than the one this handler read, because a re-claimed stale row would otherwise be restored to `analyzing` (#373, §13). The doctor's only retry path is manually re-triggering analysis (`docs/PRD.md` §8, step 5), matching CAP-5's "no autonomous action" constraint, nothing retries itself.
+No automatic retry inside `LLMClient` (§6, `Built`). The OpenAI-compatible adapter bounds chat calls to 90 seconds with zero retries, and rejects empty, truncated, malformed, or schema-invalid responses as `LLMResponseError` (`backend/src/lib/llm/openai-compatible.ts`). The `/analyze` route (§13) catches the error and reverts `Consultation.status` before returning an error response. That revert targets the status the record held before the press rather than the one this handler read, because a re-claimed stale row would otherwise be restored to `analyzing` (#373, §13). The doctor's only retry path is manually re-triggering analysis (`docs/PRD.md` §8, step 5), matching CAP-5's "no autonomous action" constraint, nothing retries itself.
 
 ## Latency Budget (Resolved 13/08/26)
 
 `docs/PRD.md` CAP-1 binds analysis to a 30-second target for a 3,000-word transcript. This section originally specified two **sequential** structured-output calls and did not reconcile that cost with the 30s figure. Both halves of the tension are now closed.
 
-- **Nothing Is Sequential Among The Model Calls.** All four (`clinical_facts`, `note_and_gaps`, `red_flags`, `suggestions`) take only the de-identified content and have no dependency on each other's output. Retrieval is the exception and does sit ahead of `suggestions`, because the corpus has to exist before the prompt can carry it. Wall clock is therefore the slowest single call, not the sum, and the budget is not split across operations because it does not need to be.
+- **The Calls Are Staged, With Independent Work In Parallel.** `clinical_facts` and `note_and_gaps` run concurrently. Note generation overlaps guideline retrieval. After retrieval completes, `red_flags` and, when chunks exist, `suggestions` run concurrently. A no-result or failed retrieval skips only the suggestions call; wall clock includes retrieval followed by the slower call branch, alongside note generation.
 - **Measured, Not Estimated.** 8 runs of the shipped pipeline on a 3,085-word synthetic Malaysian GP consultation against the live Singapore endpoint: see the table above (§19 rows 8 and 19, both closed).
 - **The Residual Risk Is The Tail, Not The Mean.** Every reduction in per-call response variance buys more headroom than any reduction in the mean. That is the reasoning behind the split, and it is the first thing to reach for if the budget comes under pressure again.
 

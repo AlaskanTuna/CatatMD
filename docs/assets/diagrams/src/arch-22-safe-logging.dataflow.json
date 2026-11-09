@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Privacy-Safe Process Logging",
+    "output": "docs/assets/diagrams/arch-22-safe-logging.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Log Flow"
+        },
+        "security": {
+          "label": "Safe Boundary"
+        },
+        "dashed": {
+          "label": "Echoed Id"
+        }
+      }
+    },
+    "viewBox": [940, 500]
+  },
+  "stages": [
+    {
+      "label": "Request Context"
+    },
+    {
+      "label": "Allowlist And Scrub"
+    },
+    {
+      "label": "Structured Output"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "type": "external",
+      "label": "HTTP Request",
+      "sublabel": "safe id or new UUID",
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "context",
+      "type": "backend",
+      "label": "Request Context",
+      "sublabel": "AsyncLocalStorage",
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "calls",
+      "type": "backend",
+      "label": "App Log Calls",
+      "sublabel": "fixed fields and events",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "scrubber",
+      "type": "security",
+      "label": "Field And Message Scrub",
+      "sublabel": "allowlist, detector, cap",
+      "stage": 1,
+      "row": 1,
+      "width": 160
+    },
+    {
+      "id": "stdout",
+      "type": "backend",
+      "label": "JSON Stdout",
+      "sublabel": "one record per line",
+      "stage": 2,
+      "row": 0
+    },
+    {
+      "id": "render",
+      "type": "cloud",
+      "label": "Render Log Drain",
+      "sublabel": "platform stdout sink",
+      "stage": 2,
+      "row": 1
+    },
+    {
+      "id": "header",
+      "type": "external",
+      "label": "Response Header",
+      "sublabel": "x-request-id",
+      "stage": 0,
+      "row": 2
+    }
+  ],
+  "flows": [
+    {
+      "id": "request-context",
+      "from": "request",
+      "to": "context",
+      "label": "validated correlation id",
+      "labelDy": 50
+    },
+    {
+      "id": "context-calls",
+      "from": "context",
+      "to": "calls",
+      "label": "request-scoped events"
+    },
+    {
+      "id": "calls-scrub",
+      "from": "calls",
+      "to": "scrubber",
+      "label": "message and fields",
+      "labelDy": 25
+    },
+    {
+      "id": "scrub-stdout",
+      "from": "scrubber",
+      "to": "stdout",
+      "label": "scrubbed record",
+      "variant": "security"
+    },
+    {
+      "id": "stdout-render",
+      "from": "stdout",
+      "to": "render",
+      "label": "JSON line",
+      "labelDy": 25
+    },
+    {
+      "id": "context-header",
+      "from": "context",
+      "to": "header",
+      "label": "echo id",
+      "variant": "dashed",
+      "labelDy": 25
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Residual Risk",
+      "items": [
+        "The message remains developer-authored free text.",
+        "Detector scrubbing and the 120-character cap do not prove message safety."
+      ]
+    }
+  ]
+}

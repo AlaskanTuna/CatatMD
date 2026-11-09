@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Approved Report To Browser Print",
+    "quality_profile": "showcase",
+    "output": "docs/assets/diagrams/arch-26-report-print.html",
+    "legend": {
+      "entries": {
+        "frontend": { "label": "Browser" },
+        "backend": { "label": "Existing API" },
+        "security": { "label": "Access Gate" },
+        "database": { "label": "Validated Record" },
+        "external": { "label": "Doctor" }
+      }
+    }
+  },
+  "lanes": [
+    { "id": "doctor", "label": "Doctor" },
+    { "id": "browser", "label": "Browser Route" },
+    { "id": "api", "label": "Existing API" }
+  ],
+  "mainPath": ["open", "session", "saved", "validate", "approved", "render", "print"],
+  "nodes": [
+    {
+      "id": "open",
+      "lane": "doctor",
+      "col": 0,
+      "type": "external",
+      "label": "Open Report",
+      "sublabel": "record route",
+      "width": 125
+    },
+    {
+      "id": "session",
+      "lane": "browser",
+      "col": 1,
+      "type": "security",
+      "label": "Session Gate",
+      "sublabel": "signed in",
+      "width": 125
+    },
+    {
+      "id": "saved",
+      "lane": "api",
+      "col": 2,
+      "type": "backend",
+      "label": "Saved Detail",
+      "sublabel": "existing API query",
+      "width": 125
+    },
+    {
+      "id": "demo",
+      "lane": "browser",
+      "col": 2,
+      "type": "database",
+      "label": "Demo Handoff",
+      "sublabel": "history state",
+      "width": 125
+    },
+    {
+      "id": "validate",
+      "lane": "browser",
+      "col": 3,
+      "type": "security",
+      "label": "Validate Detail",
+      "sublabel": "Zod schema",
+      "width": 125
+    },
+    {
+      "id": "approved",
+      "lane": "browser",
+      "col": 4,
+      "type": "security",
+      "label": "Approval Check",
+      "sublabel": "redirect if pending",
+      "width": 125
+    },
+    {
+      "id": "render",
+      "lane": "browser",
+      "col": 5,
+      "type": "frontend",
+      "label": "Render Report",
+      "sublabel": "document route",
+      "width": 125
+    },
+    {
+      "id": "print",
+      "lane": "doctor",
+      "col": 5,
+      "type": "frontend",
+      "label": "window.print()",
+      "sublabel": "browser pipeline",
+      "width": 125
+    }
+  ],
+  "edges": [
+    { "from": "open", "to": "session", "label": "navigate" },
+    { "from": "session", "to": "saved", "label": "persisted record" },
+    {
+      "from": "session",
+      "to": "demo",
+      "label": "ephemeral demo",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    { "from": "saved", "to": "validate", "label": "detail response" },
+    { "from": "demo", "to": "validate", "label": "history state" },
+    { "from": "validate", "to": "approved", "label": "schema valid" },
+    { "from": "approved", "to": "render", "label": "approved", "variant": "emphasis" },
+    { "from": "render", "to": "print", "label": "doctor prints", "variant": "emphasis" }
+  ]
+}

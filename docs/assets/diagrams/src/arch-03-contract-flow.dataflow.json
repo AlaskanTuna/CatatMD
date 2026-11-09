@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Shared Contract Flow",
+    "output": "docs/assets/diagrams/arch-03-contract-flow.html",
+    "quality_profile": "showcase",
+    "viewBox": [980, 620],
+    "legend": {
+      "entries": {
+        "default": { "label": "Data Flow" },
+        "database": { "label": "Data Store" }
+      }
+    }
+  },
+  "stages": [
+    { "label": "Client" },
+    { "label": "Shared Contracts" },
+    { "label": "API Validation" },
+    { "label": "Persistence And Output" }
+  ],
+  "nodes": [
+    {
+      "id": "browser",
+      "type": "frontend",
+      "label": "React SPA",
+      "sublabel": "typed requests and views",
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "request",
+      "type": "external",
+      "label": "HTTP Payload",
+      "sublabel": "JSON or audio",
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "schemas",
+      "type": "backend",
+      "label": "Zod Schemas",
+      "sublabel": "shared/src/",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "requestcheck",
+      "type": "security",
+      "label": "Request Parse",
+      "sublabel": "reject invalid input",
+      "stage": 2,
+      "row": 2
+    },
+    {
+      "id": "modelcheck",
+      "type": "security",
+      "label": "Model Parse",
+      "sublabel": "operation schema",
+      "stage": 2,
+      "row": 3
+    },
+    {
+      "id": "record",
+      "type": "database",
+      "label": "Prisma JSON",
+      "sublabel": "validated analysis",
+      "stage": 3,
+      "row": 2
+    },
+    {
+      "id": "response",
+      "type": "backend",
+      "label": "Response Parse",
+      "sublabel": "shared API schema",
+      "stage": 3,
+      "row": 1
+    },
+    {
+      "id": "view",
+      "type": "frontend",
+      "label": "Review UI",
+      "sublabel": "typed response",
+      "stage": 3,
+      "row": 0
+    }
+  ],
+  "flows": [
+    { "from": "browser", "to": "request", "label": "constructs", "labelAt": [100, 201] },
+    { "from": "schemas", "to": "requestcheck", "label": "request contract" },
+    { "from": "request", "to": "requestcheck", "label": "payload" },
+    { "from": "requestcheck", "to": "record", "label": "valid transcript", "route": "straight" },
+    {
+      "from": "requestcheck",
+      "to": "modelcheck",
+      "label": "analysis input",
+      "labelAt": [530, 315]
+    },
+    { "from": "modelcheck", "to": "record", "label": "validated output" },
+    { "from": "schemas", "to": "response", "label": "response contract" },
+    { "from": "record", "to": "response", "label": "consultation data" },
+    { "from": "response", "to": "view", "label": "API response" }
+  ]
+}

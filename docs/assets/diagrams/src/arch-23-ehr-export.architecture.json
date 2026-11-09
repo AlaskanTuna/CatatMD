@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Specified EHR Export Path",
+    "output": "docs/assets/diagrams/arch-23-ehr-export.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": { "label": "CatatMD Logic" },
+        "database": { "label": "Local Record" },
+        "security": { "label": "Export Control" },
+        "external": { "label": "Clinic System" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "approve",
+      "type": "backend",
+      "label": "Approve Route",
+      "sublabel": "awaiting_review + analysis",
+      "pos": [40, 200],
+      "size": [190, 64]
+    },
+    {
+      "id": "record",
+      "type": "database",
+      "label": "Consultation Record",
+      "sublabel": "note and local patient link",
+      "pos": [300, 100],
+      "size": [190, 64]
+    },
+    {
+      "id": "audit",
+      "type": "database",
+      "label": "Audit Chain",
+      "sublabel": "consultation.approved",
+      "pos": [40, 300],
+      "size": [190, 64]
+    },
+    {
+      "id": "adapter",
+      "type": "security",
+      "label": "Export Contract",
+      "sublabel": "specified, not built",
+      "pos": [570, 200],
+      "size": [190, 64]
+    },
+    {
+      "id": "composition",
+      "type": "backend",
+      "label": "FHIR Composition",
+      "sublabel": "approved note document",
+      "pos": [930, 200],
+      "size": [190, 64]
+    },
+    {
+      "id": "ehr",
+      "type": "external",
+      "label": "Clinic EHR",
+      "sublabel": "registered recipient",
+      "pos": [1240, 200],
+      "size": [190, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "CatatMD API Trust Boundary",
+      "wraps": ["approve", "record", "audit", "adapter", "composition"],
+      "pad": 18
+    }
+  ],
+  "connections": [
+    {
+      "id": "approve-record",
+      "from": "approve",
+      "to": "record",
+      "label": "set approvedAt",
+      "variant": "emphasis"
+    },
+    { "id": "approve-audit", "from": "approve", "to": "audit", "label": "append approval event" },
+    { "id": "record-adapter", "from": "record", "to": "adapter", "label": "approved note source" },
+    {
+      "id": "adapter-composition",
+      "from": "adapter",
+      "to": "composition",
+      "label": "template-aware FHIR document"
+    },
+    {
+      "id": "composition-ehr",
+      "from": "composition",
+      "to": "ehr",
+      "label": "mTLS + OAuth 2.0",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Implementation Status",
+      "items": [
+        "The approval route and audit append exist today.",
+        "The export adapter, delivery state, and retry worker are future work.",
+        "The current local patient id is not an EHR identifier."
+      ]
+    }
+  ]
+}

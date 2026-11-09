@@ -8,6 +8,13 @@ Browser-level constraints that dictate component **structure** rather than styli
 
 **Split With `docs/DESIGN.md`.** That file owns the visual rules, including "glass is chrome only" and the one-line form of each constraint below. This section owns the mechanism, the components it binds, and how to verify a change. A frontend agent should read DESIGN.md for what the interface should look like and this section for what the browser will actually do.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-24-backdrop-root-dark.svg" />
+    <img src="../assets/diagrams/arch-24-backdrop-root-light.svg" alt="The diagram shows why a dropover inside the glass ChromeCluster cannot frost the page backdrop. The panel is portalled to document.body, outside the cluster's backdrop root, then positioned from its anchor and kept interactive with panel-aware dismissal. The portalled panel also carries its own print suppression because it no longer inherits attributes from its former parent." width="100%" />
+  </picture>
+</p>
+
 ## Glass Inside Glass Is Always Flat
 
 An element with `backdrop-filter` establishes a **backdrop root**. A descendant's own `backdrop-filter` may only sample within that root, never the page behind it. Nested glass therefore blurs its ancestor's flat fill, which is a uniform colour, and the result is plain translucency with no frost.
@@ -25,7 +32,7 @@ This is not a browser bug and there is no CSS that fixes it in place. The only f
 - **Positioning.** The panel has left its wrapper, so `absolute` no longer places it. Measure from the trigger's `getBoundingClientRect()` and recompute on `scroll` (capturing, so nested scrollers fire) and `resize`.
 - **Dismissal.** The panel is no longer inside the wrapper, so an outside-click check written as `wrap.contains(target)` closes the panel on its own buttons. Test the panel node as well.
 
-Also carry `data-print="hide"` onto the portalled node when the original inherited print suppression from its parent. Leaving that parent for `body` silently makes a floating panel printable.
+The current portalled panel declares `data-print="hide"` on its own node. A portal leaves the parent that may have suppressed it for print, so print suppression must travel with the panel.
 
 ## Verifying A Glass Change
 

@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "LLM Port And Adapter",
+    "output": "docs/assets/diagrams/rendered/arch-06-llm-port.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "API Module"
+        },
+        "security": {
+          "label": "Egress Gate"
+        },
+        "cloud": {
+          "label": "Provider"
+        },
+        "database": {
+          "label": "Vector Output"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "callers",
+      "type": "backend",
+      "label": "Analysis Callers",
+      "sublabel": "typed requests",
+      "pos": [30, 120],
+      "size": [170, 64]
+    },
+    {
+      "id": "port",
+      "type": "backend",
+      "label": "LLMClient Port",
+      "sublabel": "generate and stream",
+      "pos": [260, 120],
+      "size": [180, 64]
+    },
+    {
+      "id": "adapter",
+      "type": "security",
+      "label": "OpenAI-Compatible Adapter",
+      "sublabel": "guard and schema",
+      "pos": [540, 120],
+      "size": [230, 64]
+    },
+    {
+      "id": "provider",
+      "type": "cloud",
+      "label": "Selected Provider",
+      "sublabel": "Qwen, Gemini, DeepSeek",
+      "pos": [1180, 120],
+      "size": [190, 64]
+    },
+    {
+      "id": "validated",
+      "type": "backend",
+      "label": "Validated Result",
+      "sublabel": "Zod parsed output",
+      "pos": [565, 300],
+      "size": [180, 64]
+    },
+    {
+      "id": "embed",
+      "type": "backend",
+      "label": "Embedding Client",
+      "sublabel": "10 inputs per batch",
+      "pos": [870, 300],
+      "size": [180, 64]
+    },
+    {
+      "id": "vectors",
+      "type": "database",
+      "label": "Vectors",
+      "sublabel": "1,024 dimensions",
+      "pos": [870, 460],
+      "size": [180, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Inside The API",
+      "wraps": ["callers", "port", "adapter", "validated", "embed", "vectors"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "call-port",
+      "from": "callers",
+      "to": "port",
+      "label": "request"
+    },
+    {
+      "id": "port-adapter",
+      "from": "port",
+      "to": "adapter",
+      "label": "de-identified input"
+    },
+    {
+      "id": "adapter-provider",
+      "from": "adapter",
+      "to": "provider",
+      "label": "guarded egress",
+      "variant": "security"
+    },
+    {
+      "id": "provider-return",
+      "from": "provider",
+      "to": "adapter",
+      "label": "JSON or stream",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "top"
+    },
+    {
+      "id": "adapter-result",
+      "from": "adapter",
+      "to": "validated",
+      "label": "parsed response"
+    },
+    {
+      "id": "embed-provider",
+      "from": "embed",
+      "to": "provider",
+      "label": "input text",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "provider-vectors",
+      "from": "provider",
+      "to": "vectors",
+      "label": "embeddings",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "right"
+    }
+  ]
+}

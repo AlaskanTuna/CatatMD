@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Current Speech Paths",
+    "quality_profile": "showcase",
+    "output": "docs/assets/diagrams/arch-20-asr-path.html",
+    "legend": {
+      "entries": {
+        "frontend": { "label": "Browser" },
+        "backend": { "label": "API" },
+        "database": { "label": "Local Processing" },
+        "cloud": { "label": "Speech Provider" },
+        "security": { "label": "Credential Gate" },
+        "external": { "label": "Audio Input" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "mic",
+      "type": "external",
+      "label": "Microphone",
+      "sublabel": "session audio",
+      "pos": [40, 420],
+      "size": [170, 64]
+    },
+    {
+      "id": "capture",
+      "type": "frontend",
+      "label": "Browser Capture",
+      "sublabel": "consent and mode",
+      "pos": [280, 420],
+      "size": [190, 104]
+    },
+    {
+      "id": "worker",
+      "type": "database",
+      "label": "Whisper Worker",
+      "sublabel": "on-device transcription",
+      "pos": [280, 620],
+      "size": [190, 64]
+    },
+    {
+      "id": "api",
+      "type": "security",
+      "label": "ASR API Adapters",
+      "sublabel": "relay and key mint",
+      "pos": [560, 250],
+      "size": [190, 64]
+    },
+    {
+      "id": "ilmu",
+      "type": "cloud",
+      "label": "ILMU",
+      "sublabel": "hosted batch relay",
+      "pos": [900, 250],
+      "size": [170, 64]
+    },
+    {
+      "id": "soniox",
+      "type": "cloud",
+      "label": "Soniox",
+      "sublabel": "live ambient stream",
+      "pos": [900, 30],
+      "size": [170, 64]
+    },
+    {
+      "id": "eleven",
+      "type": "cloud",
+      "label": "ElevenLabs",
+      "sublabel": "post-stop refinement",
+      "pos": [900, 420],
+      "size": [190, 64]
+    }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "CatatMD API Boundary", "wraps": ["api"], "pad": 48 }
+  ],
+  "connections": [
+    { "from": "mic", "to": "capture", "label": "audio" },
+    { "from": "capture", "to": "worker", "label": "local recording" },
+    { "from": "capture", "to": "api", "variant": "security" },
+    { "from": "api", "to": "ilmu", "label": "audio relay", "variant": "security" },
+    { "from": "api", "to": "capture", "label": "session key", "variant": "dashed" },
+    {
+      "from": "capture",
+      "to": "soniox",
+      "label": "WebSocket audio",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    { "from": "api", "to": "eleven", "label": "mint upload token", "variant": "security" },
+    { "from": "capture", "to": "eleven", "label": "finished recording", "variant": "security" }
+  ]
+}

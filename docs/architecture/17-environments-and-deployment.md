@@ -2,11 +2,18 @@
 
 Part of the [Technical Reference](../TRD.md).
 
-**Status: `Specified`**, the Render service definition below is `Built`; migration wiring and the free-tier mitigation remain `Specified`.
+**Status: `Partially Built`**, the Render service and CI deployment path are `Built`. Production migrations still require a manual apply, now flagged before merge and tracked by an issue after merge. The off-platform keep-alive schedule remains an external operational configuration.
 
 ## Topology
 
-Frontend → Vercel; backend → Render (Singapore); database → Supabase (Singapore), locked in `AGENTS.md`, all three in-region by design. Backend hosting is `Built`: see the Render Service Definition below.
+Frontend → Vercel; backend → Render (Singapore); database → Supabase (Singapore), as recorded in `AGENTS.md`. The repository pins the API and database regions, but Vercel's static SPA config has no Singapore region setting. The repository therefore does not establish that all three tiers are in-region. Backend hosting is `Built`: see the Render Service Definition below.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-17-environments-deployment-dark.svg" />
+    <img src="../assets/diagrams/arch-17-environments-deployment-light.svg" alt="The diagram shows the Vercel frontend and Render API deployment paths, with Supabase as the API's database. It marks browser audio egress directly to ASR providers and de-identified model requests from the API. The Singapore region covers the API and database, while the repository does not pin a Vercel region." width="100%" />
+  </picture>
+</p>
 
 ## Free-Tier Seats And Collaborator Access
 
@@ -63,12 +70,14 @@ Source: the `headers` block in `vercel.json`. The API is covered separately by `
 | `Permissions-Policy`         | `microphone=(self), camera=(), geolocation=(), ...` | **`microphone=(self)` Is Load-Bearing**, see below.                                      |
 | `Cross-Origin-Opener-Policy` | `same-origin`                                       | Severs any opener relationship. Safe here because the app opens no cross-origin windows. |
 
-**Four Entries Look Like They Could Be Trimmed And Cannot.** All four were established by loading the built app under the real policy and exercising the Record tab, not by reading documentation.
+**Six Entries Look Like They Could Be Trimmed And Cannot.** The WebAssembly, blob, microphone, and Hugging Face entries below were established by loading the built app under the real policy and exercising the Record tab. The Soniox and ElevenLabs hosts authorize the current hosted recognition paths.
 
 - **`'wasm-unsafe-eval'` In `script-src`.** The speech model is WebAssembly. Without this it cannot instantiate, and the failure appears as a broken Record tab rather than as an obvious policy error.
 - **`blob:` In `script-src`.** ONNX Runtime loads its execution backend by fetching it, wrapping the response in a `URL.createObjectURL` blob, and calling `import()` on that blob. A dynamic import is governed by `script-src`, not by `worker-src`, so `worker-src 'self' blob:` starts the worker and then the backend load inside it is blocked. The failure surfaces as `no available backend found. ERR: [wasm] TypeError: Failed to fetch dynamically imported module: blob:...`, **after** the model reports 100% downloaded, which reads as a model or network problem rather than a policy one.
 - **`microphone=(self)` In `Permissions-Policy`.** A policy that omits `microphone` denies it. Recording would be refused by the browser before any application code ran.
 - **`https://*.hf.co` in `connect-src`.** HuggingFace serves `huggingface.co` but **redirects model downloads to a different registrable path**, observed as `us.aws.cdn.hf.co`. Allowing only `huggingface.co` passes a superficial test, because the config and tokenizer files come from there, and then fails on the model weights.
+- **`wss://stt-rt.soniox.com` in `connect-src`.** The browser opens the Soniox real-time speech socket directly for ambient capture. The configured region selects the matching host; `SONIOX_REGION` and this CSP entry must move together.
+- **`https://api.elevenlabs.io` in `connect-src`.** The browser uploads the stopped ambient recording with a single-use token for optional batch refinement. Without this host the refinement request cannot reach the provider.
 
 **`Cross-Origin-Embedder-Policy` Is Deliberately Absent.** It would require every cross-origin response the speech model fetches to carry `Cross-Origin-Resource-Policy`, which the HuggingFace CDN does not send. Adding it would break transcription in exchange for a header this app gains nothing from, since it uses no `SharedArrayBuffer`.
 
@@ -101,9 +110,9 @@ Source: `render.yaml` (repo root).
 | `startCommand`     | `bun run --cwd backend start`                                                                                                    |
 | `healthCheckPath`  | `/api/health`                                                                                                                    |
 
-`envVars`: `NODE_ENV=production`; `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_URL`, `CORS_ORIGIN`, `QWEN_API_KEY`, `ILMU_API_KEY` all `sync: false` (set manually in the Render dashboard, never committed); `BETTER_AUTH_SECRET` uses `generateValue: true`; `LLM_PROVIDER=qwen`; `QWEN_BASE_URL` pinned to the Singapore Model Studio endpoint; `QWEN_MODEL=qwen3.7-flash`; `DEID_FAIL_CLOSED: 'true'`.
+`envVars` include `NODE_ENV=production`, `LLM_PROVIDER=qwen`, the Singapore `QWEN_BASE_URL`, `QWEN_MODEL=qwen3.7-flash`, `SONIOX_REGION=us`, `TRANSCRIPT_CLEANUP=off`, `LOG_LEVEL=info`, and `DEID_FAIL_CLOSED=true`. `BETTER_AUTH_SECRET` is generated by Render. Database and auth URLs, CORS origin, `TRUSTED_PROXY_IPS`, provider credentials, guest credentials, and `SEED_DOCTOR_PASSWORD` use `sync: false` and must be set on the service. `ILMU_API_KEY`, `SONIOX_API_KEY`, and `ELEVENLABS_API_KEY` are optional at runtime; an absent key disables that hosted path. `AUDIO_RETENTION_HOURS` has no default, and absent means recording storage is disabled.
 
-`QWEN_MODEL` pins the same untested default flagged in Open #6 below, the value is already committed to the deploy config before the exact model id has been confirmed against a live Model Studio account.
+`QWEN_MODEL=qwen3.7-flash` was verified against the live account to support strict JSON-Schema decoding (§19, row 6; §21.2). Existing Render services still need their dashboard value updated because `render.yaml` only seeds values when a service is created.
 
 The retrieved tier (§11) adds four `EnvSchema` fields, all deliberately absent from `render.yaml`:
 
@@ -214,13 +223,16 @@ It still applies nothing. The manual step remains the design; this only makes fo
 
 **Status: `Built`**, `.github/workflows/ci.yml`, reinstated 13/08/26 (issue #13), extended to deployment 13/08/26 (issue #52). It answers §19 row 12 in practice: CI runs on every push to `main` and every pull request. The register row is left open pending the dependency-scan half of the question (§16), which is still not built.
 
-Three jobs, the second and third gated on the first:
+Six jobs cover verification, migration handling, deploy selection, production deploy, and previews:
 
-| Job       | Runs On                            | Does                                                                                                                                                                    |
-| --------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `verify`  | every push and PR                  | `bun install --frozen-lockfile`, `prisma generate` + `migrate deploy` against a throwaway Postgres service container, `lint`, `typecheck`, `test`, confidentiality grep |
-| `deploy`  | pushes to `main` only              | `vercel pull` / `build` / `deploy --prebuilt`, then asserts what production actually serves                                                                             |
-| `preview` | pull requests from this repository | Builds the bundle against the in-browser stub, deploys it as a Vercel preview, and posts the URL on the pull request. See Pull Request Previews below                   |
+| Job                  | Runs On                          | Does                                                                                                                                                                                          |
+| -------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `verify`             | every push and PR                | Frozen Bun install, known-vulnerability audit at `high`, Prisma generate and migration against throwaway Postgres, lint, typecheck, tests, format check, and floor guard                      |
+| `migrations`         | pull requests                    | Warns when a PR adds a migration; does not hold a production credential or block merging                                                                                                      |
+| `migration-reminder` | pushes to `main`                 | Opens an assigned `priority:p0` issue for each new migration that still needs a manual production apply; fails if the issue cannot be created                                                 |
+| `changes`            | pushes to `main`, after `verify` | Checks repository paths to decide whether the Vercel bundle could change                                                                                                                      |
+| `deploy`             | deployable pushes to `main`      | Builds and deploys the Vercel frontend, then asserts deployment readiness, production alias identity, and served bundle. It depends on `verify` and `changes`, not on the migration reminder. |
+| `preview`            | same-repository pull requests    | Builds against the in-browser stub, deploys a Vercel preview, and posts the URL on the pull request. See Pull Request Previews below                                                          |
 
 Two properties of `verify` are deliberate. It uses a **throwaway Postgres**, never the shared Supabase instance, because the route and auth suites exercise real ownership scoping and audit writes rather than mocking the database. It carries **no LLM provider key**, because LLM-dependent tests stub at the `LLMClient` port, the same boundary that makes the provider swappable.
 

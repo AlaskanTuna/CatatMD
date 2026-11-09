@@ -97,6 +97,15 @@ An evaluation that spends real model calls must treat its **raw per-turn outputs
 
 Both model-side levers were spent (§25.4), so the fix moved tier: when an answer comes back as prose, the panel offers **Propose as Edit** under it. Pressing it sends one more turn with `propose: true`, and that turn alone forces a tool call (`tool_choice: 'required'`).
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-25-propose-as-edit-dark.svg" />
+    <img src="../assets/diagrams/arch-25-propose-as-edit-light.svg" alt="The diagram shows the doctor-requested proposal path. When the latest answer has no tool proposal and the consultation is not approved, the review panel offers Propose as Edit. A press sends a new turn with propose set, and runCopilotTurn forces a tool choice only for that turn. The resulting card remains a proposal for the doctor to apply or discard; an approved consultation has no tools." width="100%" />
+  </picture>
+</p>
+
+`propose` is an optional field in `CopilotRequestSchema`; the backend derives signed status from the loaded consultation and ignores client claims about approval. The control appears only below the latest non-empty assistant answer when that turn emitted no tool, the panel is idle, the turn was not itself a proposal request, no error is shown, and the record is neither a demo nor approved (`backend/src/copilot/index.ts`, `frontend/src/copilot/CatatAI.tsx`).
+
 | Rule                                                           | Why                                                                                             |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | Offered only under the latest answer, only when it ran no tool | An answer that already produced a card needs nothing more                                       |

@@ -32,11 +32,18 @@ Part of the [Technical Reference](../TRD.md).
 - [20.13 Evaluated 15/10/26: ElevenLabs Scribe v2 Realtime As A Soniox Replacement](#2013-evaluated-151026-elevenlabs-scribe-v2-realtime-as-a-soniox-replacement)
 - [20.14 Refinement After Stop: Batch `scribe_v2`, Browser-Direct, Under An API-Minted Token](#2014-refinement-after-stop-batch-scribe_v2-browser-direct-under-an-api-minted-token)
 
-**Status: `Built` and live. The local path (issue #2), the hosted relay (#154) and the consent gate that lets a doctor enter the hosted path (#155, §20.4) are all `Built`. `ILMU_API_KEY` is set in the Render production service, verified 16/08/26, so the path is reachable today: an authenticated doctor who has chosen the hosted engine for the device and ticked the per-consultation box for this patient sends that recording to ILMU. The route still fails closed with `503 asr_unavailable` on any deployment where the key is absent.**
+**Status: `Built`. The speech paths now include on-device Whisper, the consent-gated ILMU relay for press-to-record, browser-direct Soniox streaming for ambient capture, and optional browser-direct ElevenLabs batch refinement after Stop. The API adapters in `backend/src/lib/asr/` mint or relay credentials, while capture and provider transports live in `frontend/src/audio/`. Missing provider keys disable their routes or refinement; they do not switch audio to another provider. The ILMU deployment key was verified on Render on 16/08/26, as recorded below.**
 
 Audio input creates a second egress point that sits **before** the de-identification gate (§9): raw audio cannot be de-identified, only transcribed first. Un-redacted patient audio, and voice itself, a biometric identifier, would leave the trust boundary before the gate ever saw it, contradicting the central invariant in `AGENTS.md` that no text containing patient identifiers may leave the API.
 
-The resolution is not "audio never leaves the device" as an absolute, because §20.1 measured the hardware cost of holding that line on a modest clinic PC and it is real. It is a **default plus a gate**: on-device transcription is what the product does, and the hosted path exists, is documented, and can only be entered deliberately.
+The resolution is not "audio never leaves the device" as an absolute, because §20.1 measured the hardware cost of holding that line on a modest clinic PC and it is real. It is a **default plus a gate**: press-to-record uses on-device transcription by default; hosted relay and ambient capture require the applicable consultation choice and consent. Ambient streaming and post-stop refinement each have separate provider paths, described in §§20.7 and 20.10–20.14.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-20-asr-path-dark.svg" />
+    <img src="../assets/diagrams/arch-20-asr-path-light.svg" alt="The diagram shows the current speech paths from browser capture. Press-to-record audio can stay in the local Whisper worker or be relayed by the API to ILMU after consent. Ambient capture streams directly to Soniox under an API-minted key, and an untranslated ambient recording may be uploaded to ElevenLabs after Stop for batch refinement under a separate API-minted token." width="100%" />
+  </picture>
+</p>
 
 ## The Governing Rule
 

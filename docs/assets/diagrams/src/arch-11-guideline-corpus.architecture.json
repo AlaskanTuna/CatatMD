@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Guideline Retrieval And Citation",
+    "output": "docs/assets/diagrams/arch-11-guideline-corpus.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Consultation Input"
+        },
+        "backend": {
+          "label": "Retrieval And Validation"
+        },
+        "database": {
+          "label": "Corpus And Review Data"
+        },
+        "security": {
+          "label": "Trust Gate"
+        },
+        "cloud": {
+          "label": "Model Provider"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "transcript",
+      "type": "external",
+      "label": "Consultation Text",
+      "sublabel": "raw transcript",
+      "pos": [40, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "deid",
+      "type": "security",
+      "label": "De-identification",
+      "sublabel": "tokenised query",
+      "pos": [340, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "corpus",
+      "type": "database",
+      "label": "Guideline Chunks",
+      "sublabel": "profile and MY scoped",
+      "pos": [640, 40],
+      "size": [200, 64]
+    },
+    {
+      "id": "retrieve",
+      "type": "backend",
+      "label": "Hybrid Retrieval",
+      "sublabel": "lexical and semantic",
+      "pos": [640, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "prompt",
+      "type": "backend",
+      "label": "Prompt Candidate Set",
+      "sublabel": "up to six chunks",
+      "pos": [940, 170],
+      "size": [200, 64]
+    },
+    {
+      "id": "provider",
+      "type": "cloud",
+      "label": "Suggestions Model",
+      "sublabel": "de-identified request",
+      "pos": [1280, 340],
+      "size": [200, 64]
+    },
+    {
+      "id": "validate",
+      "type": "security",
+      "label": "Citation Schema",
+      "sublabel": "retrieved IDs only",
+      "pos": [640, 340],
+      "size": [200, 64]
+    },
+    {
+      "id": "review",
+      "type": "database",
+      "label": "Review Analysis",
+      "sublabel": "retrieved chunks persisted",
+      "pos": [340, 340],
+      "size": [200, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "API Trust Boundary",
+      "wraps": ["transcript", "deid", "corpus", "retrieve", "prompt", "validate", "review"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "transcript-deid",
+      "from": "transcript",
+      "to": "deid",
+      "label": "raw text"
+    },
+    {
+      "id": "deid-retrieve",
+      "from": "deid",
+      "to": "retrieve",
+      "label": "de-identified"
+    },
+    {
+      "id": "corpus-retrieve",
+      "from": "corpus",
+      "to": "retrieve",
+      "label": "scoped chunks",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "retrieve-prompt",
+      "from": "retrieve",
+      "to": "prompt",
+      "label": "ranked chunks"
+    },
+    {
+      "id": "prompt-provider",
+      "from": "prompt",
+      "to": "provider",
+      "label": "de-identified prompt",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "provider-validate",
+      "from": "provider",
+      "to": "validate",
+      "label": "JSON suggestions",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "retrieve-validate",
+      "from": "retrieve",
+      "to": "validate",
+      "label": "allowed IDs",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "validate-review",
+      "from": "validate",
+      "to": "review",
+      "label": "parsed citations"
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Audit Event Chain",
+    "output": "docs/assets/diagrams/arch-15-audit-logging.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "Event Flow"
+        },
+        "emphasis": {
+          "label": "Chain Write"
+        },
+        "database": {
+          "label": "Stored Record"
+        }
+      }
+    },
+    "viewBox": [940, 500]
+  },
+  "stages": [
+    {
+      "label": "Create Event"
+    },
+    {
+      "label": "Append Chain"
+    },
+    {
+      "label": "Verify And Read"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "sources",
+      "type": "backend",
+      "label": "Event Sources",
+      "sublabel": "routes and hooks",
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "union",
+      "type": "security",
+      "label": "Typed Event Union",
+      "sublabel": "action-specific metadata",
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "writer",
+      "type": "backend",
+      "label": "Audit Writer",
+      "sublabel": "one append path",
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "table",
+      "type": "database",
+      "label": "AuditEvent Table",
+      "sublabel": "append-only by writer",
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "verifier",
+      "type": "backend",
+      "label": "Chain Verifier",
+      "sublabel": "links and known head",
+      "stage": 2,
+      "row": 0
+    },
+    {
+      "id": "history",
+      "type": "backend",
+      "label": "History Reader",
+      "sublabel": "scoped audit reads",
+      "stage": 2,
+      "row": 2
+    }
+  ],
+  "flows": [
+    {
+      "id": "source-union",
+      "from": "sources",
+      "to": "union",
+      "label": "typed event",
+      "labelDy": 25
+    },
+    {
+      "id": "union-writer",
+      "from": "union",
+      "to": "writer",
+      "label": "validated fields"
+    },
+    {
+      "id": "writer-table",
+      "from": "writer",
+      "to": "table",
+      "label": "hash-linked append",
+      "variant": "emphasis",
+      "labelDy": 25
+    },
+    {
+      "id": "table-verify",
+      "from": "table",
+      "to": "verifier",
+      "label": "chain rows"
+    },
+    {
+      "id": "table-history",
+      "from": "table",
+      "to": "history",
+      "label": "owned history"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Hash Scope",
+      "items": [
+        "The hash covers ids, action, actor, consultation, timestamp, and predecessor.",
+        "Metadata is outside the hash and can be rewritten without detection."
+      ]
+    }
+  ]
+}

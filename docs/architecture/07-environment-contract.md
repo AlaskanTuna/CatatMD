@@ -2,40 +2,62 @@
 
 Part of the [Technical Reference](../TRD.md).
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-07-env-contract-dark.svg" />
+    <img src="../assets/diagrams/arch-07-env-contract-light.svg" alt="At import time, the API parses process environment values against EnvSchema and exits on invalid configuration. Valid values pass production guards before runtime use. Provider API keys are checked when a client is first built, while optional hosted speech credentials disable their features at request time." width="100%" />
+  </picture>
+</p>
+
 **Status: `Built`**
 
 Source: `backend/src/config/env.ts`. `EnvSchema` is validated against `process.env` at import time; a failing parse logs the Zod error and calls `process.exit(1)` before the app starts.
 
-| Field                | Type / Constraint                                  | Default                                                  |
-| -------------------- | -------------------------------------------------- | -------------------------------------------------------- |
-| `NODE_ENV`           | `enum(['development','test','production'])`        | `development`                                            |
-| `PORT`               | `coerce.number().int().positive()`                 | `3001`                                                   |
-| `CORS_ORIGIN`        | `string().url()`                                   | `http://localhost:5173`                                  |
-| `DATABASE_URL`       | `string().min(1)`                                  | none, required                                           |
-| `DIRECT_URL`         | `string().min(1)`                                  | none, required                                           |
-| `BETTER_AUTH_SECRET` | `string().min(32)`                                 | none, required                                           |
-| `BETTER_AUTH_URL`    | `string().url()`                                   | none, required                                           |
-| `LLM_PROVIDER`       | `enum(['qwen','gemini','deepseek'])`               | `qwen`                                                   |
-| `QWEN_API_KEY`       | `string().optional()`                              | none                                                     |
-| `QWEN_BASE_URL`      | `string().url()`                                   | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` |
-| `QWEN_MODEL`         | `string()`                                         | `qwen3.7-flash`                                          |
-| `GEMINI_API_KEY`     | `string().optional()`                              | none                                                     |
-| `GEMINI_MODEL`       | `string()`                                         | `gemini-3.5-flash-lite`                                  |
-| `DEEPSEEK_API_KEY`   | `string().optional()`                              | none                                                     |
-| `DEEPSEEK_BASE_URL`  | `string().url()`                                   | `https://api.deepseek.com`                               |
-| `DEEPSEEK_MODEL`     | `string()`                                         | `deepseek-v4-flash`                                      |
-| `ILMU_API_KEY`       | `string().optional()`                              | none: an absent key disables the hosted-ASR relay (#154) |
-| `ILMU_BASE_URL`      | `string().url()`                                   | `https://api.ilmu.ai/v1`                                 |
-| `ILMU_ASR_MODEL`     | `string()`                                         | `ilmu-asr-v4.2`                                          |
-| `SONIOX_API_KEY`     | `string().optional()`                              | none: an absent key disables ambient capture (#268)      |
-| `SONIOX_REGION`      | `enum(['us','eu','jp','in'])`                      | `us`                                                     |
-| `SONIOX_RT_MODEL`    | `string()`                                         | `stt-rt-v5`                                              |
-| `DEID_FAIL_CLOSED`   | `enum(['true','false'])`, transformed to `boolean` | `true`                                                   |
+| Field                        | Type / Constraint                                  | Default                                                  |
+| ---------------------------- | -------------------------------------------------- | -------------------------------------------------------- |
+| `NODE_ENV`                   | `enum(['development','test','production'])`        | `development`                                            |
+| `PORT`                       | `coerce.number().int().positive()`                 | `3001`                                                   |
+| `CORS_ORIGIN`                | `string().url()`                                   | `http://localhost:5173`                                  |
+| `TRUSTED_PROXY_IPS`          | comma-separated `string()`                         | empty, no forwarded proxy addresses trusted              |
+| `DATABASE_URL`               | `string().min(1)`                                  | none, required                                           |
+| `DIRECT_URL`                 | `string().min(1)`                                  | none, required                                           |
+| `BETTER_AUTH_SECRET`         | `string().min(32)`                                 | none, required                                           |
+| `BETTER_AUTH_URL`            | `string().url()`                                   | none, required                                           |
+| `GUEST_EMAIL`                | `string().email().optional()`                      | absent, shared guest route disabled                      |
+| `GUEST_PASSWORD`             | `string().min(8).optional()`                       | absent, shared guest route disabled                      |
+| `SEED_DOCTOR_PASSWORD`       | `string().min(8).optional()`                       | absent, seed script uses no runtime password             |
+| `LLM_PROVIDER`               | `enum(['qwen','gemini','deepseek'])`               | `qwen`                                                   |
+| `QWEN_API_KEY`               | `string().optional()`                              | none                                                     |
+| `QWEN_BASE_URL`              | `string().url()`                                   | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` |
+| `QWEN_MODEL`                 | `string()`                                         | `qwen3.7-flash`                                          |
+| `QWEN_EMBEDDING_MODEL`       | `string()`                                         | `text-embedding-v4`                                      |
+| `SUPABASE_URL`               | `string().url().optional()`                        | absent, guideline PDF uploads skipped                    |
+| `SUPABASE_SERVICE_ROLE_KEY`  | `string().optional()`                              | absent, guideline PDF uploads skipped                    |
+| `SUPABASE_GUIDELINES_BUCKET` | `string()`                                         | `guidelines`                                             |
+| `GEMINI_API_KEY`             | `string().optional()`                              | none                                                     |
+| `GEMINI_MODEL`               | `string()`                                         | `gemini-3.5-flash-lite`                                  |
+| `DEEPSEEK_API_KEY`           | `string().optional()`                              | none                                                     |
+| `DEEPSEEK_BASE_URL`          | `string().url()`                                   | `https://api.deepseek.com`                               |
+| `DEEPSEEK_MODEL`             | `string()`                                         | `deepseek-v4-flash`                                      |
+| `ILMU_API_KEY`               | `string().optional()`                              | none: an absent key disables the hosted-ASR relay (#154) |
+| `ILMU_BASE_URL`              | `string().url()`                                   | `https://api.ilmu.ai/v1`                                 |
+| `ILMU_ASR_MODEL`             | `string()`                                         | `ilmu-asr-v4.2`                                          |
+| `SONIOX_API_KEY`             | `string().optional()`                              | none: an absent key disables ambient capture (#268)      |
+| `SONIOX_REGION`              | `enum(['us','eu','jp','in'])`                      | `us`                                                     |
+| `SONIOX_RT_MODEL`            | `string()`                                         | `stt-rt-v5`                                              |
+| `ELEVENLABS_API_KEY`         | `string().optional()`                              | none, transcript refinement unavailable                  |
+| `AUDIO_RETENTION_HOURS`      | positive integer, optional                         | absent, consultation audio storage disabled              |
+| `TRANSCRIPT_CLEANUP`         | `enum(['on','off'])`                               | `off`                                                    |
+| `LOG_LEVEL`                  | `enum(['debug','info','warn','error'])`            | `info`                                                   |
+| `DEID_FAIL_CLOSED`           | `enum(['true','false'])`, transformed to `boolean` | `true`                                                   |
+
+`GUEST_EMAIL` and `GUEST_PASSWORD` are optional credentials for the shared demo sign-in; without them, the guest route is disabled. `SEED_DOCTOR_PASSWORD` is optional and read by `prisma/seed.ts`, not normal API runtime. Missing `ILMU_API_KEY` or `SONIOX_API_KEY` disables the hosted ASR feature at request time rather than failing startup. `AUDIO_RETENTION_HOURS` has no default or upper bound; audio storage is disabled while it is unset.
 
 ## Production Guards (Enforced At Boot)
 
 1. `NODE_ENV === 'production' && LLM_PROVIDER === 'gemini'` → throws. Gemini's free-tier terms permit Google to use submitted content for product improvement and human review, so it must never sit on a path that could carry patient-derived text in production.
-2. `NODE_ENV === 'production' && !DEID_FAIL_CLOSED` → throws. Production must run with fail-closed de-identification.
+2. `NODE_ENV === 'production' && LLM_PROVIDER === 'deepseek'` → throws. The hosted API processes and stores data in the PRC, leaving an unresolved cross-border transfer question.
+3. `NODE_ENV === 'production' && !DEID_FAIL_CLOSED` → throws. Production must run with fail-closed de-identification.
 
 ## Production Guard For DeepSeek (PRC Hosting): Closed 13/08/26
 
@@ -47,7 +69,7 @@ A third production guard now exists, symmetric with guard 1: `NODE_ENV === 'prod
 
 Previously `DEID_FAIL_CLOSED` was declared in `EnvSchema` and guarded at boot, but read nowhere in `backend/src/lib/llm/openai-compatible.ts`. It constrained what configuration was _accepted_ at startup without gating _behaviour_ where a request actually leaves the process.
 
-**What "Fail Closed" Now Does** (§19 row 2, resolved): when `DEID_FAIL_CLOSED` is true, `OpenAICompatibleClient.generate()` calls `assertNoIdentifiers(request.content, request.operation)` **before** the network call. That re-runs the full §9 detector inventory over the outbound payload, with already-minted `[LABEL_N]` tokens stripped first, so it inspects only what survived the gate, and throws `DeidentificationError` if anything fires. The request is never sent.
+**What "Fail Closed" Now Does** (§19 row 2, resolved): when `DEID_FAIL_CLOSED` is true, `OpenAICompatibleClient.generate()` and `.stream()` call `assertNoIdentifiers` on outbound text **before** the network call. The embedding client checks each input too. The guard re-runs the §9 detectors with already-minted `[LABEL_N]` tokens stripped, and throws `DeidentificationError` if anything fires. The request is never sent.
 
 Three properties make this worth more than a duplicate of the first pass:
 

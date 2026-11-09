@@ -4,43 +4,54 @@ Part of the [Technical Reference](../TRD.md).
 
 **Status: `Built`**
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-03-contract-flow-dark.svg" />
+    <img src="../assets/diagrams/arch-03-contract-flow-light.svg" alt="The shared Zod package defines contracts consumed by the browser and API. The API parses requests and responses at runtime, stores validated transcript and analysis JSON through Prisma, and validates model outputs against operation-specific schemas before the results enter the consultation record." width="100%" />
+  </picture>
+</p>
+
 All schemas live in `shared/src/` (exported from `index.ts`). Types are inferred (`z.infer`), never hand-written.
 
 ## Transcript
 
-| Schema                 | Fields                                                                                |
-| ---------------------- | ------------------------------------------------------------------------------------- |
-| `SpeakerSchema`        | `enum(['doctor', 'patient'])`                                                         |
-| `TranscriptTurnSchema` | `speaker: Speaker`, `text: string().min(1)`, `offsetSeconds?: number().nonnegative()` |
-| `TranscriptSchema`     | `turns: TranscriptTurn[]`, `.min(1)`                                                  |
+| Schema                 | Fields                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `SpeakerSchema`        | `enum(['doctor', 'patient'])`                                                                                                             |
+| `TranscriptTurnSchema` | `speaker: Speaker`, `text: string().min(1).max(MAX_TURN_CHARACTERS)` (4,000), optional timing, uncertainty ranges and other-language text |
+| `TranscriptSchema`     | Required `source`, `turns` from 1 to 600, optional `labelsReviewed`, `machineTranslation` and `batchTranscription` provenance             |
+
+Transcript turns may carry `offsetSeconds`, `endSeconds`, up to 200 ordered, non-overlapping uncertain text ranges, and an optional translated-language pair. `endSeconds` cannot precede `offsetSeconds`; ranges must stay within the turn text. See `shared/src/transcript.ts` for bounds and refinements. `source` includes `asr_live`; `source`, `labelsReviewed`, and translation provenance are client-asserted, not verified by the API.
 
 ## Transcript Provenance: `Transcript.source`
 
 **Status: `Built`**, decided and implemented 13/08/26 (issue #31). A **required** field on `TranscriptSchema` (no default: an unstated source silently recorded as `paste` would be a false audit record), persisted with the transcript and shown on the review screen:
 
 ```
-TranscriptSourceSchema = z.enum(['fixture','paste','upload','asr_local','asr_hosted'])
+TranscriptSourceSchema = z.enum(['fixture','paste','upload','asr_local','asr_hosted','asr_live'])
 ```
 
 It does double duty, and both jobs are load-bearing enough that neither would justify the field alone:
 
-- **Egress Audit.** `asr_hosted` is the only input path on which audio leaves the doctor's device (§20). The field is the durable record of which consultations took that path, alongside the audit event in §15.
+- **Egress Audit.** `asr_hosted` and `asr_live` identify the two shipped paths on which consultation audio leaves the doctor's device (§20): a completed-recording relay and a browser-held live socket. The field links that client-asserted provenance to the consultation; server-observed audit events record the relay or live-session mint in §15.
 - **Fabrication-Risk Signal For The Reviewer.** §20's threat table applies only to `asr_*` sources. A pasted or fixture transcript is what someone typed; a transcribed one may contain a substituted content word carrying a perfectly valid evidence span (§21.4). The review UI can therefore cue closer reading of the transcript itself on `asr_*` sources, and say nothing on the others, which is the difference between a useful warning and a banner the doctor learns to ignore.
 
 **`source` Is Client-Asserted, And The Backend Cannot Verify It.** Transcription runs in the browser on both ASR paths, so the API receives a claim about how the transcript was produced, not evidence of it. This is stated rather than glossed: the field is an honest provenance record for a cooperating client, not a security control, and nothing in the safety architecture rests on it. What is not client-asserted is the de-identification gate (§9), which treats every transcript identically regardless of `source`.
 
 ## Clinical Note & Analysis
 
-| Schema                       | Fields                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SoapNoteSchema`             | `subjective`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                                                                                                                                                                                                                              |
-| `NoteTemplateSchema`         | `enum(['soap','malaysian'])`                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `MedicalRecordNoteSchema`    | `presentingComplaint`, `historyOfPresentingComplaint`, `pastMedicalHistory`, `socialHistory`, `familyHistory`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                                                                                                                             |
-| `InformationGapSchema`       | `id: string`, `question: string`, `rationale: string`, `priority: enum(['high','medium','low'])`, `source?: GapSource`                                                                                                                                                                                                                                                                                                                                     |
-| `RedFlagSchema`              | `id: string`, `label: string`, `severity: enum(['emergency','urgent','advisory'])`, `evidence: string`, `source: enum(['rule','model'])`, `ruleId?: string`                                                                                                                                                                                                                                                                                                |
-| `CitationSchema`             | `guidelineId: string`, `quote?: string`                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `ClinicalSuggestionSchema`   | `id: string`, `text: string`, `citations: Citation[]`, `.min(1)`                                                                                                                                                                                                                                                                                                                                                                                           |
-| `ConsultationAnalysisSchema` | `note: SoapNote`, `medicalRecordNote?: MedicalRecordNote`, `gaps: InformationGap[]`, `redFlags: RedFlag[]`, `suggestions: ClinicalSuggestion[]`, `retrievedGuidelines?: GuidelineChunk[]` (the retrieved CPG chunks offered to the model, persisted so a citation resolves without re-running retrieval; §11), `scores?: ClinicalScore[]` (the sore-throat scores the doctor completes, each pre-filled only from the transcript; §11, Sore-Throat Scores) |
+| Schema                       | Fields                                                                                                                                                                                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SoapNoteSchema`             | `subjective`, `objective`, `assessment`, `plan`, all `string`                                                                                                                                                                                             |
+| `NoteTemplateSchema`         | `enum(['soap','malaysian'])`                                                                                                                                                                                                                              |
+| `MedicalRecordNoteSchema`    | `presentingComplaint`, `historyOfPresentingComplaint`, `pastMedicalHistory`, `socialHistory`, `familyHistory`, `objective`, `assessment`, `plan`, all `string`                                                                                            |
+| `InformationGapSchema`       | `id: string`, `question: string`, `rationale: string`, `priority: enum(['high','medium','low'])`, `source?: GapSource`                                                                                                                                    |
+| `RedFlagSchema`              | `id: string`, `label: string`, `severity: enum(['emergency','urgent','advisory'])`, `evidence: string`, `source: enum(['rule','model'])`, `ruleId?: string`                                                                                               |
+| `CitationSchema`             | `guidelineId: string`, `quote?: string`                                                                                                                                                                                                                   |
+| `ClinicalSuggestionSchema`   | `id: string`, `text: string`, `citations: Citation[]`, `.min(1)`                                                                                                                                                                                          |
+| `ConsultationAnalysisSchema` | `note`, optional canonical `medicalRecordNote`, `clinicalFacts`, `operational`, `evidenceLinks`, `outOfScope`, `retrievedGuidelines`, and `scores`, plus `gaps`, `redFlags`, and `suggestions`; optional fields preserve parsing of older stored analyses |
+
+`clinicalFacts` is optional for rollout compatibility and contains the 29 fixed clinical assertions. `operational` is a separate five-field block (`diagnosis`, `medicationsDispensed`, `mcDays`, `referral`, `followUp`); `medicationsDispensed` is capped at 10 items. `evidenceLinks` contains only checklist evidence spans. `retrievedGuidelines` preserves the retrieved citation candidates, and `scores` describes doctor-completed guideline scores with transcript-only suggestions. See `shared/src/analysis.ts`, `shared/src/assertions.ts`, and `shared/src/operational.ts`.
 
 ### Note Template Projections
 
@@ -74,7 +85,7 @@ An empty canonical category renders as `Not established`; it is never omitted or
 
 **Status: `Built`**, human-ratified (§19 row 10, closed), implemented 13/08/26 (issue #31). `SoapNoteSchema` (above) is four free-text strings and cannot express per-field assertion states. `docs/PRD.md` §10 requires that a symptom, allergy, medication, history item, vital sign, examination finding, safety question, or operational-block field never established must never be represented as denied, which requires distinguishing `NOT_ASSESSED`/`UNKNOWN` from `DENIED`/`PRESENT` at the level of an individual clinical fact. Four opaque note strings cannot do that. The schema therefore grows a structured per-field representation **alongside** `SoapNoteSchema`, which is retained as the review scaffold.
 
-**As Built**, the shape is as proposed, but it ships as **two** schemas over one object, which the specification did not anticipate:
+**As Built**, the persisted/API schema and model-output schema share the same assertion concept but deliberately differ at the decoding boundary:
 
 ```
 ClinicalAssertionSchema = z.object({
@@ -83,16 +94,20 @@ ClinicalAssertionSchema = z.object({
   evidence: z.string().optional() // verbatim de-identified transcript span
 }).refine(/* PRESENT and DENIED each require a span */)
 
-LlmClinicalAssertionSchema = /* the same object, deliberately unrefined */
+LlmClinicalAssertionSchema = z.object({
+  state: AssertionStateSchema,
+  value: z.string().max(120),
+  evidence: z.string().max(400)
+})
 ```
 
-**Why The Split, Measured, Not Preferred.** Against the live `qwen-flash` endpoint on 13/08/26, the model returned `{"state":"DENIED","value":"no fever"}` **with no evidence span**; none of its `PRESENT`/`DENIED` assertions carried one. Enforcing the span rule at the decoding boundary would therefore fail `safeParse`, throw `LLMResponseError` from §6, and leave the doctor with nothing at all.
+**Why The Split, Measured, Not Preferred.** Against the live `qwen-flash` endpoint on 13/08/26, the model returned `{"state":"DENIED","value":"no fever"}` **with no evidence span**; none of its `PRESENT`/`DENIED` assertions carried one. Enforcing the span rule at the decoding boundary would therefore fail `safeParse`, throw `LLMResponseError` from §6, and leave the doctor with nothing at all. The model schema now requires `value` and `evidence` keys and bounds them at 120 and 400 characters respectively, while still leaving the state/evidence match to the post-parse check.
 
 That is the opposite of what §21.4 specifies: the evidence check runs **after** `safeParse` and forces the individual fact to `NOT_ASSESSED`, so one unsupported assertion costs one gap prompt rather than the entire analysis. The permissive schema is what the model decodes into; the refined one is the persisted and API-facing contract, applied after the check has run, where it acts as a loud backstop against an evidence-less `DENIED` reaching a doctor.
 
 Separately: `.refine()` is **silently dropped** by `z.toJSONSchema()`, so a refinement could never have been a Tier-1 decoding constraint in the first place. The Tier-1 control here is the state enum; the span rule is Tier 3, exactly as §21.3 classifies it.
 
-**`clinicalFacts` Is A Fixed 29-key Set** (`ClinicalFactsSchema`), taken verbatim from `docs/PRD.md` §9 CAP-2's completeness checklist. §12 deferred this shape and this is it. Fixed keys are **required** by `docs/PRD.md` §10: a field the transcript never touches must never be defaulted to `DENIED` _or silently omitted_, and only a fixed key set can guarantee the second half. It is also what lets gaps derive deterministically in code (a Tier-2 control) rather than being asked of the model. This is the template §19 row 16 flags as the largest unvalidated assumption in the guardrail architecture, see the measurement note there.
+**`clinicalFacts` Is A Fixed 29-key Set** (`ClinicalFactsSchema`), taken from `docs/PRD.md` §9 CAP-2's completeness checklist. The separate five-field `OperationalBlockSchema` brings the model's assertion checklist to 34 fields. Fixed keys are **required** by `docs/PRD.md` §10: a field the transcript never touches must never be defaulted to `DENIED` _or silently omitted_. This also lets gaps derive deterministically in code through `backend/src/gaps/`, rather than being asked of the model. §19 row 16 records the remaining validation assumption and its measured note.
 
 ## Malaysian Operational Block
 

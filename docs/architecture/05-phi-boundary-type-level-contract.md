@@ -4,12 +4,19 @@ Part of the [Technical Reference](../TRD.md).
 
 **Status: `Built`**
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../assets/diagrams/arch-05-phi-egress-dark.svg" />
+    <img src="../assets/diagrams/arch-05-phi-egress-light.svg" alt="The de-identification module detects identifiers, replaces them with stable tokens, and keeps the token map in a request-scoped vault. Only the branded de-identified text reaches LLMClient, which runs the final identifier guard before provider egress; the response is re-hydrated in-process and the vault is discarded after the request." width="100%" />
+  </picture>
+</p>
+
 Source: `backend/src/deid/types.ts`.
 
 | Construct                 | Shape                                                                                                                 |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `Deidentified`            | `string & { readonly [brand]: 'deidentified' }`, a branded string, `brand` is a module-private `unique symbol`        |
-| `markDeidentified(value)` | `(value: string) => Deidentified`, casts a plain string into the branded type                                         |
+| `markDeidentified(value)` | Private to `backend/src/deid/index.ts`; brands a string only after detection completes                                |
 | `TokenVault`              | `{ readonly entries: ReadonlyMap<string, string>; rehydrate(text: string): string }`, request-scoped, never persisted |
 | `DeidentificationResult`  | `{ readonly text: Deidentified; readonly vault: TokenVault; readonly detected: readonly string[] }`                   |
 

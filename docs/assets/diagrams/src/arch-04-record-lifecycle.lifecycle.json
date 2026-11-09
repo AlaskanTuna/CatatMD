@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Clinical Record And Audio Lifecycle",
+    "output": "docs/assets/diagrams/arch-04-record-lifecycle.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    { "id": "main", "label": "Consultation Record" },
+    { "id": "audio", "label": "Optional Recording" },
+    { "id": "terminal", "label": "Erasure" }
+  ],
+  "states": [
+    {
+      "id": "draft",
+      "type": "start",
+      "label": "Draft",
+      "sublabel": "transcript may be absent",
+      "lane": "main",
+      "col": 0
+    },
+    {
+      "id": "review",
+      "type": "active",
+      "label": "Awaiting Review",
+      "sublabel": "analysis and edits",
+      "lane": "main",
+      "col": 2
+    },
+    {
+      "id": "approved",
+      "type": "success",
+      "label": "Approved",
+      "sublabel": "explicit doctor action",
+      "lane": "main",
+      "col": 3
+    },
+    {
+      "id": "stored",
+      "type": "active",
+      "label": "Audio Stored",
+      "sublabel": "retention configured",
+      "lane": "audio",
+      "col": 0
+    },
+    {
+      "id": "expired",
+      "type": "waiting",
+      "label": "Audio Expired",
+      "sublabel": "not served after expiry",
+      "lane": "audio",
+      "col": 1
+    },
+    {
+      "id": "purged",
+      "type": "success",
+      "label": "Audio Deleted",
+      "sublabel": "sweep or erasure",
+      "lane": "audio",
+      "col": 2
+    },
+    {
+      "id": "erased",
+      "type": "neutral",
+      "label": "Content Cleared",
+      "sublabel": "tombstone remains",
+      "lane": "terminal",
+      "col": 3
+    }
+  ],
+  "transitions": [
+    { "from": "draft", "to": "review", "label": "analyse" },
+    { "from": "review", "to": "approved", "label": "doctor approves" },
+    { "from": "draft", "to": "stored", "label": "recording saved", "variant": "dashed" },
+    { "from": "stored", "to": "expired", "label": "expiry reached", "variant": "dashed" },
+    { "from": "expired", "to": "purged", "label": "sweep deletes", "variant": "dashed" },
+    { "from": "stored", "to": "purged", "label": "erase", "variant": "dashed" },
+    { "from": "draft", "to": "erased", "label": "doctor erases" },
+    { "from": "review", "to": "erased", "label": "doctor erases" },
+    { "from": "approved", "to": "erased", "label": "doctor erases" }
+  ]
+}

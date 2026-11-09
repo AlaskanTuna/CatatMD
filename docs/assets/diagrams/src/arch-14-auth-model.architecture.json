@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Session Authentication And Ownership",
+    "output": "docs/assets/diagrams/arch-14-auth-model.html",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Browser"
+        },
+        "frontend": {
+          "label": "Same-Origin Routing"
+        },
+        "security": {
+          "label": "Identity Gate"
+        },
+        "backend": {
+          "label": "API Logic"
+        },
+        "database": {
+          "label": "Auth And Clinical Data"
+        }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "browser",
+      "type": "external",
+      "label": "React SPA",
+      "sublabel": "credentialed fetch",
+      "pos": [40, 160],
+      "size": [200, 64]
+    },
+    {
+      "id": "rewrite",
+      "type": "frontend",
+      "label": "Vercel Rewrite",
+      "sublabel": "first-party /api path",
+      "pos": [340, 160],
+      "size": [200, 64]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "better-auth",
+      "sublabel": "Lax HttpOnly cookie",
+      "pos": [640, 50],
+      "size": [200, 64]
+    },
+    {
+      "id": "session",
+      "type": "security",
+      "label": "requireSession",
+      "sublabel": "sets doctorId",
+      "pos": [640, 270],
+      "size": [200, 64]
+    },
+    {
+      "id": "routes",
+      "type": "backend",
+      "label": "Protected Routes",
+      "sublabel": "clinical path prefixes",
+      "pos": [940, 270],
+      "size": [200, 64]
+    },
+    {
+      "id": "ownership",
+      "type": "security",
+      "label": "Ownership Check",
+      "sublabel": "id and doctorId",
+      "pos": [1240, 270],
+      "size": [200, 64]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "Postgres",
+      "sublabel": "auth and consultations",
+      "pos": [1240, 480],
+      "size": [200, 64]
+    },
+    {
+      "id": "cookie",
+      "type": "external",
+      "label": "Session Cookie",
+      "sublabel": "seven-day expiry",
+      "pos": [340, 50],
+      "size": [200, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "API Trust Boundary",
+      "wraps": ["auth", "session", "routes", "ownership"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "browser-rewrite",
+      "from": "browser",
+      "to": "rewrite",
+      "label": "same-origin requests"
+    },
+    {
+      "id": "rewrite-auth",
+      "from": "rewrite",
+      "to": "auth",
+      "label": "sign in or sign up",
+      "toSide": "left"
+    },
+    {
+      "id": "auth-cookie",
+      "from": "auth",
+      "to": "cookie",
+      "label": "set cookie",
+      "fromSide": "left",
+      "variant": "security"
+    },
+    {
+      "id": "cookie-browser",
+      "from": "cookie",
+      "to": "browser",
+      "label": "browser stores",
+      "variant": "dashed"
+    },
+    {
+      "id": "rewrite-session",
+      "from": "rewrite",
+      "to": "session",
+      "label": "cookie-bearing request",
+      "toSide": "left"
+    },
+    {
+      "id": "session-auth",
+      "from": "session",
+      "to": "auth",
+      "label": "resolve session",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "session-routes",
+      "from": "session",
+      "to": "routes",
+      "label": "doctorId"
+    },
+    {
+      "id": "routes-ownership",
+      "from": "routes",
+      "to": "ownership",
+      "label": "consultation id"
+    },
+    {
+      "id": "ownership-db",
+      "from": "ownership",
+      "to": "db",
+      "label": "WHERE id AND doctorId"
+    }
+  ]
+}

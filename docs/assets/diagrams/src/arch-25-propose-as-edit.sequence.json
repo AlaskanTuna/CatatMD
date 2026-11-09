@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Doctor-Requested Copilot Proposal",
+    "quality_profile": "showcase",
+    "output": "docs/assets/diagrams/arch-25-propose-as-edit.html",
+    "column_fit": "spread",
+    "legend": {
+      "entries": {
+        "security": { "label": "Approval Gate" },
+        "emphasis": { "label": "Requested Tool Call" },
+        "return": { "label": "Response" }
+      }
+    }
+  },
+  "participants": [
+    { "id": "doctor", "type": "external", "label": "Doctor", "sublabel": "presses proposal" },
+    {
+      "id": "panel",
+      "type": "frontend",
+      "label": "Review Panel",
+      "sublabel": "latest prose answer"
+    },
+    { "id": "api", "type": "backend", "label": "Copilot Route", "sublabel": "validated request" },
+    {
+      "id": "turn",
+      "type": "security",
+      "label": "runCopilotTurn",
+      "sublabel": "checks loaded status"
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Sign-Off Gate",
+      "sublabel": "approved: no tools"
+    },
+    { "id": "llm", "type": "cloud", "label": "LLMClient", "sublabel": "tool choice required" },
+    { "id": "card", "type": "frontend", "label": "Proposal Card", "sublabel": "apply or discard" }
+  ],
+  "messages": [
+    {
+      "id": "offer",
+      "from": "panel",
+      "to": "doctor",
+      "y": 160,
+      "label": "offer when no tool ran",
+      "variant": "return"
+    },
+    {
+      "id": "press",
+      "from": "doctor",
+      "to": "panel",
+      "y": 195,
+      "label": "press Propose as Edit",
+      "variant": "emphasis"
+    },
+    {
+      "id": "request",
+      "from": "panel",
+      "to": "api",
+      "y": 230,
+      "label": "POST propose: true",
+      "variant": "emphasis"
+    },
+    {
+      "id": "validate",
+      "from": "api",
+      "to": "turn",
+      "y": 265,
+      "label": "validate request + load record",
+      "variant": "security"
+    },
+    {
+      "id": "status",
+      "from": "turn",
+      "to": "gate",
+      "y": 300,
+      "label": "loaded consultation status",
+      "variant": "security"
+    },
+    {
+      "id": "tools",
+      "from": "gate",
+      "to": "turn",
+      "y": 335,
+      "label": "empty tools if approved",
+      "variant": "return"
+    },
+    {
+      "id": "forced",
+      "from": "turn",
+      "to": "llm",
+      "y": 370,
+      "label": "required tool choice",
+      "variant": "emphasis"
+    },
+    {
+      "id": "result",
+      "from": "llm",
+      "to": "turn",
+      "y": 405,
+      "label": "tool call or no usable card",
+      "variant": "return"
+    },
+    {
+      "id": "stream",
+      "from": "turn",
+      "to": "panel",
+      "y": 440,
+      "label": "proposal or explanatory text",
+      "variant": "return"
+    },
+    {
+      "id": "review",
+      "from": "panel",
+      "to": "card",
+      "y": 475,
+      "label": "render proposal",
+      "variant": "emphasis"
+    },
+    {
+      "id": "decision",
+      "from": "doctor",
+      "to": "card",
+      "y": 510,
+      "label": "apply or discard",
+      "variant": "security"
+    }
+  ]
+}
