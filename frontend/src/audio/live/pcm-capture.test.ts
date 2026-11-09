@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { createPcmFramer, PCM_FRAME_SAMPLES } from './pcm-capture.js'
 
@@ -73,5 +75,12 @@ describe('createPcmFramer', () => {
     const bytes = new Uint8Array(frame as ArrayBuffer)
 
     expect([bytes[0], bytes[1]]).toEqual([0x02, 0x01])
+  })
+})
+
+describe('the worklet module', () => {
+  it('is never inlined as a data: URL, which the production CSP would refuse', () => {
+    const source = readFileSync(join(process.cwd(), 'src/audio/live/pcm-capture.ts'), 'utf8')
+    expect(source).toMatch(/from '\.\/pcm-worklet\.js\?url&no-inline'/)
   })
 })

@@ -34,7 +34,7 @@ Adapters for the speech recognisers behind hosted transcription, live capture an
 
 ## Relay Behaviour
 
-- **Upgrade:** accepted only on the relay path and only from the configured SPA origin. Any other upgrade is refused.
+- **Upgrade:** accepted only on the relay path and only from the configured SPA origin. Any other upgrade is refused, and so is any upgrade while 32 sockets are still waiting to authenticate (503).
 - **First Frame:** a text frame carrying a relay token in `api_key`. A bad token closes with 4401 after an `error_code` 401, and audio before it closes with 1002.
 - **Audio:** binary frames of 16 kHz 16-bit mono PCM, 32 KiB at most, forwarded to Qwen as base64 appends.
 - **Output:** Soniox-shaped messages. Each carries the finals newly settled, then the whole interim tail, with an `<end>` token after each phrase. Words are spread evenly across a phrase, because Qwen times phrases and not words.

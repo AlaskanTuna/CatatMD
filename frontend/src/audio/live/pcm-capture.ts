@@ -1,4 +1,6 @@
-import workletUrl from './pcm-worklet.js?url'
+// `no-inline` because Vite inlines a small asset as a `data:` URL, which the production CSP's `script-src` refuses
+// for a worklet; served from `/assets/` it is `'self'`. `pcm-capture.test.ts` pins this.
+import workletUrl from './pcm-worklet.js?url&no-inline'
 
 export const PCM_SAMPLE_RATE = 16_000
 export const PCM_FRAME_SAMPLES = 1_600

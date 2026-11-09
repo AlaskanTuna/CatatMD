@@ -273,6 +273,80 @@ describe('the upgrade, which only a browser on our own origin may complete', () 
   })
 })
 
+/** Whether an upgrade was completed or refused, and with what. */
+const outcomeOf = (client: Client) =>
+  Promise.race([
+    opened(client).then(() => 'open'),
+    refusedWith(client).then((status) => `refused ${status}`),
+  ])
+
+/** Opens `count` sockets that say nothing, which is what an unauthenticated socket is. */
+async function openWaiting(count: number) {
+  const waiting = Array.from({ length: count }, () => connect())
+  await Promise.all(waiting.map(opened))
+  return waiting
+}
+
+describe('sockets that have not authenticated yet, which are bounded', () => {
+  it('refuses an upgrade with 503 while 32 are still waiting, and opens nothing upstream', async () => {
+    await openWaiting(32)
+
+    const extra = connect()
+
+    expect(await refusedWith(extra)).toBe(503)
+    expect(qwen.connections).toBe(0)
+    const record = logged()
+      .map((line) => JSON.parse(line) as Json)
+      .find((entry) => entry.msg === 'live relay upgrade refused')
+    expect(record).toMatchObject({ level: 'warn', status: 503 })
+  })
+
+  it('accepts the thirty-second, which is the last place', async () => {
+    const waiting = await openWaiting(31)
+
+    expect(await outcomeOf(connect())).toBe('open')
+    expect(waiting).toHaveLength(31)
+  })
+
+  it('frees a place when a waiting socket authenticates', async () => {
+    const waiting = await openWaiting(32)
+    expect(await outcomeOf(connect())).toBe('refused 503')
+
+    waiting[0]?.ws.send(configFrame(token()))
+    await vi.waitFor(() => expect(qwen.connections).toBe(1))
+
+    expect(await outcomeOf(connect())).toBe('open')
+  })
+
+  it('frees a place when a waiting socket leaves', async () => {
+    const waiting = await openWaiting(32)
+    expect(await outcomeOf(connect())).toBe('refused 503')
+
+    waiting[0]?.ws.terminate()
+
+    await vi.waitFor(async () => expect(await outcomeOf(connect())).toBe('open'))
+  })
+
+  it('frees a place when a waiting socket is closed for taking too long', async () => {
+    await restart({ limits: { authTimeoutMs: 150 } })
+    const waiting = await openWaiting(32)
+    expect(await outcomeOf(connect())).toBe('refused 503')
+
+    expect(await Promise.all(waiting.map((client) => client.closed))).toEqual(Array(32).fill(4401))
+
+    expect(await outcomeOf(connect())).toBe('open')
+  })
+
+  it('does not count a session that has authenticated', async () => {
+    await session()
+
+    await openWaiting(32)
+
+    expect(await outcomeOf(connect())).toBe('refused 503')
+    expect(qwen.connections).toBe(1)
+  })
+})
+
 describe('the first frame, which has to authenticate', () => {
   it('opens one upstream session for a valid token, built from the token and not from the frame', async () => {
     await session('dictation')

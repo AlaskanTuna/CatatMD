@@ -27,7 +27,8 @@ import { MAX_SESSION_DURATION_SECONDS } from './soniox.js'
  *
  * - **Who may open it.** Only the configured SPA origin, on one path, presenting
  *   a token the API minted sixty seconds ago and has not seen before. A socket
- *   that does not authenticate in ten seconds is closed.
+ *   that does not authenticate in ten seconds is closed, and at most 32 may be
+ *   waiting to authenticate at once.
  * - **What the session is.** Built from the token's `mode` and from nothing the
  *   browser sends: the config frame's recognition settings are ignored, so the
  *   vocabulary and the cap that cross the egress are the API's, never a client's.
@@ -48,6 +49,13 @@ const MAX_FRAME_BYTES = 32 * 1024
 
 /** Seconds of audio beyond the cap a client may have buffered while its socket opened. */
 const AUDIO_OVERRUN_SECONDS = 10
+
+/**
+ * How many sockets may be open and still unauthenticated at once. Each holds a
+ * connection for up to ten seconds before it has proved anything, so without a
+ * bound a caller with no token could fill the process with them.
+ */
+const MAX_UNAUTHENTICATED_SOCKETS = 32
 
 export interface LiveRelayLimits {
   /** How long a socket may stay open without presenting its token. */
@@ -214,9 +222,25 @@ const toBuffer = (data: RawData): Buffer =>
 
 type Stage = 'awaiting_auth' | 'streaming' | 'draining' | 'closed'
 
-function runSession(client: WebSocket, openUpstream: OpenQwenRealtime, limits: LiveRelayLimits) {
+/** Sockets that have upgraded and not yet authenticated, shared by every session of one relay. */
+type UnauthenticatedCount = { value: number }
+
+function runSession(
+  client: WebSocket,
+  openUpstream: OpenQwenRealtime,
+  limits: LiveRelayLimits,
+  unauthenticated: UnauthenticatedCount,
+) {
   const startedAt = performance.now()
   let stage: Stage = 'awaiting_auth'
+  unauthenticated.value += 1
+  let counted = true
+  /** Idempotent, so authenticating and closing before authenticating can both call it. */
+  const leaveUnauthenticated = () => {
+    if (!counted) return
+    counted = false
+    unauthenticated.value -= 1
+  }
   let claims: RelayClaims | undefined
   let upstream: QwenRealtimeSession | undefined
   let shaper: TranscriptShaper | undefined
@@ -238,6 +262,7 @@ function runSession(client: WebSocket, openUpstream: OpenQwenRealtime, limits: L
   const finalize = (code: number) => {
     if (stage === 'closed') return
     stage = 'closed'
+    leaveUnauthenticated()
     clearTimeout(authTimer)
     clearTimeout(capTimer)
     clearTimeout(drainTimer)
@@ -328,6 +353,7 @@ function runSession(client: WebSocket, openUpstream: OpenQwenRealtime, limits: L
   const authenticate = (data: RawData, isBinary: boolean) => {
     clearTimeout(authTimer)
     authTimer = undefined
+    leaveUnauthenticated()
     if (isBinary) {
       protocolError()
       return
@@ -449,6 +475,7 @@ export function createLiveRelay(options: LiveRelayOptions = {}): LiveRelay {
   const openUpstream = options.openUpstream ?? openQwenRealtime
   const limits: LiveRelayLimits = { ...DEFAULT_LIMITS, ...options.limits }
   const wss = new WebSocketServer({ noServer: true, maxPayload: MAX_FRAME_BYTES })
+  const unauthenticated: UnauthenticatedCount = { value: 0 }
 
   // Between the upgrade event and the handshake finishing, nothing else owns the socket.
   const onSocketError = (error: Error) => {
@@ -474,9 +501,15 @@ export function createLiveRelay(options: LiveRelayOptions = {}): LiveRelay {
         return
       }
 
+      if (unauthenticated.value >= MAX_UNAUTHENTICATED_SOCKETS) {
+        logger.warn('live relay upgrade refused', { status: 503 })
+        reject(socket, '503 Service Unavailable')
+        return
+      }
+
       wss.handleUpgrade(req, socket, head, (client) => {
         socket.removeListener('error', onSocketError)
-        runSession(client, openUpstream, limits)
+        runSession(client, openUpstream, limits, unauthenticated)
       })
     },
     close() {
