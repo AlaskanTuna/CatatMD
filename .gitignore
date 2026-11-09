@@ -102,6 +102,9 @@ take-*/
 *.wav
 *.srt
 narration-segments/
+# The published walkthrough film and its captions are tracked (#473).
+!docs/assets/video/*.mp4
+!docs/assets/video/*.srt
 
 # Local agent tooling state
 .dkm/
