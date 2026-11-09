@@ -114,14 +114,19 @@ Clinical scope is deliberately narrow: **adult GP consultations for acute cough,
 
 ### Walkthrough Film
 
-A GP takes one synthetic consultation through the live app: sign-in, ambient capture, review, a dictated prescription and approval, ending on the exported report. Select the poster to play the film (2:25, with burned-in captions).
+A GP takes one synthetic consultation through CatatMD: ambient capture with live red flags, analysis behind the de-identification gate, review, a CatatAI-applied edit, a dictated prescription and approval, ending on the exported report. Select the poster to play the film (3:27, with burned-in captions).
 
 <a href="docs/assets/video/catatmd-walkthrough.mp4">
   <img src="docs/assets/video/catatmd-walkthrough-poster.jpg" alt="CatatMD walkthrough film: select to play" width="100%">
 </a>
 
-- **Captions:** [`catatmd-walkthrough.srt`](docs/assets/video/catatmd-walkthrough.srt).
-- **Production:** Playwright takes recorded on the deployed app, edited in Remotion, and narrated by Kokoro-82M, an open-weight text-to-speech model. Every patient, transcript and prescription in it is synthetic.
+| Aspect   | Detail                                                                                                                                                                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Captions | [`catatmd-walkthrough.srt`](docs/assets/video/catatmd-walkthrough.srt)                                                                                                                                                                      |
+| Filming  | Playwright takes on a local production build of the app, edited in Remotion. Every patient, transcript and prescription is synthetic.                                                                                                       |
+| Speech   | A local stand-in for the live speech provider sent the audio to OpenAI's transcription models. It returns each utterance a few seconds later than the real service streams, so the consultation audio is offset 3.30 s against the picture. |
+| Voice    | Narration by Kokoro-82M, an open-weight text-to-speech model. The consultation voices are Gemini text-to-speech.                                                                                                                            |
+| Sound    | Music: "Pulse Memory", from an AI-generated, non-copyright lofi suite. Sound effects: ElevenLabs sound generation and two synthesised tones.                                                                                                |
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
