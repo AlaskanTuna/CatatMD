@@ -72,9 +72,6 @@
     <li><a href="#safety-by-construction">Safety By Construction</a></li>
     <li><a href="#engineering-highlights">Engineering Highlights</a></li>
     <li><a href="#documentation">Documentation</a></li>
-    <li><a href="#limitations">Limitations</a></li>
-    <li><a href="#challenges-and-learnings">Challenges and Learnings</a></li>
-    <li><a href="#future-improvements">Future Improvements</a></li>
     <li><a href="#team">Team</a></li>
     <li><a href="#ai-disclosure">AI Disclosure</a></li>
     <li><a href="#license">License</a></li>
@@ -101,7 +98,7 @@ Clinical scope is deliberately narrow: **adult GP consultations for acute cough,
 | Resource             | Link                                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------ |
 | Live Demo            | <https://catatmd.vercel.app>, with a guest account and a guided tour                             |
-| Walkthrough Film     | [`docs/assets/video/catatmd-walkthrough.mp4`](docs/assets/video/catatmd-walkthrough.mp4)         |
+| Walkthrough Film     | [Watch it in this README](#walkthrough-film)                                                     |
 | API Health           | <https://catatmd-api.onrender.com/api/health> (free tier: the first request after idle is slow)  |
 | Documentation        | [`docs/README.md`](docs/README.md), an index of every document by the question it answers        |
 | Product Requirements | [`docs/PRD.md`](docs/PRD.md)                                                                     |
@@ -114,19 +111,7 @@ Clinical scope is deliberately narrow: **adult GP consultations for acute cough,
 
 ### Walkthrough Film
 
-A GP takes one synthetic consultation through CatatMD: ambient capture with live red flags, analysis behind the de-identification gate, review, a CatatAI-applied edit, a dictated prescription and approval, ending on the exported report. Select the poster to play the film (3:27, with burned-in captions).
-
-<a href="docs/assets/video/catatmd-walkthrough.mp4">
-  <img src="docs/assets/video/catatmd-walkthrough-poster.jpg" alt="CatatMD walkthrough film: select to play" width="100%">
-</a>
-
-| Aspect   | Detail                                                                                                                                                                                                                                      |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Captions | [`catatmd-walkthrough.srt`](docs/assets/video/catatmd-walkthrough.srt)                                                                                                                                                                      |
-| Filming  | Playwright takes on a local production build of the app, edited in Remotion. Every patient, transcript and prescription is synthetic.                                                                                                       |
-| Speech   | A local stand-in for the live speech provider sent the audio to OpenAI's transcription models. It returns each utterance a few seconds later than the real service streams, so the consultation audio is offset 3.30 s against the picture. |
-| Voice    | Narration by Kokoro-82M, an open-weight text-to-speech model. The consultation voices are Gemini text-to-speech.                                                                                                                            |
-| Sound    | Music: "Pulse Memory", from an AI-generated, non-copyright lofi suite. Sound effects: ElevenLabs sound generation and two synthesised tones.                                                                                                |
+https://github.com/user-attachments/assets/d9b8a81b-39ad-41d2-971f-c9db7029509e
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
@@ -391,45 +376,6 @@ The safety argument is not "a doctor reviews everything". Doctors do not reliabl
 | How do I contribute?                | [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md)                                               |
 
 The full index is [`docs/README.md`](docs/README.md).
-
-<p align="right"><a href="#readme-top">&uarr;</a></p>
-
-<a id="limitations"></a>
-
-## Limitations
-
-- **No Clinician Has Validated The Output**, and all data is synthetic. CatatMD is a prototype, not a medical device, and is not for clinical use.
-- **Regulatory Posture Is Conceded, Not Escaped.** Red flags with cited suggestions are clinical decision support, which in Malaysia is Class B medical-device territory. The architecture is designed as the compliance strategy ([`docs/PRD.md`](docs/PRD.md) section 11).
-- **De-Identification Is Pattern-Based And Best-Effort.** Measured gaps, such as some identifiers read aloud, are listed rather than hidden.
-- **Two Hosted Speech Destinations Leave The Region**, because no in-region streaming recogniser handled Malay, English and Chinese switching with speaker separation. The transfer basis is recorded as open in [`docs/DPIA.md`](docs/DPIA.md).
-- **No EMR Write-Back.** Malaysian private GP systems publish no common API; PDF export is the interim.
-- **It May Be Slower Than A Handwritten Line** for a three-minute consultation. The claim is documentation quality and a safety net, not time saved.
-
-<p align="right"><a href="#readme-top">&uarr;</a></p>
-
-<a id="challenges-and-learnings"></a>
-
-## Challenges And Learnings
-
-- **Prompts Are The Weakest Control.** A system-prompt rule fails silently; that is how the fabricated negatives above happened. Structural constraints (enums, ID-constrained citations) and deterministic code fail loudly, so they carry the safety claims.
-- **Sparse Input Is The Dangerous Input.** The model invented the most on the shortest transcripts, the very consultations a busy GP produces.
-- **Code-Switching Is The Norm.** Malaysian consultations mix English, Malay, Manglish, Mandarin and Tamil mid-sentence, which shaped the red-flag lexicon, the de-identification detectors and the choice of speech provider.
-- **A Consent Control Can Quietly Fail Open.** For three weeks a remembered device preference stood in for per-patient consent; it was caught, split back into two controls, and pinned by a test.
-- **SOAP Is A Scaffold, Not A Malaysian Norm.** No local rule mandates it, and the note payers read has fields SOAP has no home for, so the record offers both views of one note.
-
-<p align="right"><a href="#readme-top">&uarr;</a></p>
-
-<a id="future-improvements"></a>
-
-## Future Improvements
-
-- [ ] A practising-GP validation study of note quality and red-flag recall ([#251](https://github.com/AlaskanTuna/CatatMD/issues/251), [#210](https://github.com/AlaskanTuna/CatatMD/issues/210))
-- [ ] IC-scan patient registration ([#386](https://github.com/AlaskanTuna/CatatMD/issues/386)) and an integration path for clinic-management systems ([#387](https://github.com/AlaskanTuna/CatatMD/issues/387))
-- [ ] Tokenise identifiers read in Tamil number words and dates of birth said as words ([#440](https://github.com/AlaskanTuna/CatatMD/issues/440), [#441](https://github.com/AlaskanTuna/CatatMD/issues/441))
-- [ ] Synthetic Tamil, Mandarin and Cantonese consultations for measurement ([#249](https://github.com/AlaskanTuna/CatatMD/issues/249))
-- [ ] A switchable guideline corpus per jurisdiction, once reuse terms are confirmed ([#220](https://github.com/AlaskanTuna/CatatMD/issues/220), [#250](https://github.com/AlaskanTuna/CatatMD/issues/250))
-
-See the [open issues](https://github.com/AlaskanTuna/CatatMD/issues) for the full list.
 
 <p align="right"><a href="#readme-top">&uarr;</a></p>
 
