@@ -1,0 +1,94 @@
+{
+  "note": "Dialogue v2 (REVISION-2 §3, the Director's words), spliced from one Gemini 2.5 Flash TTS multi-speaker render (Achird doctor, Sulafat patient). Synthetic; the NRIC is SPOKEN_IC_DIGITS from backend/src/fixtures/spoken-identifiers.ts, read as continuous digits (#475). The patient never says her name: the surname leaks in lowercase (#482) and the clipped \"Siti\" vanished on the stand-in. The doctor, who has her registered name, says \"Puan Siti\". Turn 1 drops \"full name and\"; turn 2 drops \"Siti Contoh.\"; turn 3 is as rendered. Allergies and current medicines stay unasked. The doctor never says \"short of breath\" or \"chest pain\" (#477).",
+  "voices": {
+    "engine": "gemini-2.5-flash-preview-tts multi-speaker",
+    "doctor": "Charon",
+    "patient": "Leda"
+  },
+  "turns": [
+    {
+      "speaker": "doctor",
+      "text": "Good morning. Please, have a seat. Before we start, can I confirm your IC number?"
+    },
+    {
+      "speaker": "patient",
+      "text": "My IC is nine zero zero four one two zero eight six five four three."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Thank you, Puan Siti. What brings you in today?"
+    },
+    {
+      "speaker": "patient",
+      "text": "I've had a cough for three days now, and since yesterday my throat is really sore."
+    },
+    {
+      "speaker": "doctor",
+      "text": "I'm sorry to hear that. Have you had any fever?"
+    },
+    {
+      "speaker": "patient",
+      "text": "Yes. Last night it was thirty-eight point two. This morning it feels a bit lower."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Are you coughing anything up?"
+    },
+    {
+      "speaker": "patient",
+      "text": "Some white phlegm. But this morning I noticed a few streaks of blood in my phlegm, and that worried me."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Thank you for telling me. Was it only streaks, or more than that?"
+    },
+    {
+      "speaker": "patient",
+      "text": "Only a few streaks, just once."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Any pain in your chest when you breathe or cough?"
+    },
+    {
+      "speaker": "patient",
+      "text": "No, no pain there."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Can you swallow? Are you eating and drinking normally?"
+    },
+    {
+      "speaker": "patient",
+      "text": "I can swallow. It just hurts when my throat is dry."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Do you smoke?"
+    },
+    {
+      "speaker": "patient",
+      "text": "No, never."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Any other medical problems?"
+    },
+    {
+      "speaker": "patient",
+      "text": "No, I'm usually healthy."
+    },
+    {
+      "speaker": "doctor",
+      "text": "Alright, let me have a look. Your throat is a bit red, and your chest sounds clear."
+    },
+    {
+      "speaker": "doctor",
+      "text": "I'll give you something for the fever and the sore throat. If you see blood in your phlegm again, or you feel worse, please come back straight away."
+    },
+    {
+      "speaker": "patient",
+      "text": "Okay. Thank you, doctor."
+    }
+  ]
+}

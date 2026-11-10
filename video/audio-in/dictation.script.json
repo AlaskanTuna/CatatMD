@@ -1,0 +1,7 @@
+{
+  "note": "Synthetic prescription dictation for S6, in the doctor's consultation voice.",
+  "voice": "am_michael",
+  "text": "Paracetamol, two tablets, four times a day, for five days. Benzydamine gargle, 15 mL, three times a day, for five days.",
+  "say": "Paracetamol, two tablets, four times a day, for five days. Benzydamine gargle, fifteen M L, three times a day, for five days.",
+  "parser_note": "Checked against backend/src/medications parseSig: \"two tablets\" and \"15 mL\" give doses; spelled-out \"milligrams\", \"gram\" and \"millilitres\" do not. If Soniox writes \"fifteen ML\", line 2 loses its dose: re-check after the check run."
+}

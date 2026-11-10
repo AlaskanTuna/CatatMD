@@ -1,0 +1,285 @@
+{
+  "version": "v3",
+  "brief": "docs/REVISION-2.md (overrides docs/BRIEF.md); camera and mark rules in src/camera.ts and scripts/check-marks.ts",
+  "target": {
+    "url": "set by APP_URL (default http://localhost:4173): the local stack from stand-in/up.sh, or the live app",
+    "sign_in": "Sign In as Guest"
+  },
+  "film_patient": {
+    "name": "Siti Contoh",
+    "name_note": "\"Contoh\" is Malay for \"example\": unique, plainly invented to a Malaysian viewer, and still reads as a name on screen. Searched for before registering; never reused from another visitor.",
+    "nric": "900412-08-6543",
+    "age": 36,
+    "gender": "Female",
+    "nric_note": "SPOKEN_IC_DIGITS from backend/src/fixtures/spoken-identifiers.ts:18 (synthetic, born 12 Apr 1990), so the age is 36"
+  },
+  "pacing": "Record takes hold 1.8 s on each on-camera target between its cue and the click (0.9 s camera move + ring), and 1.2 s after each click for the result to land.",
+  "narration": [
+    {
+      "id": "S0-1",
+      "scene": "S0",
+      "graphic": true,
+      "text": "This is CatatMD."
+    },
+    {
+      "id": "S0-2",
+      "scene": "S0",
+      "graphic": true,
+      "text": "It turns a GP consultation into a clinical note the doctor can review."
+    },
+    {
+      "id": "S1-1",
+      "scene": "S1",
+      "graphic": false,
+      "text": "Everything you'll see here is synthetic: no real patient appears."
+    },
+    {
+      "id": "S2-1",
+      "scene": "S2",
+      "graphic": false,
+      "text": "The doctor registers a patient and starts a consultation from the profile."
+    },
+    {
+      "id": "S3-1",
+      "scene": "S3",
+      "graphic": false,
+      "text": "With the patient's consent, given for this visit only, CatatMD listens."
+    },
+    {
+      "id": "S3-2a",
+      "scene": "S3",
+      "graphic": false,
+      "text": "The transcript builds live, turn by turn,"
+    },
+    {
+      "id": "S3-2b",
+      "scene": "S3",
+      "graphic": false,
+      "text": "and the safety panel suggests what to ask next."
+    },
+    {
+      "id": "S4-1",
+      "scene": "S4",
+      "graphic": true,
+      "text": "One click analyses the visit."
+    },
+    {
+      "id": "S4-2",
+      "scene": "S4",
+      "graphic": true,
+      "text": "Before any text leaves the server, names and identity numbers become tokens."
+    },
+    {
+      "id": "S4-3",
+      "scene": "S4",
+      "graphic": true,
+      "text": "The model only ever sees the tokens, and the real details come back on the return trip."
+    },
+    {
+      "id": "S5-1",
+      "scene": "S5",
+      "graphic": false,
+      "text": "The doctor reviews three panels side by side: the transcript, the structured note, and clinical safety."
+    },
+    {
+      "id": "S5-2",
+      "scene": "S5",
+      "graphic": false,
+      "text": "Red flags come from deterministic rules first."
+    },
+    {
+      "id": "S5-3",
+      "scene": "S5",
+      "graphic": false,
+      "text": "The model can add candidates for review, but it can never remove a rule's hit."
+    },
+    {
+      "id": "S5-4",
+      "scene": "S5",
+      "graphic": false,
+      "text": "The checklist ties each field to the words that support it."
+    },
+    {
+      "id": "S5-5",
+      "scene": "S5",
+      "graphic": false,
+      "text": "Suggestions cite guideline IDs from a fixed corpus, so a made-up reference cannot reach the screen."
+    },
+    {
+      "id": "S6-1",
+      "scene": "S6",
+      "graphic": false,
+      "text": "The doctor dictates the prescription."
+    },
+    {
+      "id": "S6-2",
+      "scene": "S6",
+      "graphic": false,
+      "text": "CatatMD parses each line into dose, frequency and duration, and saves only the lines the doctor confirms."
+    },
+    {
+      "id": "S7-1",
+      "scene": "S7",
+      "graphic": false,
+      "text": "CatatAI answers questions about the visit, and can propose an edit."
+    },
+    {
+      "id": "S7-2",
+      "scene": "S7",
+      "graphic": false,
+      "text": "Nothing changes until the doctor applies it."
+    },
+    {
+      "id": "S8-1",
+      "scene": "S8",
+      "graphic": false,
+      "text": "Nothing is ever approved by default."
+    },
+    {
+      "id": "S8-2",
+      "scene": "S8",
+      "graphic": false,
+      "text": "The doctor acknowledges the red flags and approves the note."
+    },
+    {
+      "id": "S8-3",
+      "scene": "S8",
+      "graphic": false,
+      "text": "The finished record exports as a consultation report."
+    },
+    {
+      "id": "S9-1",
+      "scene": "S9",
+      "graphic": true,
+      "text": "CatatMD drafts."
+    },
+    {
+      "id": "S9-2",
+      "scene": "S9",
+      "graphic": true,
+      "text": "The doctor decides."
+    }
+  ],
+  "shots": [
+    {
+      "id": "S1",
+      "screen": "Landing, then Login",
+      "on_camera": "Landing hero for about 2 s; click Try the Demo; the Login page; click Sign In as Guest. The shot ends on the click: the app opens on a consultation list full of other visitors' patients, which never reaches the edit.",
+      "cues": ["landing-hero", "try-demo", "login-page", "guest-button"]
+    },
+    {
+      "id": "S2",
+      "screen": "Register Patient, Patient Profile",
+      "on_camera": "Type the film patient's name, NRIC, age and gender; Register Patient; the profile; click Start Consultation.",
+      "creates": "The film patient (record run only). A check run fills the form but does not submit; the record take submits once. A retake that would create a second patient waits for the Director.",
+      "cues": [
+        "form-empty",
+        "name-typed",
+        "nric-typed",
+        "register-button",
+        "profile",
+        "start-consultation"
+      ]
+    },
+    {
+      "id": "S3",
+      "screen": "Consultation: Ambient Capture",
+      "audio_in": "audio-in/consult.wav (92.3 s, dialogue v2)",
+      "on_camera": "Consent tick; Start Ambient Capture; Listening; the transcript builds turn by turn while the dialogue plays; the safety panel's Ask Next prompts; the live haemoptysis flag; Stop and Finish; Use Live Transcript if refinement starts; the saved transcript.",
+      "cues": [
+        "consent-unticked",
+        "consent-ticked",
+        "start-ambient",
+        "listening",
+        "first-turn",
+        "name-turn",
+        "transcript-building",
+        "ask-next",
+        "red-flag-live",
+        "last-turn",
+        "stop-finish",
+        "transcript-saved"
+      ]
+    },
+    {
+      "id": "S4",
+      "screen": "Analyse",
+      "cues": ["analyse-button", "analysing", "analysis-done"]
+    },
+    {
+      "id": "S5",
+      "screen": "Review: three panels",
+      "cues": [
+        "three-panels",
+        "transcript-pane",
+        "note-pane",
+        "safety-pane",
+        "ai-generated-badge",
+        "red-flag-rule",
+        "rule-badge",
+        "ai-candidate",
+        "missing-info",
+        "missing-allergies",
+        "checklist",
+        "checklist-evidence",
+        "suggestion",
+        "guideline-chip",
+        "guideline-expanded"
+      ]
+    },
+    {
+      "id": "S7",
+      "screen": "CatatAI",
+      "questions": [
+        "In one or two plain sentences, without references: which red flag matters most here, and what should I ask next?",
+        "Add to the Plan that she should come back in three days if she is not improving."
+      ],
+      "on_camera": "Open CatatAI; Q1 typed and answered (retake once if a bracketed ID prints); Q2 typed; the Plan proposal card; Apply; the Plan reads You Edited This.",
+      "cues": [
+        "open-catatai",
+        "q1-typed",
+        "q1-answer",
+        "q2-typed",
+        "proposal-card",
+        "apply",
+        "plan-edited"
+      ]
+    },
+    {
+      "id": "S6",
+      "screen": "Prescriptions: Dictate",
+      "audio_in": "audio-in/dictation.wav",
+      "cues": [
+        "prescriptions-open",
+        "dictate-button",
+        "listening",
+        "dictated-text",
+        "stop-dictation",
+        "parsed-lines",
+        "parsed-fields",
+        "confirm-prescription",
+        "prescription-saved"
+      ]
+    },
+    {
+      "id": "S8",
+      "screen": "Acknowledge, approve, export",
+      "one_shot": "Approval cannot be undone: one record take.",
+      "cues": [
+        "ack-rule",
+        "ack-ai",
+        "approve-button",
+        "confirm-approval",
+        "approve-tip",
+        "approved-status",
+        "export",
+        "report"
+      ]
+    },
+    {
+      "id": "S8R",
+      "screen": "Report pickup",
+      "cues": ["report-top", "report-prescriptions"]
+    }
+  ]
+}

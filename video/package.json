@@ -1,0 +1,41 @@
+{
+  "name": "catatmd-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "stack:up": "bash stand-in/up.sh",
+    "stack:down": "bash stand-in/down.sh",
+    "record": "bun record/run.ts",
+    "record:check": "CATATMD_RECORD_CHECK=1 bun record/run.ts",
+    "dialogue": "bun scripts/dialogue-gemini.ts",
+    "audio-in": "bun scripts/make-audio-in.ts",
+    "voice": "bun scripts/narration.ts",
+    "sfx": "bun sound/make-sfx.ts",
+    "sound": "bun scripts/sound.ts",
+    "ingest": "bun scripts/ingest.ts",
+    "stage": "bun scripts/stage.ts",
+    "studio": "remotion studio src/index.ts",
+    "still": "remotion still src/index.ts Film",
+    "check-marks": "bun scripts/check-marks.ts",
+    "render": "bun scripts/check-marks.ts && remotion render src/index.ts Film",
+    "finish": "bash scripts/finish.sh",
+    "qa": "bun scripts/qa.ts",
+    "contact-sheet": "bash scripts/contact-sheet.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/bun": "1.4.3",
+    "@types/node": "24",
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.530",
+    "@remotion/fonts": "4.0.530",
+    "@remotion/media": "4.0.530",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.530"
+  }
+}

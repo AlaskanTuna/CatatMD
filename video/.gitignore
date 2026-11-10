@@ -1,0 +1,14 @@
+# Media and run state are not committed: README.md, Inputs Not Committed.
+node_modules/
+footage/
+out/
+.state/
+music/
+voice/lines/
+public/footage/
+public/audio/
+public/voice/
+public/music/
+stand-in/refs/
+# The root .gitignore drops every WAV; the five UI effects are the suite's own.
+!public/sfx/*.wav

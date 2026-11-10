@@ -1,0 +1,51 @@
+{
+  "note": "Director-owned. Paths are relative to public/. Music: \"Pulse Memory\", track 6 of the user's AI-generated, non-copyright lofi suite. Sound effects: generated with ElevenLabs sound generation for this film.",
+  "music": {
+    "file": "music/pulse-memory.mp3",
+    "cutIn": 0,
+    "seconds": 222.04,
+    "lufs": -15.8,
+    "bpm": 78.3,
+    "lra": 2.7,
+    "centroidHz": 733.6,
+    "track": "Pulse Memory, track 6 of the lofi suite",
+    "replaces": "Goodbye Halflight (204 s, shorter than the 3:25+ cut)"
+  },
+  "sfx": {
+    "click": {
+      "file": "sfx/click.wav",
+      "seconds": 0.075,
+      "lufs": -34.5,
+      "peakDbfs": -3,
+      "source": "ElevenLabs sound generation (sound/make-sfx.ts)"
+    },
+    "captureStart": {
+      "file": "sfx/captureStart.wav",
+      "seconds": 0.5,
+      "lufs": -18.8,
+      "peakDbfs": -3,
+      "source": "synthesised (sound/synth-tones.sh)"
+    },
+    "analysisChime": {
+      "file": "sfx/analysisChime.wav",
+      "seconds": 1.2,
+      "lufs": -21.4,
+      "peakDbfs": -3,
+      "source": "ElevenLabs sound generation (sound/make-sfx.ts)"
+    },
+    "approveChime": {
+      "file": "sfx/approveChime.wav",
+      "seconds": 1.3,
+      "lufs": -16.9,
+      "peakDbfs": -3,
+      "source": "synthesised (sound/synth-tones.sh)"
+    },
+    "paperSlide": {
+      "file": "sfx/paperSlide.wav",
+      "seconds": 0.629,
+      "lufs": -24,
+      "peakDbfs": -3,
+      "source": "ElevenLabs sound generation (sound/make-sfx.ts)"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "file": "dictation.wav",
+  "seconds": 12.91,
+  "turns": [
+    {
+      "text": "Paracetamol, two tablets, four times a day, for five days. Benzydamine gargle, 15 mL, three times a day, for five days.",
+      "start": 1.5,
+      "end": 10.91
+    }
+  ]
+}

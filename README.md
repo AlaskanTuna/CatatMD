@@ -250,6 +250,7 @@ CatatMD/
 ├── evals/               measurements that spend real model calls, kept out of the test suite
 ├── corpus/cpg/          guideline manifest (raw PDFs are not committed)
 ├── scripts/             floor guard and walkthrough recorder
+├── video/               the walkthrough film: Playwright takes, a Remotion edit, narration and finish
 └── docs/                product, architecture, operations and decision records
 ```
 

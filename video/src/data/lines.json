@@ -1,0 +1,198 @@
+{
+  "voice": "kokoro af_heart",
+  "speed": 1,
+  "lines": [
+    {
+      "id": "S0-1",
+      "scene": "S0",
+      "graphic": true,
+      "text": "This is CatatMD.",
+      "file": "voice/lines/S0-1.wav",
+      "seconds": 1.332
+    },
+    {
+      "id": "S0-2",
+      "scene": "S0",
+      "graphic": true,
+      "text": "It turns a GP consultation into a clinical note the doctor can review.",
+      "file": "voice/lines/S0-2.wav",
+      "seconds": 4.51
+    },
+    {
+      "id": "S1-1",
+      "scene": "S1",
+      "graphic": false,
+      "text": "Everything you'll see here is synthetic: no real patient appears.",
+      "file": "voice/lines/S1-1.wav",
+      "seconds": 3.728
+    },
+    {
+      "id": "S2-1",
+      "scene": "S2",
+      "graphic": false,
+      "text": "The doctor registers a patient and starts a consultation from the profile.",
+      "file": "voice/lines/S2-1.wav",
+      "seconds": 4.081
+    },
+    {
+      "id": "S3-1",
+      "scene": "S3",
+      "graphic": false,
+      "text": "With the patient's consent, given for this visit only, CatatMD listens.",
+      "file": "voice/lines/S3-1.wav",
+      "seconds": 4.596
+    },
+    {
+      "id": "S3-2a",
+      "scene": "S3",
+      "graphic": false,
+      "text": "The transcript builds live, turn by turn,",
+      "file": "voice/lines/S3-2a.wav",
+      "seconds": 2.401
+    },
+    {
+      "id": "S3-2b",
+      "scene": "S3",
+      "graphic": false,
+      "text": "and the safety panel suggests what to ask next.",
+      "file": "voice/lines/S3-2b.wav",
+      "seconds": 2.558
+    },
+    {
+      "id": "S4-1",
+      "scene": "S4",
+      "graphic": true,
+      "text": "One click analyses the visit.",
+      "file": "voice/lines/S4-1.wav",
+      "seconds": 1.799
+    },
+    {
+      "id": "S4-2",
+      "scene": "S4",
+      "graphic": true,
+      "text": "Before any text leaves the server, names and identity numbers become tokens.",
+      "file": "voice/lines/S4-2.wav",
+      "seconds": 4.766
+    },
+    {
+      "id": "S4-3",
+      "scene": "S4",
+      "graphic": true,
+      "text": "The model only ever sees the tokens, and the real details come back on the return trip.",
+      "file": "voice/lines/S4-3.wav",
+      "seconds": 5.161
+    },
+    {
+      "id": "S5-1",
+      "scene": "S5",
+      "graphic": false,
+      "text": "The doctor reviews three panels side by side: the transcript, the structured note, and clinical safety.",
+      "file": "voice/lines/S5-1.wav",
+      "seconds": 5.997
+    },
+    {
+      "id": "S5-2",
+      "scene": "S5",
+      "graphic": false,
+      "text": "Red flags come from deterministic rules first.",
+      "file": "voice/lines/S5-2.wav",
+      "seconds": 2.752
+    },
+    {
+      "id": "S5-3",
+      "scene": "S5",
+      "graphic": false,
+      "text": "The model can add candidates for review, but it can never remove a rule's hit.",
+      "file": "voice/lines/S5-3.wav",
+      "seconds": 4.434
+    },
+    {
+      "id": "S5-4",
+      "scene": "S5",
+      "graphic": false,
+      "text": "The checklist ties each field to the words that support it.",
+      "file": "voice/lines/S5-4.wav",
+      "seconds": 3.051
+    },
+    {
+      "id": "S5-5",
+      "scene": "S5",
+      "graphic": false,
+      "text": "Suggestions cite guideline IDs from a fixed corpus, so a made-up reference cannot reach the screen.",
+      "file": "voice/lines/S5-5.wav",
+      "seconds": 6
+    },
+    {
+      "id": "S6-1",
+      "scene": "S6",
+      "graphic": false,
+      "text": "The doctor dictates the prescription.",
+      "file": "voice/lines/S6-1.wav",
+      "seconds": 1.823
+    },
+    {
+      "id": "S6-2",
+      "scene": "S6",
+      "graphic": false,
+      "text": "CatatMD parses each line into dose, frequency and duration, and saves only the lines the doctor confirms.",
+      "file": "voice/lines/S6-2.wav",
+      "seconds": 7.665
+    },
+    {
+      "id": "S7-1",
+      "scene": "S7",
+      "graphic": false,
+      "text": "CatatAI answers questions about the visit, and can propose an edit.",
+      "file": "voice/lines/S7-1.wav",
+      "seconds": 4.363
+    },
+    {
+      "id": "S7-2",
+      "scene": "S7",
+      "graphic": false,
+      "text": "Nothing changes until the doctor applies it.",
+      "file": "voice/lines/S7-2.wav",
+      "seconds": 2.533
+    },
+    {
+      "id": "S8-1",
+      "scene": "S8",
+      "graphic": false,
+      "text": "Nothing is ever approved by default.",
+      "file": "voice/lines/S8-1.wav",
+      "seconds": 2.035
+    },
+    {
+      "id": "S8-2",
+      "scene": "S8",
+      "graphic": false,
+      "text": "The doctor acknowledges the red flags and approves the note.",
+      "file": "voice/lines/S8-2.wav",
+      "seconds": 3.379
+    },
+    {
+      "id": "S8-3",
+      "scene": "S8",
+      "graphic": false,
+      "text": "The finished record exports as a consultation report.",
+      "file": "voice/lines/S8-3.wav",
+      "seconds": 3.183
+    },
+    {
+      "id": "S9-1",
+      "scene": "S9",
+      "graphic": true,
+      "text": "CatatMD drafts.",
+      "file": "voice/lines/S9-1.wav",
+      "seconds": 1.399
+    },
+    {
+      "id": "S9-2",
+      "scene": "S9",
+      "graphic": true,
+      "text": "The doctor decides.",
+      "file": "voice/lines/S9-2.wav",
+      "seconds": 1.249
+    }
+  ]
+}

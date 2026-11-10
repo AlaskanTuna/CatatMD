@@ -1,0 +1,33 @@
+{
+  "voiceLufs": -18.7,
+  "sfx": {
+    "click": {
+      "src": "sfx/click.wav",
+      "gainDb": -16.7
+    },
+    "captureStart": {
+      "src": "sfx/captureStart.wav",
+      "gainDb": -16
+    },
+    "analysisChime": {
+      "src": "sfx/analysisChime.wav",
+      "gainDb": -15.1
+    },
+    "approveChime": {
+      "src": "sfx/approveChime.wav",
+      "gainDb": -16
+    },
+    "paperSlide": {
+      "src": "sfx/paperSlide.wav",
+      "gainDb": -16
+    }
+  },
+  "sfxDb": -18,
+  "music": {
+    "src": "music/pulse-memory.mp3",
+    "from": 0,
+    "seconds": 222.04,
+    "bedDb": -18.9
+  },
+  "voicePeakDbfs": -1
+}
