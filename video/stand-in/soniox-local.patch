@@ -1,0 +1,32 @@
+diff --git a/backend/src/lib/asr/soniox.ts b/backend/src/lib/asr/soniox.ts
+index 2f38709..9c84e88 100644
+--- a/backend/src/lib/asr/soniox.ts
++++ b/backend/src/lib/asr/soniox.ts
+@@ -47,9 +47,10 @@ export class SonioxMintError extends Error {
+  * `vercel.json` pins the configured one; the three must be changed together.
+  */
+ const REGION_HOSTS: Record<LiveAsrRegion, { api: string; websocket: string }> = {
++  // FILM-ONLY LOCAL PATCH (never committed): the walkthrough film's OpenAI stand-in for Soniox.
+   us: {
+-    api: 'https://api.soniox.com',
+-    websocket: 'wss://stt-rt.soniox.com/transcribe-websocket',
++    api: 'http://127.0.0.1:8787',
++    websocket: 'ws://127.0.0.1:8787/transcribe-websocket',
+   },
+   eu: {
+     api: 'https://api.eu.soniox.com',
+diff --git a/shared/src/live-asr.ts b/shared/src/live-asr.ts
+index 27f2083..6fbb428 100644
+--- a/shared/src/live-asr.ts
++++ b/shared/src/live-asr.ts
+@@ -53,8 +53,9 @@ export const LiveAsrModeSchema = z.enum(['ambient', 'dictation'])
+  * `vercel.json` pins the same host at the platform layer, so redirecting this
+  * egress takes both a bad response and a CSP change.
+  */
++// FILM-ONLY LOCAL PATCH (never committed): also accept the film's local stand-in.
+ export const LIVE_ASR_WEBSOCKET_URL =
+-  /^wss:\/\/stt-rt(?:\.(?:eu|jp|in))?\.soniox\.com\/transcribe-websocket$/
++  /^(?:wss:\/\/stt-rt(?:\.(?:eu|jp|in))?\.soniox\.com|ws:\/\/127\.0\.0\.1:8787)\/transcribe-websocket$/
+ 
+ /**
+  * How many vocabulary terms may ride in the session context.

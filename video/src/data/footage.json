@@ -1,0 +1,868 @@
+{
+  "shots": {
+    "S1": {
+      "run": "check-1",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S1.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 10.952,
+      "staged": 14.5,
+      "cues": {
+        "landing-hero": {
+          "t": 0.881,
+          "box": {
+            "x": 472,
+            "y": 183,
+            "width": 515,
+            "height": 165
+          }
+        },
+        "try-demo": {
+          "t": 6.189,
+          "box": {
+            "x": 472,
+            "y": 517,
+            "width": 186,
+            "height": 48
+          }
+        },
+        "login-page": {
+          "t": 7.102,
+          "box": {
+            "x": 1248,
+            "y": 320,
+            "width": 384,
+            "height": 37
+          }
+        },
+        "guest-button": {
+          "t": 8.583,
+          "box": {
+            "x": 1248,
+            "y": 382,
+            "width": 384,
+            "height": 48
+          }
+        }
+      },
+      "clicks": [],
+      "audioIn": null
+    },
+    "S2": {
+      "run": "check-1",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S2.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 18.505,
+      "staged": 22.1,
+      "cues": {
+        "form-empty": {
+          "t": 0.774,
+          "box": {
+            "x": 644,
+            "y": 301,
+            "width": 704,
+            "height": 28
+          }
+        },
+        "name-typed": {
+          "t": 6.767,
+          "box": {
+            "x": 644,
+            "y": 399,
+            "width": 704,
+            "height": 44
+          }
+        },
+        "nric-typed": {
+          "t": 9.28,
+          "box": {
+            "x": 644,
+            "y": 489,
+            "width": 342,
+            "height": 44
+          }
+        },
+        "register-button": {
+          "t": 12.702,
+          "box": {
+            "x": 1206,
+            "y": 664,
+            "width": 142,
+            "height": 40
+          }
+        },
+        "profile": {
+          "t": 14.073,
+          "box": {
+            "x": 576,
+            "y": 335,
+            "width": 104,
+            "height": 31
+          }
+        },
+        "start-consultation": {
+          "t": 15.671,
+          "box": {
+            "x": 576,
+            "y": 193,
+            "width": 191,
+            "height": 40
+          }
+        }
+      },
+      "clicks": [],
+      "audioIn": null
+    },
+    "S3": {
+      "run": "rec-v3",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S3.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 149.329,
+      "staged": 151.3,
+      "cues": {
+        "consent-unticked": {
+          "t": 1.769,
+          "box": {
+            "x": 396,
+            "y": 663,
+            "width": 18,
+            "height": 18
+          }
+        },
+        "consent-ticked": {
+          "t": 4.909,
+          "box": {
+            "x": 396,
+            "y": 663,
+            "width": 18,
+            "height": 18
+          }
+        },
+        "start-ambient": {
+          "t": 5.078,
+          "box": {
+            "x": 396,
+            "y": 743,
+            "width": 213,
+            "height": 40
+          }
+        },
+        "listening": {
+          "t": 9.056,
+          "box": {
+            "x": 1488,
+            "y": 44,
+            "width": 63,
+            "height": 20
+          }
+        },
+        "first-turn": {
+          "t": 10.815,
+          "box": {
+            "x": 61,
+            "y": 158,
+            "width": 99,
+            "height": 16
+          }
+        },
+        "name-turn": {
+          "t": 17.42,
+          "box": {
+            "x": 293,
+            "y": 158,
+            "width": 386,
+            "height": 16
+          }
+        },
+        "transcript-building": {
+          "t": 29.232,
+          "box": {
+            "x": 61,
+            "y": 312,
+            "width": 542,
+            "height": 16
+          }
+        },
+        "ask-next": {
+          "t": 29.566,
+          "box": {
+            "x": 1523,
+            "y": 201,
+            "width": 59,
+            "height": 15
+          }
+        },
+        "red-flag-live": {
+          "t": 62.913,
+          "box": {
+            "x": 1547,
+            "y": 179,
+            "width": 315,
+            "height": 20
+          }
+        },
+        "last-turn": {
+          "t": 106.061,
+          "box": {
+            "x": 61,
+            "y": 952,
+            "width": 859,
+            "height": 39
+          }
+        },
+        "stop-finish": {
+          "t": 106.74,
+          "box": {
+            "x": 1719,
+            "y": 34,
+            "width": 164,
+            "height": 40
+          }
+        },
+        "transcript-saved": {
+          "t": 145.318,
+          "box": {
+            "x": 356,
+            "y": 321,
+            "width": 380,
+            "height": 703
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "consent",
+          "t": 4.154
+        },
+        {
+          "id": "start-ambient",
+          "t": 7.448
+        },
+        {
+          "id": "stop-finish",
+          "t": 109.522
+        }
+      ],
+      "audioIn": {
+        "file": "audio-in/consult.wav",
+        "start": 8.648
+      }
+    },
+    "S4": {
+      "run": "rec-v3",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S4.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 59.545,
+      "staged": 63.166667,
+      "cues": {
+        "analyse-button": {
+          "t": 1.757,
+          "box": {
+            "x": 384,
+            "y": 221,
+            "width": 240,
+            "height": 48
+          }
+        },
+        "analysing": {
+          "t": 4.439,
+          "box": {
+            "x": 384,
+            "y": 221,
+            "width": 146,
+            "height": 48
+          }
+        },
+        "analysis-done": {
+          "t": 56.023,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "analyse",
+          "t": 4.132
+        }
+      ],
+      "audioIn": null
+    },
+    "S5": {
+      "run": "rec-v3",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S5.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 63.868,
+      "staged": 67.233333,
+      "cues": {
+        "three-panels": {
+          "t": 5.848,
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1080
+          }
+        },
+        "transcript-pane": {
+          "t": 6.018,
+          "box": {
+            "x": 356,
+            "y": 321,
+            "width": 380,
+            "height": 703
+          }
+        },
+        "note-pane": {
+          "t": 6.18,
+          "box": {
+            "x": 756,
+            "y": 321,
+            "width": 520,
+            "height": 703
+          }
+        },
+        "safety-pane": {
+          "t": 6.348,
+          "box": {
+            "x": 1296,
+            "y": 321,
+            "width": 340,
+            "height": 703
+          }
+        },
+        "ai-generated-badge": {
+          "t": 9.514,
+          "box": {
+            "x": 1102,
+            "y": 370,
+            "width": 94,
+            "height": 22
+          }
+        },
+        "red-flag-rule": {
+          "t": 12.213,
+          "box": {
+            "x": 1296,
+            "y": 354,
+            "width": 336,
+            "height": 166
+          }
+        },
+        "rule-badge": {
+          "t": 12.389,
+          "box": {
+            "x": 1397,
+            "y": 370,
+            "width": 58,
+            "height": 22
+          }
+        },
+        "ai-candidate": {
+          "t": 15.582,
+          "box": {
+            "x": 1296,
+            "y": 532,
+            "width": 336,
+            "height": 168
+          }
+        },
+        "missing-info": {
+          "t": 20.582,
+          "box": {
+            "x": 1296,
+            "y": 662,
+            "width": 336,
+            "height": 21
+          }
+        },
+        "missing-allergies": {
+          "t": 28.298,
+          "box": {
+            "x": 674,
+            "y": 562,
+            "width": 596,
+            "height": 20
+          }
+        },
+        "checklist": {
+          "t": 40.29,
+          "box": {
+            "x": 512,
+            "y": 156,
+            "width": 896,
+            "height": 768
+          }
+        },
+        "checklist-evidence": {
+          "t": 45.755,
+          "box": {
+            "x": 673,
+            "y": 492,
+            "width": 99,
+            "height": 52
+          }
+        },
+        "suggestion": {
+          "t": 53.056,
+          "box": {
+            "x": 1312,
+            "y": 707,
+            "width": 304,
+            "height": 80
+          }
+        },
+        "guideline-chip": {
+          "t": 55.259,
+          "box": {
+            "x": 1312,
+            "y": 799,
+            "width": 282,
+            "height": 28
+          }
+        },
+        "guideline-expanded": {
+          "t": 59.454,
+          "box": {
+            "x": 1312,
+            "y": 338,
+            "width": 304,
+            "height": 359
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "show-all",
+          "t": 26.08
+        },
+        {
+          "id": "checklist",
+          "t": 40.117
+        },
+        {
+          "id": "evidence-row",
+          "t": 45.435
+        },
+        {
+          "id": "guideline-chip",
+          "t": 57.62
+        }
+      ],
+      "audioIn": null
+    },
+    "S7": {
+      "run": "rec-v3",
+      "take": 1,
+      "status": "ok-deviation",
+      "note": "q1-answer skipped: not seen within 3000 ms (waitFor: Timeout 3000ms exceeded.)",
+      "src": "footage/S7.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 125.923,
+      "staged": 126.333333,
+      "cues": {
+        "open-catatai": {
+          "t": 1.771,
+          "box": {
+            "x": 1848,
+            "y": 1016,
+            "width": 48,
+            "height": 48
+          }
+        },
+        "q1-typed": {
+          "t": 10.991,
+          "box": {
+            "x": 1529,
+            "y": 1001,
+            "width": 302,
+            "height": 42
+          }
+        },
+        "q2-typed": {
+          "t": 97.951,
+          "box": {
+            "x": 1529,
+            "y": 1001,
+            "width": 302,
+            "height": 42
+          }
+        },
+        "proposal-card": {
+          "t": 109.147,
+          "box": {
+            "x": 1537,
+            "y": 715,
+            "width": 334,
+            "height": 210
+          }
+        },
+        "apply": {
+          "t": 112.809,
+          "box": {
+            "x": 1550,
+            "y": 880,
+            "width": 60,
+            "height": 32
+          }
+        },
+        "plan-edited": {
+          "t": 118.905,
+          "box": {
+            "x": 1090,
+            "y": 784,
+            "width": 106,
+            "height": 22
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "open-catatai",
+          "t": 4.152
+        },
+        {
+          "id": "send",
+          "t": 12.548
+        },
+        {
+          "id": "send",
+          "t": 99.417
+        },
+        {
+          "id": "apply",
+          "t": 115.165
+        }
+      ],
+      "audioIn": null
+    },
+    "S7Q": {
+      "run": "rec-v3",
+      "take": 6,
+      "status": "ok-deviation",
+      "note": "q2-typed skipped: Q1-only retake | proposal-card skipped: Q1-only retake | apply skipped: Q1-only retake | plan-edited skipped: Q1-only retake",
+      "src": "footage/S7Q.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 33.169,
+      "staged": 34.366667,
+      "cues": {
+        "open-catatai": {
+          "t": 1.858,
+          "box": {
+            "x": 1848,
+            "y": 1016,
+            "width": 48,
+            "height": 48
+          }
+        },
+        "q1-typed": {
+          "t": 15.173,
+          "box": {
+            "x": 1529,
+            "y": 1001,
+            "width": 302,
+            "height": 42
+          }
+        },
+        "q1-answer": {
+          "t": 26.249,
+          "box": {
+            "x": 1579,
+            "y": 726,
+            "width": 87,
+            "height": 16
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "open-catatai",
+          "t": 4.329
+        },
+        {
+          "id": "send",
+          "t": 16.74
+        }
+      ],
+      "audioIn": null
+    },
+    "S6": {
+      "run": "rec-v3",
+      "take": 2,
+      "status": "ok",
+      "src": "footage/S6.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 45.399,
+      "staged": 48.333333,
+      "cues": {
+        "prescriptions-open": {
+          "t": 3.329,
+          "box": {
+            "x": 772,
+            "y": 916,
+            "width": 484,
+            "height": 20
+          }
+        },
+        "dictate-button": {
+          "t": 8.487,
+          "box": {
+            "x": 1186,
+            "y": 367,
+            "width": 93,
+            "height": 32
+          }
+        },
+        "listening": {
+          "t": 12.567,
+          "box": {
+            "x": 1099,
+            "y": 373,
+            "width": 63,
+            "height": 20
+          }
+        },
+        "dictated-text": {
+          "t": 28.988,
+          "box": {
+            "x": 614,
+            "y": 480,
+            "width": 692,
+            "height": 144
+          }
+        },
+        "stop-dictation": {
+          "t": 29.199,
+          "box": {
+            "x": 1249,
+            "y": 367,
+            "width": 74,
+            "height": 32
+          }
+        },
+        "parsed-lines": {
+          "t": 33.4,
+          "box": {
+            "x": 365,
+            "y": 449,
+            "width": 1190,
+            "height": 330
+          }
+        },
+        "parsed-fields": {
+          "t": 33.656,
+          "box": {
+            "x": 382,
+            "y": 522,
+            "width": 1156,
+            "height": 94
+          }
+        },
+        "confirm-prescription": {
+          "t": 37.699,
+          "box": {
+            "x": 1337,
+            "y": 814,
+            "width": 218,
+            "height": 40
+          }
+        },
+        "prescription-saved": {
+          "t": 41.94,
+          "box": {
+            "x": 772,
+            "y": 916,
+            "width": 484,
+            "height": 20
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "prescriptions-open",
+          "t": 5.699
+        },
+        {
+          "id": "add",
+          "t": 7.484
+        },
+        {
+          "id": "dictate-button",
+          "t": 11.188
+        },
+        {
+          "id": "stop-dictation",
+          "t": 31.845
+        },
+        {
+          "id": "confirm-prescription",
+          "t": 40.508
+        }
+      ],
+      "audioIn": {
+        "file": "audio-in/dictation.wav",
+        "start": 12.389
+      }
+    },
+    "S8": {
+      "run": "rec-v3",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S8.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 38.627,
+      "staged": 34.5,
+      "shiftMs": -3000,
+      "cues": {
+        "ack-rule": {
+          "t": 1.917,
+          "box": {
+            "x": 1296,
+            "y": 354,
+            "width": 336,
+            "height": 166
+          }
+        },
+        "ack-ai": {
+          "t": 5.71,
+          "box": {
+            "x": 1296,
+            "y": 543,
+            "width": 336,
+            "height": 168
+          }
+        },
+        "approve-button": {
+          "t": 9.616,
+          "box": {
+            "x": 384,
+            "y": 221,
+            "width": 157,
+            "height": 48
+          }
+        },
+        "confirm-approval": {
+          "t": 13.401,
+          "box": {
+            "x": 473,
+            "y": 221,
+            "width": 212,
+            "height": 48
+          }
+        },
+        "approve-tip": {
+          "t": 14.947,
+          "box": {
+            "x": 657,
+            "y": 261,
+            "width": 288,
+            "height": 68
+          }
+        },
+        "approved-status": {
+          "t": 20.378,
+          "box": {
+            "x": 835,
+            "y": 29,
+            "width": 271,
+            "height": 18
+          }
+        },
+        "export": {
+          "t": 22.762,
+          "box": {
+            "x": 624,
+            "y": 221,
+            "width": 129,
+            "height": 48
+          }
+        },
+        "report": {
+          "t": 28.503,
+          "box": {
+            "x": 1141,
+            "y": 198,
+            "width": 155,
+            "height": 13
+          }
+        }
+      },
+      "clicks": [
+        {
+          "id": "ack-rule",
+          "t": 4.313
+        },
+        {
+          "id": "ack-ai",
+          "t": 8.076
+        },
+        {
+          "id": "approve-button",
+          "t": 12.02
+        },
+        {
+          "id": "confirm-approval",
+          "t": 18.549
+        },
+        {
+          "id": "export",
+          "t": 25.111
+        }
+      ],
+      "audioIn": null
+    },
+    "S8R": {
+      "run": "rec-v3",
+      "take": 1,
+      "status": "ok",
+      "src": "footage/S8R.mp4",
+      "width": 1920,
+      "height": 1080,
+      "seconds": 10.474,
+      "staged": 12.366667,
+      "cues": {
+        "report-top": {
+          "t": 2.244,
+          "box": {
+            "x": 1141,
+            "y": 198,
+            "width": 155,
+            "height": 13
+          }
+        },
+        "report-prescriptions": {
+          "t": 5.914,
+          "box": {
+            "x": 624,
+            "y": 528,
+            "width": 673,
+            "height": 24
+          }
+        }
+      },
+      "clicks": [],
+      "audioIn": null
+    }
+  }
+}

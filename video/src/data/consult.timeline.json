@@ -1,0 +1,135 @@
+{
+  "file": "consult.wav",
+  "seconds": 90.72,
+  "change_gap": 0.85,
+  "same_gap": 0.6,
+  "turns": [
+    {
+      "speaker": "doctor",
+      "text": "Good morning. Please, have a seat. Before we start, can I confirm your IC number?",
+      "start": 2.0,
+      "end": 7.05
+    },
+    {
+      "speaker": "patient",
+      "text": "My IC is nine zero zero four one two zero eight six five four three.",
+      "start": 8.03,
+      "end": 14.48
+    },
+    {
+      "speaker": "doctor",
+      "text": "Thank you, Puan Siti. What brings you in today?",
+      "start": 15.33,
+      "end": 17.88
+    },
+    {
+      "speaker": "patient",
+      "text": "I've had a cough for three days now, and since yesterday my throat is really sore.",
+      "start": 18.73,
+      "end": 24.01
+    },
+    {
+      "speaker": "doctor",
+      "text": "I'm sorry to hear that. Have you had any fever?",
+      "start": 24.86,
+      "end": 27.44
+    },
+    {
+      "speaker": "patient",
+      "text": "Yes. Last night it was thirty-eight point two. This morning it feels a bit lower.",
+      "start": 28.29,
+      "end": 33.85
+    },
+    {
+      "speaker": "doctor",
+      "text": "Are you coughing anything up?",
+      "start": 34.7,
+      "end": 36.23
+    },
+    {
+      "speaker": "patient",
+      "text": "Some white phlegm. But this morning I noticed a few streaks of blood in my phlegm, and that worried me.",
+      "start": 37.08,
+      "end": 43.42
+    },
+    {
+      "speaker": "doctor",
+      "text": "Thank you for telling me. Was it only streaks, or more than that?",
+      "start": 44.27,
+      "end": 47.64
+    },
+    {
+      "speaker": "patient",
+      "text": "Only a few streaks, just once.",
+      "start": 48.49,
+      "end": 50.7
+    },
+    {
+      "speaker": "doctor",
+      "text": "Any pain in your chest when you breathe or cough?",
+      "start": 51.55,
+      "end": 54.29
+    },
+    {
+      "speaker": "patient",
+      "text": "No, no pain there.",
+      "start": 55.14,
+      "end": 56.46
+    },
+    {
+      "speaker": "doctor",
+      "text": "Can you swallow? Are you eating and drinking normally?",
+      "start": 57.31,
+      "end": 59.92
+    },
+    {
+      "speaker": "patient",
+      "text": "I can swallow. It just hurts when my throat is dry.",
+      "start": 60.77,
+      "end": 64.37
+    },
+    {
+      "speaker": "doctor",
+      "text": "Do you smoke?",
+      "start": 65.22,
+      "end": 66.21
+    },
+    {
+      "speaker": "patient",
+      "text": "No, never.",
+      "start": 67.06,
+      "end": 67.83
+    },
+    {
+      "speaker": "doctor",
+      "text": "Any other medical problems?",
+      "start": 68.68,
+      "end": 70.28
+    },
+    {
+      "speaker": "patient",
+      "text": "No, I'm usually healthy.",
+      "start": 71.13,
+      "end": 73.28
+    },
+    {
+      "speaker": "doctor",
+      "text": "Alright, let me have a look. Your throat is a bit red, and your chest sounds clear.",
+      "start": 74.13,
+      "end": 78.72
+    },
+    {
+      "speaker": "doctor",
+      "text": "I'll give you something for the fever and the sore throat. If you see blood in your phlegm again, or you feel worse, please come back straight away.",
+      "start": 79.32,
+      "end": 86.54
+    },
+    {
+      "speaker": "patient",
+      "text": "Okay. Thank you, doctor.",
+      "start": 87.39,
+      "end": 88.81
+    }
+  ],
+  "splice": "from .state/consult-v2-puan-siti.wav: 6.282 to 6.978 cut (\"full name and\"), 8.68 to 10.11 cut (\"Siti Contoh.\"), 20 to 25 ms crossfades"
+}
