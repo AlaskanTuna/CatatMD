@@ -360,3 +360,43 @@ describe('a forced tool call', () => {
     expect(await send()).not.toHaveProperty('tool_choice')
   })
 })
+
+/*
+ * #479. A streamed turn on Model Studio can reason for minutes before it answers, and `max_tokens` does not bound
+ * that, so the cap travels as its own field and only when the provider was built with one.
+ */
+describe('the stream reasoning budget', () => {
+  beforeEach(() => {
+    completionsCreate.mockReset().mockResolvedValue(
+      (async function* () {
+        yield { choices: [{ delta: { content: 'ok' } }] }
+      })(),
+    )
+  })
+
+  async function send(streamReasoningBudget?: number) {
+    const stream = new OpenAICompatibleClient('qwen', 'qwen3.7-flash', {
+      apiKey: 'test-key',
+      baseURL: 'https://example.invalid/v1',
+      resolvesSchemaRefs: true,
+      ...(streamReasoningBudget !== undefined && { streamReasoningBudget }),
+    }).stream({
+      operation: 'copilot_turn',
+      system: deidentify('ordinary system prompt').text,
+      turns: [{ role: 'user', content: deidentify('which red flag matters most').text }],
+      tools: [],
+    })
+    for await (const _ of stream) {
+      // drained
+    }
+    return completionsCreate.mock.calls[0]?.[0] as Record<string, unknown>
+  }
+
+  it('reaches the provider when the client carries one', async () => {
+    expect((await send(2_048)).thinking_budget).toBe(2_048)
+  })
+
+  it('is absent otherwise, so other providers are sent what they always were', async () => {
+    expect(await send()).not.toHaveProperty('thinking_budget')
+  })
+})

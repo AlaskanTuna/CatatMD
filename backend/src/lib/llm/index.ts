@@ -12,6 +12,16 @@ export { LLMResponseError } from './types.js'
 
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/'
 
+/**
+ * The reasoning `qwen3.7-flash` may spend on one copilot turn before answering (#479).
+ *
+ * Measured 10/11/26 on one copilot question asked 8 times: 7 turns reasoned for 470 to 1,483 tokens and answered in
+ * 5 to 18 s, and the eighth reasoned for 81,920 tokens over 491 s before writing a word. In the browser that turn is
+ * a panel showing one word and then nothing, because the reasoning never reaches the stream. 2,048 sits above every
+ * normal turn measured, so it bounds the runaway without trimming an ordinary answer.
+ */
+const QWEN_STREAM_REASONING_BUDGET = 2_048
+
 function build(): LLMClient {
   switch (env.LLM_PROVIDER) {
     case 'qwen': {
@@ -20,6 +30,7 @@ function build(): LLMClient {
         apiKey: env.QWEN_API_KEY,
         baseURL: env.QWEN_BASE_URL,
         resolvesSchemaRefs: true,
+        streamReasoningBudget: QWEN_STREAM_REASONING_BUDGET,
       })
     }
     case 'gemini': {
