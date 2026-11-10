@@ -1,5 +1,5 @@
 import { resolve } from 'node:path'
-import { LiveAsrRegionSchema } from '@shared/types'
+import { LIVE_ASR_RELAY_URL, LiveAsrProviderSchema, LiveAsrRegionSchema } from '@shared/types'
 import { config } from 'dotenv'
 import { z } from 'zod'
 
@@ -78,6 +78,28 @@ const EnvSchema = z.object({
   SONIOX_API_KEY: z.string().optional(),
   SONIOX_REGION: LiveAsrRegionSchema.default('us'),
   SONIOX_RT_MODEL: z.string().default('stt-rt-v5'),
+
+  // Which recogniser carries live capture (#487). `soniox` is the browser-held
+  // socket above. `qwen` is the API's own WebSocket relay to Qwen3-ASR realtime
+  // in Singapore, which reuses QWEN_API_KEY: absent, the live routes answer 503
+  // exactly as they do without a Soniox key.
+  //
+  // The upstream host is a literal in lib/asr/qwen-realtime.ts and is never
+  // configuration. The relay address the browser opens defaults to
+  // BETTER_AUTH_URL with its scheme swapped; set LIVE_RELAY_PUBLIC_URL only when
+  // the API is reached on another host, and change the connect-src host in
+  // vercel.json to match. A blank value counts as unset.
+  LIVE_ASR_PROVIDER: LiveAsrProviderSchema.default('soniox'),
+  LIVE_RELAY_PUBLIC_URL: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().regex(LIVE_ASR_RELAY_URL).optional(),
+  ),
+  // Reaches the upstream address as a query value, so it is a model id and not
+  // free text.
+  QWEN_ASR_RT_MODEL: z
+    .string()
+    .regex(/^[A-Za-z0-9._-]{1,64}$/)
+    .default('qwen3-asr-flash-realtime'),
 
   // ElevenLabs batch speech-to-text, which refines an untranslated ambient
   // transcript after Stop (#436, docs/TRD.md §20.14). Optional on the same

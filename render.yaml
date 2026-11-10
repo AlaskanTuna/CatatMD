@@ -48,6 +48,12 @@ services:
         sync: false
       - key: SONIOX_REGION
         value: us
+      # Live capture through this API's own relay to Qwen3-ASR realtime in
+      # Singapore (#487), reusing QWEN_API_KEY. The relay address derives from
+      # BETTER_AUTH_URL, so the connect-src host in vercel.json must be this
+      # API's. Set to soniox to return to the browser-held socket above.
+      - key: LIVE_ASR_PROVIDER
+        value: qwen
       # Refinement after Stop (#436). The browser uploads the finished ambient
       # recording to ElevenLabs under a single-use token this service mints.
       # Set only by the account holder, only once the vendor account's "use

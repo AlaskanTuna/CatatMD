@@ -833,11 +833,13 @@ jobs:
       # Removed rather than repointed: with no rewrite, a request the stub
       # somehow missed gets a 404 from Vercel instead of reaching Render. The
       # SPA catch-all already excludes `api/`, so it cannot swallow it either.
+      # The live-capture relay's host leaves the CSP too (#487), so a preview
+      # cannot open a socket to the production API either.
       - name: Cut the preview off from the production API
         if: steps.filter.outputs.deployable == 'true'
         run: |
           set -euo pipefail
-          jq '.rewrites |= map(select(.source != "/api/(.*)"))' vercel.json > vercel.preview.json
+          jq '.rewrites |= map(select(.source != "/api/(.*)")) | .headers |= map(.headers |= map(.value |= gsub(" wss://[a-z0-9.-]+\\.onrender\\.com"; "")))' vercel.json > vercel.preview.json
           mv vercel.preview.json vercel.json
           if grep -qF "onrender.com" vercel.json; then
             echo "::error::vercel.json still routes to Render after the API rewrite was removed."

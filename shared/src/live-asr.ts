@@ -20,6 +20,19 @@ import { InterpretedLanguageSchema } from './transcript.js'
 export const LiveAsrRegionSchema = z.enum(['us', 'eu', 'jp', 'in'])
 
 /**
+ * Which live recogniser the deployment uses (`LIVE_ASR_PROVIDER`, #487).
+ *
+ * - `soniox`: the browser holds a socket straight to Soniox under a key the API minted (#268).
+ * - `qwen`: the browser streams 16 kHz mono PCM to the API's own relay (`LIVE_ASR_RELAY_PATH`), which holds the
+ *   upstream socket to Qwen3-ASR realtime on Alibaba Cloud Model Studio. A browser cannot set `Authorization` on a
+ *   WebSocket, so the key stays on the API and the relay authorises the browser with a short-lived token instead.
+ */
+export const LiveAsrProviderSchema = z.enum(['soniox', 'qwen'])
+
+/** Where the relay's upstream processes audio: Alibaba Cloud Model Studio's international region, Singapore. */
+export const LiveAsrRelayRegionSchema = z.enum(['sg'])
+
+/**
  * What the doctor is about to say, which decides the recognition settings, the
  * vocabulary and the session cap the API will mint.
  *
@@ -55,6 +68,18 @@ export const LiveAsrModeSchema = z.enum(['ambient', 'dictation'])
  */
 export const LIVE_ASR_WEBSOCKET_URL =
   /^wss:\/\/stt-rt(?:\.(?:eu|jp|in))?\.soniox\.com\/transcribe-websocket$/
+
+/** The relay's path on the API (#487). */
+export const LIVE_ASR_RELAY_PATH = '/api/asr/live-relay'
+
+/**
+ * The relay address the API may hand out: `wss://` on any host, or `ws://` on loopback for local development, and
+ * always this exact path. The host is not pinned here because it is the API's own, and it is not the SPA's origin:
+ * a WebSocket cannot pass the Vercel rewrite, so the browser opens the Render host directly. The CSP `connect-src` in
+ * `vercel.json` pins that host, so a tampered response cannot point audio anywhere else.
+ */
+export const LIVE_ASR_RELAY_URL =
+  /^(?:wss:\/\/[a-z0-9.-]+(?::\d{2,5})?|ws:\/\/(?:localhost|127\.0\.0\.1)(?::\d{2,5})?)\/api\/asr\/live-relay$/
 
 /**
  * How many vocabulary terms may ride in the session context.
@@ -142,6 +167,13 @@ export const LiveSessionConfigSchema = z.object({
       languageB: z.literal('en'),
     })
     .optional(),
+  /**
+   * What the client sends after the config frame (#487). Absent or `auto`: the recorder's own container, forwarded
+   * as produced (Soniox). `pcm_s16le`: raw 16-bit little-endian mono PCM at `sampleRate`, which the relay forwards to
+   * a recogniser that takes PCM only (Qwen).
+   */
+  audioFormat: z.enum(['auto', 'pcm_s16le']).optional(),
+  sampleRate: z.literal(16000).optional(),
 })
 
 /**
@@ -153,10 +185,15 @@ export const LiveSessionConfigSchema = z.object({
  * reading. A key is minted when the patient has agreed and the microphone is
  * open, never before.
  */
-export const LiveAsrConfigSchema = z.object({
-  provider: z.literal('soniox'),
-  region: LiveAsrRegionSchema,
-  websocketUrl: z.string().regex(LIVE_ASR_WEBSOCKET_URL),
+const LiveAsrConfigObject = z.object({
+  provider: LiveAsrProviderSchema,
+  region: z.union([LiveAsrRegionSchema, LiveAsrRelayRegionSchema]),
+  websocketUrl: z
+    .string()
+    .refine(
+      (url) => LIVE_ASR_WEBSOCKET_URL.test(url) || LIVE_ASR_RELAY_URL.test(url),
+      'Not a live ASR address',
+    ),
   config: LiveSessionConfigSchema,
   /**
    * The languages this deployment can pair with English on ambient capture.
@@ -177,6 +214,18 @@ export const LiveAsrConfigSchema = z.object({
    */
   batchRefinement: z.boolean().optional(),
 })
+
+/**
+ * Provider, address and region agree: a Soniox session points at Soniox in a Soniox region, and a Qwen session at
+ * the API's relay in `sg`. Without this, a response could pair one provider's disclosure with another's socket.
+ */
+const consistentProvider = (c: { provider: string; region: string; websocketUrl: string }) =>
+  c.provider === 'soniox'
+    ? LIVE_ASR_WEBSOCKET_URL.test(c.websocketUrl) && LiveAsrRegionSchema.safeParse(c.region).success
+    : LIVE_ASR_RELAY_URL.test(c.websocketUrl) && c.region === 'sg'
+const INCONSISTENT = { message: 'Provider, address and region disagree', path: ['provider'] }
+
+export const LiveAsrConfigSchema = LiveAsrConfigObject.refine(consistentProvider, INCONSISTENT)
 
 /**
  * Body of `POST /api/asr/live-sessions`.
@@ -230,7 +279,7 @@ export const LiveSessionRequestSchema = z
  * never stores it. The config fields are repeated rather than referenced so the
  * client needs one response to open a socket.
  */
-export const LiveSessionSchema = LiveAsrConfigSchema.extend({
+export const LiveSessionSchema = LiveAsrConfigObject.extend({
   apiKey: z.string().min(1),
   expiresAt: z.string().min(1),
   /**
@@ -239,10 +288,11 @@ export const LiveSessionSchema = LiveAsrConfigSchema.extend({
    * Optional so a client and an API on either side of a deploy still agree.
    */
   maxSessionSeconds: z.number().int().positive().optional(),
-})
+}).refine(consistentProvider, INCONSISTENT)
 // ─── Inferred types ──────────────────────────────────────────────────────────
 
 export type LiveAsrRegion = z.infer<typeof LiveAsrRegionSchema>
+export type LiveAsrProvider = z.infer<typeof LiveAsrProviderSchema>
 export type LiveAsrMode = z.infer<typeof LiveAsrModeSchema>
 export type LiveSessionConfig = z.infer<typeof LiveSessionConfigSchema>
 export type LiveAsrConfig = z.infer<typeof LiveAsrConfigSchema>

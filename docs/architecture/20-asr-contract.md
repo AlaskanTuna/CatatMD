@@ -31,8 +31,9 @@ Part of the [Technical Reference](../TRD.md).
 - [20.12 Two-Way Translation On Ambient Capture](#2012-two-way-translation-on-ambient-capture)
 - [20.13 Evaluated 15/10/26: ElevenLabs Scribe v2 Realtime As A Soniox Replacement](#2013-evaluated-151026-elevenlabs-scribe-v2-realtime-as-a-soniox-replacement)
 - [20.14 Refinement After Stop: Batch `scribe_v2`, Browser-Direct, Under An API-Minted Token](#2014-refinement-after-stop-batch-scribe_v2-browser-direct-under-an-api-minted-token)
+- [20.15 Live Capture Through The API's Relay To Qwen3-ASR Realtime](#2015-live-capture-through-the-apis-relay-to-qwen3-asr-realtime)
 
-**Status: `Built`. The speech paths now include on-device Whisper, the consent-gated ILMU relay for press-to-record, browser-direct Soniox streaming for ambient capture, and optional browser-direct ElevenLabs batch refinement after Stop. The API adapters in `backend/src/lib/asr/` mint or relay credentials, while capture and provider transports live in `frontend/src/audio/`. Missing provider keys disable their routes or refinement; they do not switch audio to another provider. The ILMU deployment key was verified on Render on 16/08/26, as recorded below.**
+**Status: `Built`. The speech paths now include on-device Whisper, the consent-gated ILMU relay for press-to-record, browser-direct Soniox streaming for ambient capture (or, when `LIVE_ASR_PROVIDER=qwen`, the API's own relay to Qwen3-ASR realtime, §20.15), and optional browser-direct ElevenLabs batch refinement after Stop. The API adapters in `backend/src/lib/asr/` mint or relay credentials, while capture and provider transports live in `frontend/src/audio/`. Missing provider keys disable their routes or refinement; they do not switch audio to another provider. The ILMU deployment key was verified on Render on 16/08/26, as recorded below.**
 
 Audio input creates a second egress point that sits **before** the de-identification gate (§9): raw audio cannot be de-identified, only transcribed first. Un-redacted patient audio, and voice itself, a biometric identifier, would leave the trust boundary before the gate ever saw it, contradicting the central invariant in `AGENTS.md` that no text containing patient identifiers may leave the API.
 
@@ -2230,3 +2231,83 @@ Each is a named constant, **provisional until the measurement gate**.
 | Spelled-out identifiers        | Depend on #435; this section is not safe to ship before it                                                                                                                        |
 
 ---
+
+## 20.15 Live Capture Through The API's Relay To Qwen3-ASR Realtime
+
+**Status: `Built`.** Recorded 10/11/26 (issue #487, `docs/decisions/` D-015, status Accepted, pending the owner's approval of the pull request). Selected by `LIVE_ASR_PROVIDER=qwen`. The code default is `soniox`, which leaves §20.10 as it was, but `render.yaml` sets `qwen`, so production live capture runs here.
+
+- **What It Does.** Ambient capture and prescription dictation stream through a WebSocket on the API to Qwen3-ASR realtime (`qwen3-asr-flash-realtime`) on Alibaba Cloud Model Studio, Singapore (`dashscope-intl`). The relay answers in Soniox's message shape, so the SPA's token handling (`frontend/src/audio/live/live-tokens.ts`) is reused unchanged.
+- **Why A Relay.** A browser cannot set `Authorization` on a WebSocket, so the vendor key would otherwise ship in the bundle. The key stays on the API and the browser presents a short-lived token instead. Unlike §20.10, this means the audio passes through the API, in memory, for the length of the session. Nothing is stored.
+- **What It Does Not Have.** No two-way translation (a request is a 400), no refinement after Stop (§20.14), and no speaker ids, because Qwen does not diarise.
+
+### Selection And The Two Routes
+
+With `qwen`, both live routes answer a body in the Soniox shape, built from the same per-mode context the Soniox settings use (`liveSessionConfig`, §20.10). Without `QWEN_API_KEY` both answer 503 `asr_unavailable`, as Soniox does without its key.
+
+| Field                      | Value                                                                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `provider`, `region`       | `qwen`, `sg`                                                                                                                     |
+| `websocketUrl`             | `LIVE_RELAY_PUBLIC_URL` when set, otherwise `BETTER_AUTH_URL` with `https:` swapped for `wss:` (`http:` for `ws:`) plus the path |
+| `config.model`             | `QWEN_ASR_RT_MODEL`, default `qwen3-asr-flash-realtime`                                                                          |
+| `config.languageHints`     | `["en", "ms"]`, with `languageIdentification` and `speakerDiarization` false                                                     |
+| `config.endpointDetection` | True for dictation, false for ambient                                                                                            |
+| `config.context`           | The per-mode `general` and `terms` the Soniox settings build                                                                     |
+| `config.audioFormat`       | `pcm_s16le` at `sampleRate` 16000                                                                                                |
+| `availableTranslations`    | `[]`. `batchRefinement` is `false`                                                                                               |
+
+`POST /api/asr/live-sessions` takes the same request and the same consent rule, and adds `apiKey` (the relay token), `expiresAt` and `maxSessionSeconds` (1800 ambient, 300 dictation). The limiters and the audit event are Soniox's: `asr.live_session_minted` is written before the response, with the token's `jti` as `clientReferenceId`, the model, region `sg`, the mode, the cap and the consent assertion derived from the mode. The audit type has no provider field, so the row does not name one.
+
+The relay token is HMAC-SHA256 over `{ sub, mode, consent, jti, exp }`, keyed from `BETTER_AUTH_SECRET` under the label `live-relay`. It is valid for 60 seconds and accepted once, from an in-memory `jti` set that is pruned at expiry.
+
+### The Relay Socket, Browser To API
+
+1. **Upgrade.** Accepted only on `LIVE_ASR_RELAY_PATH` (`/api/asr/live-relay`) and only when `Origin` equals `CORS_ORIGIN`. Any other path is a 404 and any other origin a 403. While 32 sockets are still waiting to authenticate, a further upgrade is refused with 503. The browser opens the API's host directly, because a WebSocket cannot pass the Vercel rewrite, so no session cookie arrives and the token is its only credential.
+2. **First frame, text JSON.** `{ "api_key": "<token>", "audio_format": "pcm_s16le", "sample_rate": 16000, "num_channels": 1 }`. The relay verifies the token before anything else. Every other field in the frame, including any recognition settings, is ignored: the session is built from the mode in the token.
+3. **Audio, binary.** Raw 16-bit little-endian mono PCM at 16 kHz, 100 ms (3200 bytes) per frame, 32 KiB at most. An odd byte at the end of a frame is held and joined to the next, so samples stay aligned. Audio forwarded is also bounded to the session cap plus 10 seconds, so sending faster than real time buys nothing.
+4. **End of audio.** An empty text frame, as for Soniox.
+5. **Messages, relay to browser.** `{ "tokens": [{ "text", "start_ms", "end_ms", "is_final" }], "finished"?, "error_code"? }`.
+   - Each message carries the finals newly settled, in phrase order, then the **complete** interim tail. The SPA appends finals and replaces its interim words.
+   - Tokens are words with a leading space, except the stream's first final word.
+   - After each settled phrase the relay appends `{ "text": "<end>", "is_final": true }`. Qwen has no speakers, so this is what stops an ambient consultation becoming one block. After Stop the labelling pass (`POST /api/asr/draft-turns`, §20.5) assigns Doctor and Patient, as it does for any speaker-less transcript.
+   - Qwen times phrases, not words, so a phrase's words are spread evenly across its span. An interim phrase ends at the audio received so far (32 bytes per millisecond). Times are milliseconds from the session's first audio byte.
+   - A final with no letter or digit is a breath or a click and is dropped. A phrase is held back until every earlier phrase has settled.
+   - No `speaker`, `language` or `confidence` is ever set, because Qwen reports none, and a made-up confidence would read as certainty to the code that marks uncertain words.
+
+### How A Session Ends
+
+| Condition                                                                                                                                                                               | Message to the browser                                    | Close |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ----- |
+| No first frame within 10 seconds, a first frame that is not JSON or has no valid token (bad signature, expired or replayed)                                                             | `{ "error_code": 401 }`                                   | 4401  |
+| Binary audio before authenticating, a text frame other than the empty one afterwards, or a first frame that does not declare `pcm_s16le`, 16000 and 1 channel (a stale SPA says `auto`) | `{ "error_code": 400 }`                                   | 1002  |
+| A frame over 32 KiB                                                                                                                                                                     | None. `ws` closes the socket itself                       | 1009  |
+| Qwen fails: an `error` event, a failed transcription, a malformed known event, a failed handshake, or hanging up while the doctor is still talking                                      | `{ "error_code": 502 }`                                   | 1011  |
+| The empty frame, the per-mode session cap, the audio cap, or Qwen hanging up after being asked to finish                                                                                | Pending finals, then `{ "tokens": [], "finished": true }` | 1000  |
+| The browser closes or stops answering pings                                                                                                                                             | None                                                      | n/a   |
+
+The relay waits up to 8 seconds after end of audio for Qwen to settle. Words Qwen never confirmed are then kept as finals rather than lost. Whichever side ends the session, the upstream socket is closed.
+
+### The Upstream Socket, API To Qwen
+
+- **Address.** `wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime?model=<model>`, a literal in `backend/src/lib/asr/qwen-realtime.ts` with only the model id configurable, and `Authorization: Bearer <QWEN_API_KEY>`. Redirects are not followed.
+- **Session.** `session.update` with `modalities: ['text']`, `input_audio_format: 'pcm'`, `sample_rate: 16000`, `input_audio_transcription: { language: 'en', corpus: { text: 'Terms: <the mode's terms>.' } }` and `turn_detection: { type: 'server_vad', threshold: 0.2, silence_duration_ms: 500 }`. Each audio frame becomes `{ type: 'input_audio_buffer.append', audio: <base64> }`.
+- **Events used.** `input_audio_buffer.speech_started` and `speech_stopped` (phrase times), `conversation.item.input_audio_transcription.text` (the interim text is `text` plus `stash`), `...completed` (the final), `session.finished`, and `error`. There is no speaker field.
+- **One Second Of Silence Before `session.finish`.** On end of audio the relay appends 1 s of zero PCM and then sends `session.finish`. Measured 10/11/26: `session.finish` on its own drew no `session.finished` and left an open phrase uncompleted, while with the silence first Qwen completed the phrase and answered `session.finished` within about 100 ms.
+- **A Failed Transcription Is A Failure.** Phrases settle in order, so one that never completes would hold every later one back, and dropping it quietly would leave a hole in a clinical transcript that nobody could see.
+
+### Controls
+
+The controls are listed in `.claude/rules/phi-egress.md` and pinned by `live-relay.test.ts`, `live-relay-token.test.ts`, `qwen-realtime.test.ts` and the two `no-stray-*` guards, which pin every `ws` import, socket construction and `dashscope` host per file. Nothing is logged but event types, ids, byte counts, durations and close codes, and the vendor's error text is never read.
+
+### Measured 10/11/26
+
+On the synthetic dictation clip (12.9 s) at real-time pace, through the real route, token, relay and Qwen: 55 messages, 52 carrying interim words, the first interim at 1.7 s, and the socket closed 106 ms after the end of audio. On the first 25 s of the synthetic consultation: 100 messages and five phrases, closed 225 ms after the end of audio. This is a smoke test on simulated audio, not an accuracy measurement.
+
+### Not Built Today
+
+| Item             | Detail                                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Spend cap        | No global or per-actor cap, and no cap on concurrent authenticated sessions. The mint limiters and the per-session cap are the only bounds |
+| Replay set       | In one process. A second API instance needs a shared store before single use holds across them                                             |
+| Consent signal   | None server-side: the assertion is client-sent and audited                                                                                 |
+| Vendor retention | Alibaba Cloud's retention and data-use terms for realtime audio are unmeasured                                                             |
+| Accuracy         | Run here only on synthetic English audio. No accuracy measurement of this realtime model is recorded in this section                       |

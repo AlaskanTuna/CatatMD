@@ -123,8 +123,8 @@ export type SonioxStreamHandlers = {
 
 export type SonioxStream = {
   readonly state: 'connecting' | 'streaming' | 'draining' | 'closed'
-  /** Forwards one recorder chunk. Ignored unless the socket is streaming. */
-  send: (chunk: Blob) => void
+  /** Forwards one recorder chunk or PCM frame. Ignored unless streaming. */
+  send: (chunk: Blob | ArrayBuffer) => void
   /** Ends the stream and waits, briefly, for the provider to acknowledge it. */
   finish: () => Promise<{ finished: boolean }>
   /** Drops the session without ceremony. Fires no handler. */
@@ -243,13 +243,18 @@ export function openSonioxStream(
     clearTimeout(connectTimer)
     connectTimer = undefined
     // The provider's snake_case wire names live here and nowhere else.
+    const isPcm = session.config.audioFormat === 'pcm_s16le'
     socket.send(
       JSON.stringify({
         api_key: session.apiKey,
         model: session.config.model,
-        // The recorder's own container, forwarded as produced. No transcoding
-        // and no PCM path in the browser.
-        audio_format: 'auto',
+        ...(isPcm
+          ? {
+              audio_format: 'pcm_s16le',
+              sample_rate: session.config.sampleRate ?? 16000,
+              num_channels: 1,
+            }
+          : { audio_format: 'auto' }),
         language_hints: session.config.languageHints,
         enable_language_identification: session.config.languageIdentification,
         enable_speaker_diarization: session.config.speakerDiarization,
@@ -334,7 +339,7 @@ export function openSonioxStream(
     },
     send(chunk) {
       if (state !== 'streaming' || socket.readyState !== WebSocket.OPEN) return
-      if (chunk.size === 0) return
+      if (chunk instanceof ArrayBuffer ? chunk.byteLength === 0 : chunk.size === 0) return
       socket.send(chunk)
     },
     finish() {

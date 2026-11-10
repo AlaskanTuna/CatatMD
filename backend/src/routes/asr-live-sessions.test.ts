@@ -1,6 +1,8 @@
 import type { Server } from 'node:http'
 import { LiveAsrConfigSchema, LiveSessionSchema } from '@shared/types'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { verifyRelayToken } from '../lib/asr/live-relay-token.js'
+import { liveSessionConfig } from '../lib/asr/soniox.js'
 
 /**
  * Route-level tests for the ambient session mint (#268).
@@ -42,6 +44,9 @@ const testEnv = vi.hoisted(() => ({
   SONIOX_API_KEY: 'test-soniox-key' as string | undefined,
   SONIOX_REGION: 'us' as 'us' | 'eu' | 'jp' | 'in',
   SONIOX_RT_MODEL: 'stt-rt-v5',
+  LIVE_ASR_PROVIDER: 'soniox' as 'soniox' | 'qwen',
+  LIVE_RELAY_PUBLIC_URL: undefined as string | undefined,
+  QWEN_ASR_RT_MODEL: 'qwen3-asr-flash-realtime',
   LOG_LEVEL: 'info',
   DEID_FAIL_CLOSED: true,
 }))
@@ -150,6 +155,10 @@ beforeEach(() => {
   auditState.failNextWrite = false
   testEnv.SONIOX_API_KEY = 'test-soniox-key'
   testEnv.SONIOX_REGION = 'us'
+  testEnv.LIVE_ASR_PROVIDER = 'soniox'
+  testEnv.LIVE_RELAY_PUBLIC_URL = undefined
+  testEnv.QWEN_API_KEY = undefined
+  testEnv.BETTER_AUTH_URL = 'http://localhost:3001'
   sessionState.doctorId = 'doctor-1'
 })
 
@@ -696,5 +705,308 @@ describe('two-way translation, an ambient session with a different first frame',
     const res = await mint({ consent: true, translation: 'ur' }, ip)
 
     expect(res.status).toBe(429)
+  })
+})
+
+/*
+ * The Qwen relay provider (#487). Selected by `LIVE_ASR_PROVIDER=qwen`: the
+ * browser is told to open the API's own relay and is given a token the API
+ * signed, where Soniox has it mint a key upstream. Same routes, same consent
+ * rule, same limiter and same audit event, so most of what is pinned here is
+ * what did not move. Nothing reaches the network: no Soniox call is made, and
+ * the relay itself is covered by `lib/asr/live-relay.test.ts`.
+ */
+describe('the Qwen relay provider', () => {
+  beforeEach(() => {
+    testEnv.LIVE_ASR_PROVIDER = 'qwen'
+    testEnv.QWEN_API_KEY = 'test-qwen-key'
+    // A deployment on this provider holds no Soniox key, and must not need one.
+    testEnv.SONIOX_API_KEY = undefined
+  })
+
+  describe('GET /live-sessions/config', () => {
+    it('describes the relay, which is where the browser sends audio', async () => {
+      const res = await readConfig()
+
+      expect(res.status).toBe(200)
+      const body = LiveAsrConfigSchema.parse(await res.json())
+      expect(body).toEqual({
+        provider: 'qwen',
+        region: 'sg',
+        websocketUrl: 'ws://localhost:3001/api/asr/live-relay',
+        config: {
+          model: 'qwen3-asr-flash-realtime',
+          languageHints: ['en', 'ms'],
+          languageIdentification: false,
+          speakerDiarization: false,
+          endpointDetection: false,
+          // Written once, in the Soniox settings, and reused.
+          context: liveSessionConfig('ambient').context,
+          audioFormat: 'pcm_s16le',
+          sampleRate: 16000,
+        },
+        availableTranslations: [],
+        batchRefinement: false,
+      })
+      expect(upstream).not.toHaveBeenCalled()
+      expect(auditState.writes).toEqual([])
+    })
+
+    it('asks for turn boundaries on dictation and not on ambient', async () => {
+      const dictation = LiveAsrConfigSchema.parse(
+        await (await readConfig('?mode=dictation')).json(),
+      )
+      const ambient = LiveAsrConfigSchema.parse(await (await readConfig('?mode=ambient')).json())
+
+      expect(dictation.config.endpointDetection).toBe(true)
+      expect(dictation.config.context).toEqual(liveSessionConfig('dictation').context)
+      expect(ambient.config.endpointDetection).toBe(false)
+      expect(dictation.config.context.terms).toContain('amoxicillin')
+    })
+
+    it("derives the address from the API's own, with the scheme swapped", async () => {
+      testEnv.BETTER_AUTH_URL = 'https://catatmd-api.onrender.com'
+
+      const body = (await (await readConfig()).json()) as { websocketUrl: string }
+
+      expect(body.websocketUrl).toBe('wss://catatmd-api.onrender.com/api/asr/live-relay')
+    })
+
+    it('prefers LIVE_RELAY_PUBLIC_URL when it is set', async () => {
+      testEnv.BETTER_AUTH_URL = 'https://catatmd-api.onrender.com'
+      testEnv.LIVE_RELAY_PUBLIC_URL = 'wss://relay.example.test:8443/api/asr/live-relay'
+
+      const body = (await (await readConfig()).json()) as { websocketUrl: string }
+
+      expect(body.websocketUrl).toBe('wss://relay.example.test:8443/api/asr/live-relay')
+    })
+
+    it('answers 500 rather than advertise an address the browser would refuse', async () => {
+      // A cleartext socket to a non-loopback host is not an address the shared contract allows.
+      testEnv.BETTER_AUTH_URL = 'http://203.0.113.9:3001'
+
+      const res = await readConfig()
+
+      expect(res.status).toBe(500)
+      await expect(res.json()).resolves.toMatchObject({ error: { code: 'internal_error' } })
+    })
+
+    it('answers 503 without a Qwen key, whatever else is configured', async () => {
+      testEnv.QWEN_API_KEY = undefined
+      testEnv.SONIOX_API_KEY = 'test-soniox-key'
+
+      const res = await readConfig()
+
+      expect(res.status).toBe(503)
+      await expect(res.json()).resolves.toMatchObject({ error: { code: 'asr_unavailable' } })
+    })
+
+    it('refuses a translation, which the relay cannot give', async () => {
+      const res = await readConfig('?translation=bn')
+
+      expect(res.status).toBe(400)
+      await expect(res.json()).resolves.toMatchObject({ error: { code: 'invalid_query' } })
+    })
+
+    it.each(['?mode=AMBIENT', '?mode=', '?mode=ambient&mode=dictation'])(
+      'still answers 400 to %s rather than falling back to ambient',
+      async (query) => {
+        expect((await readConfig(query)).status).toBe(400)
+      },
+    )
+
+    it('requires a session', async () => {
+      sessionState.doctorId = undefined
+
+      expect((await readConfig()).status).toBe(401)
+    })
+
+    it('leaves Soniox alone when that is the provider, even with a Qwen key present', async () => {
+      testEnv.LIVE_ASR_PROVIDER = 'soniox'
+      testEnv.SONIOX_API_KEY = 'test-soniox-key'
+
+      const body = (await (await readConfig()).json()) as { provider: string; region: string }
+
+      expect(body.provider).toBe('soniox')
+      expect(body.region).toBe('us')
+    })
+  })
+
+  describe('POST /live-sessions', () => {
+    it('hands back a relay token the relay will accept, once', async () => {
+      const res = await mint({ consent: true })
+
+      expect(res.status).toBe(200)
+      expect(res.headers.get('cache-control')).toBe('no-store')
+      const body = LiveSessionSchema.parse(await res.json())
+      expect(body.provider).toBe('qwen')
+      expect(body.region).toBe('sg')
+      expect(body.websocketUrl).toBe('ws://localhost:3001/api/asr/live-relay')
+      expect(body.maxSessionSeconds).toBe(1_800)
+      expect(body.availableTranslations).toEqual([])
+      expect(body.batchRefinement).toBe(false)
+      expect(Date.parse(body.expiresAt) - Date.now()).toBeGreaterThan(55_000)
+      expect(Date.parse(body.expiresAt) - Date.now()).toBeLessThanOrEqual(60_000)
+
+      const claims = verifyRelayToken(body.apiKey, 'ambient')
+      expect(claims).toMatchObject({ sub: 'doctor-1', mode: 'ambient', consent: true })
+      expect(verifyRelayToken(body.apiKey)).toBeNull()
+      // Nothing was minted upstream: the API signed this itself.
+      expect(upstream).not.toHaveBeenCalled()
+    })
+
+    it('mints a dictation session with its own config and cap, and asserts no consent', async () => {
+      const res = await mint({ mode: 'dictation' })
+
+      expect(res.status).toBe(200)
+      const body = LiveSessionSchema.parse(await res.json())
+      expect(body.config.endpointDetection).toBe(true)
+      expect(body.maxSessionSeconds).toBe(300)
+      expect(verifyRelayToken(body.apiKey, 'dictation')).toMatchObject({
+        mode: 'dictation',
+        consent: false,
+      })
+    })
+
+    it('records the session against the token id, in the Soniox event and shape', async () => {
+      const res = await mint({ consent: true })
+
+      const { apiKey } = LiveSessionSchema.parse(await res.json())
+      const jti = JSON.parse(Buffer.from(apiKey.split('.')[0] ?? '', 'base64url').toString()).jti
+      expect(auditActions()).toEqual(['asr.live_session_minted'])
+      expect(auditState.writes[0]?.data).toMatchObject({
+        actorId: 'doctor-1',
+        metadata: {
+          clientReferenceId: jti,
+          model: 'qwen3-asr-flash-realtime',
+          region: 'sg',
+          mode: 'ambient',
+          maxSessionSeconds: 1800,
+          consentAsserted: true,
+        },
+      })
+      // The same keys the Soniox row carries, and no more: the audit type has no provider field.
+      expect(Object.keys(auditState.writes[0]?.data.metadata as object).sort()).toEqual([
+        'clientReferenceId',
+        'consentAsserted',
+        'maxSessionSeconds',
+        'mode',
+        'model',
+        'region',
+      ])
+    })
+
+    it('derives the consent it records from the mode, not from the body alone', async () => {
+      const res = await mint({ consent: true, mode: 'dictation' })
+
+      const { apiKey } = LiveSessionSchema.parse(await res.json())
+      expect(auditState.writes[0]?.data).toMatchObject({
+        metadata: { mode: 'dictation', consentAsserted: false },
+      })
+      expect(verifyRelayToken(apiKey)).toMatchObject({ consent: false })
+    })
+
+    it('keeps the consent rule: an ambient body must assert it', async () => {
+      for (const body of [
+        {},
+        { consent: false },
+        { consent: 'yes' },
+        { consent: true, mode: 'x' },
+      ]) {
+        const res = await mint(body)
+
+        expect(res.status).toBe(400)
+        await expect(res.json()).resolves.toMatchObject({ error: { code: 'invalid_body' } })
+      }
+      expect(auditState.writes).toEqual([])
+    })
+
+    it('refuses a translation before minting or auditing anything', async () => {
+      const res = await mint({ consent: true, translation: 'bn' })
+
+      expect(res.status).toBe(400)
+      await expect(res.json()).resolves.toMatchObject({
+        error: { code: 'invalid_body', message: 'Translation is not available.' },
+      })
+      expect(auditState.writes).toEqual([])
+    })
+
+    it('answers 503 without a Qwen key, minting and auditing nothing', async () => {
+      testEnv.QWEN_API_KEY = undefined
+
+      const res = await mint({ consent: true })
+
+      expect(res.status).toBe(503)
+      await expect(res.json()).resolves.toMatchObject({ error: { code: 'asr_unavailable' } })
+      expect(auditState.writes).toEqual([])
+    })
+
+    it('answers 500 before minting when the relay address is not one the contract allows', async () => {
+      testEnv.BETTER_AUTH_URL = 'http://203.0.113.9:3001'
+
+      const res = await mint({ consent: true })
+
+      expect(res.status).toBe(500)
+      expect(auditState.writes).toEqual([])
+    })
+
+    it('requires a session', async () => {
+      sessionState.doctorId = undefined
+
+      const res = await mint({ consent: true })
+
+      expect(res.status).toBe(401)
+      expect(auditState.writes).toEqual([])
+    })
+
+    it('shares the Soniox limiter: five ambient a minute, ten dictation', async () => {
+      const ip = '203.0.113.240'
+      const ambient: number[] = []
+      for (let i = 0; i < 6; i++) ambient.push((await mint({ consent: true }, ip)).status)
+
+      expect(ambient).toEqual([200, 200, 200, 200, 200, 429])
+
+      const dictation: number[] = []
+      for (let i = 0; i < 11; i++) dictation.push((await mint({ mode: 'dictation' }, ip)).status)
+
+      expect(dictation).toEqual([...Array(10).fill(200), 429])
+    })
+
+    it('fails the request when the trail cannot record it, and never shows the token', async () => {
+      auditState.failNextWrite = true
+
+      const res = await mint({ consent: true })
+
+      expect(res.status).toBe(500)
+      expect(await res.text()).not.toMatch(/"apiKey"|\w{20,}\.\w{20,}/)
+    })
+
+    it('puts the token in the response and in no log line or audit row', async () => {
+      const captured: string[] = []
+      const spy = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+        captured.push(String(chunk))
+        return true
+      })
+      let apiKey = ''
+      try {
+        apiKey = LiveSessionSchema.parse(await (await mint({ consent: true })).json()).apiKey
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      } finally {
+        spy.mockRestore()
+      }
+
+      expect(apiKey.length).toBeGreaterThan(40)
+      expect(captured.join('')).not.toContain(apiKey)
+      expect(captured.join('')).not.toContain(apiKey.split('.')[0])
+      expect(JSON.stringify(auditState.writes)).not.toContain(apiKey)
+      expect(captured.join('')).not.toContain('test-qwen-key')
+    })
+
+    it('mints a different token every time', async () => {
+      const first = LiveSessionSchema.parse(await (await mint({ consent: true })).json())
+      const second = LiveSessionSchema.parse(await (await mint({ consent: true })).json())
+
+      expect(first.apiKey).not.toBe(second.apiKey)
+    })
   })
 })

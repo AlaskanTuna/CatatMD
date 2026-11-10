@@ -6,6 +6,7 @@ import {
   DraftTurnsResponseSchema,
   InterpretedLanguageSchema,
   LiveAsrConfigSchema,
+  type LiveAsrMode,
   LiveAsrModeSchema,
   LiveSessionRequestSchema,
   LiveSessionSchema,
@@ -31,6 +32,9 @@ import {
   mintBatchToken,
 } from '../lib/asr/elevenlabs.js'
 import { getAsrDescriptor, IlmuRelayError, transcribeWithIlmu } from '../lib/asr/ilmu.js'
+import { liveRelayUrl } from '../lib/asr/live-relay.js'
+import { mintRelayToken } from '../lib/asr/live-relay-token.js'
+import { getQwenLiveDescriptor, qwenLiveSessionConfig } from '../lib/asr/qwen-realtime.js'
 import {
   getLiveAsrDescriptor,
   liveSessionConfig,
@@ -206,6 +210,24 @@ function requireSonioxConfigured(_req: Request, _res: Response, next: NextFuncti
 }
 
 /**
+ * The live routes' gate, which asks for whichever key the configured provider
+ * needs (#487). The Soniox answer is `requireSonioxConfigured`'s, untouched; a
+ * Qwen deployment without `QWEN_API_KEY` answers the same 503 for the same
+ * reason, before a token is minted that the relay could not use.
+ */
+function requireLiveAsrConfigured(req: Request, res: Response, next: NextFunction) {
+  if (env.LIVE_ASR_PROVIDER !== 'qwen') {
+    requireSonioxConfigured(req, res, next)
+    return
+  }
+  if (!env.QWEN_API_KEY) {
+    next(new HttpError(503, 'asr_unavailable', 'Ambient transcription is not available.'))
+    return
+  }
+  next()
+}
+
+/**
  * Fixed responses per mint failure. `rejected` reads as plain unavailability
  * because it means our own account credential or region is wrong, which is a
  * deployment fault rather than the caller's business.
@@ -231,6 +253,97 @@ const LIVE_FAILURE_RESPONSES: Record<
   },
 }
 
+/**
+ * The config body for the Qwen relay (#487), in the shape `LiveAsrConfigSchema`
+ * takes. The browser opens the API's own relay, which holds the upstream socket,
+ * so `websocketUrl` is ours; there are no translations and no refinement.
+ */
+const relayConfigBody = (mode: LiveAsrMode) => ({
+  provider: 'qwen',
+  region: getQwenLiveDescriptor().region,
+  websocketUrl: liveRelayUrl(),
+  config: qwenLiveSessionConfig(mode),
+  availableTranslations: [],
+  batchRefinement: false,
+})
+
+/*
+ * The Qwen mint (#487). Same contract as the Soniox one below: an authenticated
+ * session, the consent the client asserts, the per-caller limiter (registered in
+ * `app.ts` on this path, so both providers share it), a credential that expires
+ * in a minute, and an audit row written before the response.
+ *
+ * What differs is that nothing is minted upstream. The credential is a relay
+ * token the API signs itself (`live-relay-token.ts`), so there is no upstream
+ * call to fail and no failure row to write: the one thing that can go wrong, a
+ * relay address the shared schema refuses, is a configuration fault that is
+ * found before a token exists, exactly as in the config route.
+ */
+async function mintRelaySession(res: Response, actor: string, mode: LiveAsrMode, consent: boolean) {
+  const { model, region } = getQwenLiveDescriptor()
+  const startedAt = performance.now()
+
+  // Built before anything is minted, so a config that cannot be built fails as
+  // a pre-flight error rather than after a token exists that no row recorded.
+  const config = LiveAsrConfigSchema.safeParse(relayConfigBody(mode))
+  if (!config.success) {
+    throw new HttpError(500, 'internal_error', 'Ambient transcription is misconfigured.')
+  }
+
+  // Derived from the mode, not just read from the body, for the reason the
+  // Soniox row records: the schema only constrains ambient, so a body may name
+  // dictation and still carry `consent: true`, and the trail must never say an
+  // agreement was given that the interface did not ask for.
+  const consentAsserted = mode === 'ambient' && consent
+  const maxSessionSeconds = MAX_SESSION_DURATION_SECONDS[mode]
+  const { token, expiresAt, jti } = mintRelayToken({
+    userId: actor,
+    mode,
+    consent: consentAsserted,
+  })
+
+  const body = LiveSessionSchema.safeParse({
+    ...config.data,
+    apiKey: token,
+    expiresAt,
+    maxSessionSeconds,
+  })
+  if (!body.success) {
+    throw new HttpError(500, 'internal_error', 'Ambient transcription is misconfigured.')
+  }
+
+  // Before the response and unguarded: a failed audit write fails the request,
+  // so a token the trail did not record is never observable. The reference id is
+  // the token's `jti`, which the relay logs for the session it opens, so a row
+  // here can be matched to the relay's own record of the socket.
+  await recordAuditEvent({
+    action: 'asr.live_session_minted',
+    actorId: actor,
+    metadata: {
+      clientReferenceId: jti,
+      model,
+      region,
+      mode,
+      maxSessionSeconds,
+      consentAsserted,
+    },
+  })
+
+  // The one response in this system that carries a credential.
+  res.setHeader('Cache-Control', 'no-store')
+
+  logger.info('live asr session minted', {
+    actorId: actor,
+    outcome: 'ok',
+    durationMs: Math.round(performance.now() - startedAt),
+    model,
+    provider: 'qwen',
+    status: 200,
+  })
+
+  res.json(body.data)
+}
+
 /*
  * What the capture surface needs before anything is minted: where the audio
  * would go, and in which languages.
@@ -240,7 +353,7 @@ const LIVE_FAILURE_RESPONSES: Record<
  * the screen must not spend a key to see it. Nothing egresses here, so there is
  * no audit row: the read is of our own configuration.
  */
-asrRouter.get('/live-sessions/config', requireSonioxConfigured, (req, res) => {
+asrRouter.get('/live-sessions/config', requireLiveAsrConfigured, (req, res) => {
   doctorId(req)
 
   // Absent means ambient, which is the mode that already shipped; present and
@@ -261,6 +374,21 @@ asrRouter.get('/live-sessions/config', requireSonioxConfigured, (req, res) => {
   }
   if (translation.data !== undefined && mode.data !== 'ambient') {
     throw new HttpError(400, 'invalid_query', 'Translation is available on ambient capture only.')
+  }
+
+  if (env.LIVE_ASR_PROVIDER === 'qwen') {
+    // The relay has no translation, and a client asking for one must be told so
+    // rather than handed a plain config and left to believe it is translated.
+    if (translation.data !== undefined) {
+      throw new HttpError(400, 'invalid_query', 'Translation is not available.')
+    }
+
+    const relayBody = LiveAsrConfigSchema.safeParse(relayConfigBody(mode.data))
+    if (!relayBody.success) {
+      throw new HttpError(500, 'internal_error', 'Ambient transcription is misconfigured.')
+    }
+    res.json(relayBody.data)
+    return
   }
 
   const body = LiveAsrConfigSchema.safeParse({
@@ -311,7 +439,7 @@ asrRouter.get('/live-sessions/config', requireSonioxConfigured, (req, res) => {
  * before any response leaves, so no unaudited session key can be observed by a
  * client.
  */
-asrRouter.post('/live-sessions', requireSonioxConfigured, async (req, res) => {
+asrRouter.post('/live-sessions', requireLiveAsrConfigured, async (req, res) => {
   const actor = doctorId(req)
 
   const parsed = LiveSessionRequestSchema.safeParse(req.body)
@@ -336,6 +464,15 @@ asrRouter.post('/live-sessions', requireSonioxConfigured, async (req, res) => {
   }
 
   const { mode, translation } = parsed.data
+
+  if (env.LIVE_ASR_PROVIDER === 'qwen') {
+    if (translation !== undefined) {
+      throw new HttpError(400, 'invalid_body', 'Translation is not available.')
+    }
+    await mintRelaySession(res, actor, mode, parsed.data.consent === true)
+    return
+  }
+
   const { model, region } = getLiveAsrDescriptor()
   const startedAt = performance.now()
 
